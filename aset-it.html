@@ -532,7 +532,7 @@
                                 </th>
                                 <th>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span>Asset Name</span>
+                                        <span>Brand</span>
                                         <svg class="filter-icon" data-col="nama_barang" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; cursor: pointer; opacity: 0.6;" onclick="toggleFilterPopup(this, event)">
                                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                                         </svg>
@@ -616,7 +616,7 @@
                                 </th>
                                 <th>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span>Location</span>
+                                        <span>Area / Department</span>
                                         <svg class="filter-icon" data-col="area" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; cursor: pointer; opacity: 0.6;" onclick="toggleFilterPopup(this, event)">
                                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                                         </svg>
@@ -947,6 +947,20 @@
         }
 
         // ========== TABLE RENDERING ==========
+        function renderEmptyState(title, message) {
+            return `<div class="table-empty-state">
+                <div class="empty-state-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <path d="M7.5 9.5 12 12l4.5-2.5"></path>
+                        <path d="M12 12v5"></path>
+                    </svg>
+                </div>
+                <strong>${title}</strong>
+                <span>${message}</span>
+            </div>`;
+        }
+
         function renderRow(item) {
             let kondisiBadge = 'badge-pending';
             const kondisi = item.stocktaking_condition || item.kondisi || '-';
@@ -1043,7 +1057,7 @@
                 updateSummaryCards(filteredDataIt);
                 hideActionColumnForRole();
             } else {
-                tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 20px; color: #777;">Tidak ada data yang sesuai dengan filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No matching asset data found.', 'Adjust or clear the active filter to see more asset records.')}</td></tr>`;
                 hideActionColumnForRole();
             }
             renderPaginationIt();
@@ -1102,7 +1116,7 @@
                 } else {
                     // Jika data kosong, pastikan kartu juga di-reset ke 0
                     updateSummaryCards([]);
-                    tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 20px; color: #777;">Belum ada data aset IT.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
                     hideActionColumnForRole();
                 }
             } catch (error) {
@@ -1354,7 +1368,7 @@
             const editId = modal.dataset.editId;
 
             if (!nama) {
-                showToast("Asset Name harus diisi!", "info");
+                showToast("Brand harus diisi!", "info");
                 return;
             }
 
@@ -1473,7 +1487,7 @@
                     applyColumnFilters();
                 } else {
                     updateSummaryCards([]);
-                    tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 20px; color: #777;">Belum ada data aset IT.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
                     hideActionColumnForRole();
                 }
             } catch (error) {

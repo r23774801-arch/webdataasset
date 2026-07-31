@@ -223,14 +223,32 @@
     <!-- Main Content -->
     <div class="main-wrapper">
         <div class="container" style="margin-top: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                <div>
+            <div class="enterprise-page-header">
+                <div class="enterprise-page-heading">
                     <button onclick="window.location.href='dashboard.html'" class="btn-back">
                         &larr; Kembali ke Dashboard
                     </button>
-                    <h2 style="margin-top: 10px;">Data Barang Keluar</h2>
+                    <h2>Outbound Asset Goods</h2>
+                    <p>Monitor outgoing asset items, responsible PIC, area movement, and release history.</p>
                 </div>
-                <button onclick="bukaModal()" class="btn-warning" style="width: auto; padding: 12px 24px;">+ Tambah Barang Keluar</button>
+                <div class="enterprise-page-actions">
+                    <button onclick="bukaModal()" class="btn-warning">+ Tambah Barang Keluar</button>
+                </div>
+            </div>
+
+            <div class="tutorial-card">
+                <button class="tutorial-close" type="button" onclick="this.closest('.tutorial-card').style.display='none'" aria-label="Tutup tutorial">&times;</button>
+                <div class="tutorial-icon" aria-hidden="true">?</div>
+                <div>
+                    <h3>How to Input Asset</h3>
+                    <ol>
+                        <li>Fill Asset Number.</li>
+                        <li>Fill Serial Number or item reference.</li>
+                        <li>Select Area.</li>
+                        <li>Complete Department or PIC context.</li>
+                        <li>Save Asset.</li>
+                    </ol>
+                </div>
             </div>
 
             <!-- Summary Cards by Area -->
@@ -249,7 +267,7 @@
                             <line x1="15" y1="18" x2="15" y2="18.01"></line>
                         </svg>
                     </div>
-                    <div class="card-title">Total Unit Main Office</div>
+                    <div class="card-title">Total Asset Main Office</div>
                     <div class="card-value" id="total-Main Office">0</div>
                     <div class="card-subtitle">Unit</div>
                 </div>
@@ -262,7 +280,7 @@
                             <line x1="7" y1="18" x2="7" y2="18.01"></line>
                         </svg>
                     </div>
-                    <div class="card-title">Total Unit Part BKJ</div>
+                    <div class="card-title">Total Asset Part BKJ</div>
                     <div class="card-value" id="total-Part BKJ">0</div>
                     <div class="card-subtitle">Unit</div>
                 </div>
@@ -275,8 +293,16 @@
                             <path d="M14 12h.01"></path>
                         </svg>
                     </div>
-                    <div class="card-title">Total Unit Part BIU</div>
+                    <div class="card-title">Total Asset Part BIU</div>
                     <div class="card-value" id="total-Part BIU">0</div>
+                    <div class="card-subtitle">Unit</div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8l6 6v12"></path><path d="M14 3v6h6"></path><path d="M8 13h8"></path><path d="M8 17h6"></path></svg>
+                    </div>
+                    <div class="card-title">Total Asset Part BIU 3</div>
+                    <div class="card-value" id="total-Part BIU 3">0</div>
                     <div class="card-subtitle">Unit</div>
                 </div>
                 <div class="summary-card">
@@ -285,7 +311,7 @@
                             <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
                         </svg>
                     </div>
-                    <div class="card-title">Total Unit BIU Service</div>
+                    <div class="card-title">Total Asset BIU Service</div>
                     <div class="card-value" id="total-BIU Service">0</div>
                     <div class="card-subtitle">Unit</div>
                 </div>
@@ -296,8 +322,16 @@
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </div>
-                    <div class="card-title">Total Unit Kel.</div>
+                    <div class="card-title">Total Asset Kel.</div>
                     <div class="card-value" id="total-Kel.">0</div>
+                    <div class="card-subtitle">Unit</div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path></svg>
+                    </div>
+                    <div class="card-title">Total Asset PTK</div>
+                    <div class="card-value" id="total-PTK">0</div>
                     <div class="card-subtitle">Unit</div>
                 </div>
             </div>
@@ -342,8 +376,10 @@
                         <option value="Main Office">Main Office</option>
                         <option value="Part BKJ">Part BKJ</option>
                         <option value="Part BIU">Part BIU</option>
+                        <option value="Part BIU 3">Part BIU 3</option>
                         <option value="BIU Service">BIU Service</option>
                         <option value="Kel.">Kel.</option>
+                        <option value="PTK">PTK</option>
                     </select>
                 </div>
                 <button class="btn-warning" onclick="simpanBarangKeluar()">Simpan Data</button>
@@ -386,7 +422,7 @@
         let sourceDataKeluar = [];
 
         function updateSummaryCardsKeluar(data) {
-            const areaTotals = { 'Main Office': 0, 'Part BKJ': 0, 'Part BIU': 0, 'BIU Service': 0, 'Kel.': 0 };
+            const areaTotals = { 'Main Office': 0, 'Part BKJ': 0, 'Part BIU': 0, 'Part BIU 3': 0, 'BIU Service': 0, 'Kel.': 0, 'PTK': 0 };
             data.forEach(item => {
                 if (item.area && areaTotals.hasOwnProperty(item.area)) {
                     areaTotals[item.area] += parseInt(item.jumlah) || 0;
@@ -419,7 +455,7 @@
                 });
                 updateSummaryCardsKeluar(allDataKeluar);
             } else {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#777;">Belum ada data barang keluar.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7">${renderEmptyState('No outbound asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
                 updateSummaryCardsKeluar([]);
             }
             renderPaginationKeluar();
@@ -458,6 +494,20 @@
             if (page < 1 || page > totalPages) return;
             currentPageKeluar = page;
             renderPageKeluar();
+        }
+
+        function renderEmptyState(title, message) {
+            return `<div class="table-empty-state">
+                <div class="empty-state-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <path d="M7.5 9.5 12 12l4.5-2.5"></path>
+                        <path d="M12 12v5"></path>
+                    </svg>
+                </div>
+                <strong>${title}</strong>
+                <span>${message}</span>
+            </div>`;
         }
 
         function applyColumnFilters() {

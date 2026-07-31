@@ -424,7 +424,7 @@ const itemsPerPage = 10;
         let sourceDataMasuk = [];
 
         function updateSummaryCards(data) {
-            const totals = { 'Main Office': 0, 'Part BKJ': 0, 'Part BIU': 0, 'BIU Service': 0, 'Kel.': 0 };
+            const totals = { 'Main Office': 0, 'Part BKJ': 0, 'Part BIU': 0, 'Part BIU 3': 0, 'BIU Service': 0, 'Kel.': 0, 'PTK': 0 };
             data.forEach(item => {
                 if (item.area && totals.hasOwnProperty(item.area)) {
                     totals[item.area] += parseInt(item.jumlah) || 1;
@@ -457,7 +457,7 @@ function renderPageMasuk() {
                     </tr>`;
                 });
             } else {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color:#777;">Belum ada data barang masuk.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8">${renderEmptyState('No inbound asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
             }
             // Update summary cards using the FULL dataset (allDataMasuk), not just the visible page
             updateSummaryCards(allDataMasuk);
@@ -497,6 +497,20 @@ function renderPageMasuk() {
             if (page < 1 || page > totalPages) return;
             currentPageMasuk = page;
             renderPageMasuk();
+        }
+
+        function renderEmptyState(title, message) {
+            return `<div class="table-empty-state">
+                <div class="empty-state-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <path d="M7.5 9.5 12 12l4.5-2.5"></path>
+                        <path d="M12 12v5"></path>
+                    </svg>
+                </div>
+                <strong>${title}</strong>
+                <span>${message}</span>
+            </div>`;
         }
 
         function applyColumnFilters() {
