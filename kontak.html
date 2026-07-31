@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontak - PT United Tractors</title>
+    <link rel="icon" href="img/ikon.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/enterprise-ui.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="img/logo.png" alt="UT Logo">
+            <div class="sidebar-brand-text">UT Asset Dashboard</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">UTAMA</div>
+            <a href="dashboard.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="nav-label">Home</span>
+            </a>
+
+            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-dropdown">
+                <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                        <span class="nav-label">Data Aset</span>
+                    </div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <div class="sidebar-dropdown-menu">
+                    <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
+                    <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
+                    <a href="barang-masuk.html" class="sidebar-dropdown-item">Barang Masuk</a>
+                    <a href="barang-keluar.html" class="sidebar-dropdown-item">Barang Keluar</a>
+                </div>
+            </div>
+
+            <div class="sidebar-section-label">OTHERS</div>
+            <a href="kontak.html" class="sidebar-nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span class="nav-label">Kontak</span>
+            </a>
+            <a href="laporan.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span class="nav-label">Laporan Aset</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+            <a href="javascript:void(0)" class="sidebar-user-info" style="text-decoration: none; color: inherit; cursor: default;">
+                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
+                <div class="sidebar-user-details">
+                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
+                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
+                </div>
+            </a>
+            <button onclick="logout()" class="sidebar-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="top-header-left">
+            <button class="sidebar-toggle-btn" title="Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div>
+                <div class="page-title">Kontak</div>
+                <div class="page-breadcrumb">Dashboard / <span>Kontak</span></div>
+            </div>
+        </div>
+        <div class="top-header-right">
+            <div class="top-user-badge">
+                <div class="top-user-avatar" id="topAvatar">U</div>
+                <div>
+                    <div class="top-user-name" id="topUserName">User</div>
+                    <div class="top-user-role" id="topUserRole">ADMIN</div>
+                </div>
+            </div>
+            <button onclick="logout()" class="top-logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="container">
+            <section id="kontak-section" style="padding: 20px 0;">
+                <style>
+                    .ut-contact-card { background: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); padding: 40px; margin: 0 auto; max-width: 1100px; font-family: sans-serif; }
+                    .ut-contact-heading { font-size: 1.5rem; font-weight: 700; color: #222222; margin-bottom: 8px; }
+                    .ut-contact-sub { font-size: 1.1rem; color: #333333; margin-bottom: 25px; border-bottom: 3px solid #FFCC00; display: inline-block; padding-bottom: 5px; }
+                    .ut-contact-desc { color: #555555; font-size: 0.95rem; margin-bottom: 35px; }
+                    .ut-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+                    .ut-map-wrap { width: 100%; height: 350px; border-radius: 12px; overflow: hidden; border: 1px solid #eeeeee; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+                    .ut-info-list { display: flex; flex-direction: column; gap: 24px; justify-content: center; }
+                    .ut-item { display: flex; align-items: flex-start; gap: 16px; }
+                    .ut-icon-box { background: rgba(255, 204, 0, 0.15); color: #B38F00; width: 48px; height: 48px; min-width: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+                    .ut-text-box { display: flex; flex-direction: column; }
+                    .ut-label { font-size: 0.75rem; color: #888888; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+                    .ut-value { font-size: 0.95rem; font-weight: 600; color: #111111; line-height: 1.4; }
+                    @media (max-width: 768px) { .ut-contact-grid { grid-template-columns: 1fr; } .ut-map-wrap { height: 250px; } }
+                </style>
+                <div class="ut-contact-card">
+                    <h2 class="ut-contact-heading">Hubungi Kami</h2>
+                    <div class="ut-contact-sub">Layanan Terpusat PT United Tractors Tbk Site Batu Kajang</div>
+                    <p class="ut-contact-desc">Untuk kebutuhan mendesak, Anda bisa langsung menghubungi layanan terpusat 24 Jam kami.</p>
+                    <div class="ut-contact-grid">
+                        <div class="ut-map-wrap">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3281.6247313461063!2d115.90280829999999!3d-1.8238189999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df06efe2d69425b%3A0x150d04770680a3ef!2sMess%20PT.%20United%20Tractors%20Batu%20Kajang!5e1!3m2!1sid!2sid!4v1784764009296!5m2!1sid!2sid" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                        <div class="ut-info-list">
+                            <div class="ut-item">
+                                <div class="ut-icon-box">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                </div>
+                                <div class="ut-text-box">
+                                    <span class="ut-label">Alamat</span>
+                                    <span class="ut-value">Jl. Negara KM 140 Batukajang, Kec. Batu Sopang, Kab. Paser, Kalimantan Timur 76252</span>
+                                </div>
+                            </div>
+                            <div class="ut-item">
+                                <div class="ut-icon-box">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                </div>
+                                <div class="ut-text-box">
+                                    <span class="ut-label">Telepon Darurat (UT Call 24 Jam)</span>
+                                    <span class="ut-value">1 500 072</span>
+                                </div>
+                            </div>
+                            <div class="ut-item">
+                                <div class="ut-icon-box">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                                </div>
+                                <div class="ut-text-box">
+                                    <span class="ut-label">WhatsApp</span>
+                                    <span class="ut-value">08151 1500072</span>
+                                </div>
+                            </div>
+                            <div class="ut-item">
+                                <div class="ut-icon-box">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                                </div>
+                                <div class="ut-text-box">
+                                    <span class="ut-label">Email</span>
+                                    <span class="ut-value">utcall@unitedtractors.com</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="js/loader.js"></script>
+    <script>
+        function toggleSidebarDropdown() {
+            const dropdown = document.querySelector('.sidebar-dropdown');
+            if (dropdown) dropdown.classList.toggle('open');
+        }
+
+        function loadUserInfo() {
+            const nrp = localStorage.getItem('currentNrp') || 'User';
+            const username = localStorage.getItem('currentUser') || 'User';
+            const role = localStorage.getItem('userRole') || 'admin';
+            const initial = username.charAt(0).toUpperCase();
+
+            const sidebarNrp = document.getElementById('sidebarNrp');
+            const sidebarRole = document.getElementById('sidebarRole');
+            const sidebarAvatar = document.getElementById('sidebarAvatar');
+            const topAvatar = document.getElementById('topAvatar');
+            const topUserName = document.getElementById('topUserName');
+            const topUserRole = document.getElementById('topUserRole');
+
+            if (sidebarNrp) sidebarNrp.textContent = nrp + ' (' + role.toUpperCase() + ')';
+            if (sidebarRole) sidebarRole.textContent = role.toUpperCase();
+            if (sidebarAvatar) sidebarAvatar.textContent = initial;
+            if (topAvatar) topAvatar.textContent = initial;
+            if (topUserName) topUserName.textContent = username;
+            if (topUserRole) topUserRole.textContent = role.toUpperCase();
+        }
+
+        function logout() {
+            if (typeof toggleLoader === 'function') toggleLoader(true, "Keluar dari sesi...");
+            setTimeout(() => {
+                sessionStorage.removeItem('isLoggedIn');
+                localStorage.clear();
+                window.location.replace('login.html');
+            }, 500);
+        }
+
+        loadUserInfo();
+    </script>
+</body>
+</html>

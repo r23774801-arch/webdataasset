@@ -1,0 +1,120 @@
+.custom-table th,
+.table-container th {
+    position: relative;
+}
+
+.custom-table th .filter-icon,
+.table-container th .filter-icon {
+    color: #ffc107;
+    stroke: #ffc107;
+    transition: opacity 0.2s, stroke 0.2s;
+}
+
+.filter-popup {
+    display: none;
+    position: absolute;
+    top: auto;
+    left: 0;
+    margin-top: 0;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 12px;
+    min-width: 220px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    white-space: normal !important;
+    box-sizing: border-box !important;
+}
+
+.filter-popup * {
+    box-sizing: border-box !important;
+}
+
+.filter-popup.active {
+    display: block;
+}
+
+.filter-popup-label {
+    color: #ccc;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    font-weight: 500;
+    display: block;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.filter-popup-select,
+.filter-popup-input {
+    width: 100% !important;
+    padding: 8px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.filter-popup-select {
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.filter-popup-input {
+    margin-bottom: 12px;
+}
+
+.filter-popup-select:focus,
+.filter-popup-input:focus {
+    outline: none;
+    border-color: #FFCC00;
+}
+
+.filter-popup-input::placeholder {
+    color: #888;
+}
+
+.filter-popup-buttons {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.filter-btn-filter,
+.filter-btn-clear {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn-filter {
+    background: #FFCC00;
+    color: #1a1a1a;
+    border: none;
+}
+
+.filter-btn-filter:hover {
+    background: #e6b800;
+    transform: translateY(-1px);
+}
+
+.filter-btn-clear {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.filter-btn-clear:hover {
+    background: #444;
+    border-color: #666;
+}
+
+.filter-icon:hover {
+    opacity: 1 !important;
+    stroke: #FFCC00;
+}

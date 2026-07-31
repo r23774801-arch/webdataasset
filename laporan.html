@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Aset - PT United Tractors</title>
+    <link rel="icon" href="img/ikon.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --ut-yellow: #FFC20E;
+            --ut-gold: #E8B500;
+            --ut-charcoal: #111827;
+            --ut-slate: #2C2C2C;
+            --ut-surface: #ffffff;
+            --ut-surface-soft: #f8f5ea;
+            --ut-border: rgba(17, 24, 39, 0.08);
+        }
+
+        .report-slide {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 246, 237, 0.95) 100%);
+            border-radius: 30px;
+            margin-bottom: 16px;
+            padding: 20px;
+            box-shadow: 0 22px 48px rgba(17, 24, 39, 0.08);
+            border: 1px solid rgba(255, 199, 24, 0.16);
+        }
+
+        .report-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .report-title {
+            margin: 0;
+            font-size: clamp(1.85rem, 2.4vw, 2.4rem);
+            font-weight: 900;
+            color: var(--ut-charcoal);
+            line-height: 1.05;
+        }
+
+        .report-description p {
+            margin: 0;
+            color: #475569;
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 720px;
+        }
+
+        .report-status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: rgba(255, 194, 14, 0.14);
+            color: #92400e;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .report-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .kpi-card {
+            padding: 14px 16px;
+            border-radius: 22px;
+            background: var(--ut-surface);
+            border: 1px solid rgba(255, 199, 24, 0.18);
+            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.08);
+        }
+
+        .kpi-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .kpi-value {
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: var(--ut-charcoal);
+            margin-bottom: 8px;
+        }
+
+        .kpi-note {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.85fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .chart-container,
+        .donut-card {
+            border-radius: 26px;
+            background: var(--ut-surface);
+            padding: 20px;
+            box-shadow: 0 20px 52px rgba(17, 24, 39, 0.08);
+            border: 1px solid rgba(255, 199, 24, 0.16);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--ut-charcoal);
+        }
+
+        .card-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .chart-actions button {
+            padding: 12px 18px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chart-actions button:hover {
+            transform: translateY(-1px);
+        }
+
+        .chart-actions .btn-export {
+            background: #111827;
+            color: #ffffff;
+            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.18);
+        }
+
+        .chart-actions .btn-export.btn-warning {
+            background: var(--ut-yellow);
+            color: #111827;
+            box-shadow: 0 14px 30px rgba(255, 194, 14, 0.22);
+        }
+
+        .bar-chart-frame {
+            flex: 1;
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bar-chart-frame canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 460px;
+        }
+
+        .donut-card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .donut-card-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--ut-charcoal);
+        }
+
+        .donut-card-subtitle {
+            margin: 0;
+            font-size: 0.96rem;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .donut-panel {
+            display: grid;
+            grid-template-columns: 1fr 0.88fr;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .donut-chart-panel {
+            position: relative;
+            min-height: 300px;
+            padding: 16px;
+            border-radius: 26px;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            box-shadow: 0 22px 52px rgba(17, 24, 39, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-chart-panel canvas {
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 440px;
+        }
+
+        .donut-center {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid rgba(17, 24, 39, 0.08);
+            box-shadow: 0 24px 44px rgba(17, 24, 39, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .donut-center-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--ut-charcoal);
+        }
+
+        .donut-center-label {
+            margin-top: 6px;
+            font-size: 0.88rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        .donut-stats {
+            display: grid;
+            gap: 16px;
+        }
+
+        .donut-stat-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 14px;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 22px;
+            background: #ffffff;
+            border: 1px solid rgba(17, 24, 39, 0.08);
+            box-shadow: 0 16px 34px rgba(17, 24, 39, 0.06);
+        }
+
+        .donut-stat-marker {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            box-shadow: 0 4px 14px rgba(17, 24, 39, 0.12);
+        }
+
+        .donut-stat-content {
+            display: grid;
+            gap: 6px;
+        }
+
+        .donut-stat-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--ut-charcoal);
+        }
+
+        .donut-stat-number {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ut-charcoal);
+        }
+
+        .donut-stat-pct {
+            font-size: 0.88rem;
+            color: #64748b;
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 18px;
+            box-shadow: 0 20px 56px rgba(17, 24, 39, 0.08);
+            width: 100%;
+            margin-top: 18px;
+            overflow: visible;
+        }
+
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        .table-container th {
+            background-color: #0f172a !important;
+            color: #facc15 !important;
+            padding: 14px 12px;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            text-align: left;
+            border-bottom: 4px solid #facc15 !important;
+            vertical-align: middle;
+            letter-spacing: 0.4px;
+        }
+
+        .table-container td {
+            padding: 12px 10px;
+            font-size: 0.88rem;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .table-container .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px 0 0 0;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .report-title-line {
+            flex: 1;
+            min-height: 2px;
+            background: linear-gradient(90deg, rgba(255,194,14,0), rgba(255,194,14,0.75), rgba(255,194,14,0));
+            margin-top: 14px;
+        }
+
+        @media (max-width: 1080px) {
+            .report-kpi-row,
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .donut-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-height: 820px) {
+            .report-slide {
+                padding: 18px;
+            }
+
+            .report-header {
+                margin-bottom: 14px;
+            }
+
+            .report-kpi-row {
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+
+            .kpi-card {
+                padding: 14px 16px;
+            }
+
+            .chart-container,
+            .donut-card {
+                min-height: 320px;
+                padding: 18px;
+            }
+
+            .bar-chart-frame {
+                min-height: 300px;
+            }
+
+            .donut-chart-panel {
+                min-height: 300px;
+            }
+
+            .table-container {
+                padding: 18px;
+                margin-top: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .report-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .report-status-pill {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .chart-container,
+            .donut-card,
+            .table-container {
+                padding: 22px;
+            }
+
+            .bar-chart-frame {
+                min-height: 320px;
+            }
+
+            .donut-chart-panel {
+                min-height: 340px;
+            }
+
+            .donut-center {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/table-filters.css">
+    <link rel="stylesheet" href="css/enterprise-ui.css">
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="img/logo.png" alt="UT Logo">
+            <div class="sidebar-brand-text">UT Asset Dashboard</div>
+        </div>
+
+        <nav class="sidebar-nav">
+<div class="sidebar-section-label">UTAMA</div>
+            <a href="dashboard.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="nav-label">Home</span>
+            </a>
+
+            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-dropdown">
+                <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                        <span class="nav-label">Data Aset</span>
+                    </div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <div class="sidebar-dropdown-menu">
+                    <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
+                    <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
+                    <a href="barang-masuk.html" class="sidebar-dropdown-item">Barang Masuk</a>
+                    <a href="barang-keluar.html" class="sidebar-dropdown-item">Barang Keluar</a>
+                </div>
+            </div>
+
+<div class="sidebar-section-label">OTHERS</div>
+<a href="kontak.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span class="nav-label">Kontak</span>
+            </a>
+            <a href="laporan.html" class="sidebar-nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span class="nav-label">Laporan Aset</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
+                <div class="sidebar-user-details">
+                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
+                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
+                </div>
+            </div>
+            <button onclick="logout()" class="sidebar-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="top-header-left">
+            <button class="sidebar-toggle-btn" title="Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div>
+                <div class="page-title">Laporan Aset</div>
+                <div class="page-breadcrumb">Dashboard / <span>Laporan Aset</span></div>
+            </div>
+        </div>
+        <div class="top-header-right">
+            <div class="top-user-badge">
+                <div class="top-user-avatar" id="topAvatar">U</div>
+                <div>
+                    <div class="top-user-name" id="topUserName">User</div>
+                    <div class="top-user-role" id="topUserRole">ADMIN</div>
+                </div>
+            </div>
+            <button onclick="logout()" class="top-logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="report-slide">
+                    <div class="report-header">
+                    <div>
+                        <h2 class="report-title">Laporan Distribusi & Kondisi Aset</h2>
+                        <div class="report-description">
+                            <p>Analisis komprehensif distribusi aset berdasarkan lokasi area dan kondisi terkini aset perusahaan. Data diambil langsung dari database secara real-time.</p>
+                        </div>
+                    </div>
+                    <div class="report-status-pill">Executive dashboard view</div>
+                </div>
+
+                <div class="report-charts">
+                    <section class="chart-container bar-chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <div class="card-label">Aset per Area</div>
+                                <h3 class="card-title">Distribusi jumlah aset</h3>
+                            </div>
+                        </div>
+                        <div class="bar-chart-frame">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="donut-card">
+                        <div class="donut-card-header">
+                            <div class="donut-card-title">Persentase Kondisi Aset</div>
+                            <div class="donut-card-subtitle">Ringkasan kondisi aset perusahaan secara visual.</div>
+                        </div>
+                        <div class="donut-panel">
+                            <div class="donut-chart-panel">
+                                <canvas id="donutChart"></canvas>
+                                <div class="donut-center">
+                                    <div class="donut-center-value" id="donutTotalCount">0</div>
+                                    <div class="donut-center-label">Total Assets</div>
+                                </div>
+                            </div>
+                            <div class="donut-stats">
+                                <div class="donut-stat-card">
+                                    <span class="donut-stat-marker" style="background: #1E5AA8;"></span>
+                                    <div class="donut-stat-content">
+                                        <div class="donut-stat-label">Normal</div>
+                                        <div class="donut-stat-number" id="legendNormalCount">0 Assets</div>
+                                        <div class="donut-stat-pct" id="legendNormalPercent">0%</div>
+                                    </div>
+                                </div>
+                                <div class="donut-stat-card">
+                                    <span class="donut-stat-marker" style="background: #FFCC00;"></span>
+                                    <div class="donut-stat-content">
+                                        <div class="donut-stat-label">Pending</div>
+                                        <div class="donut-stat-number" id="legendPendingCount">0 Assets</div>
+                                        <div class="donut-stat-pct" id="legendPendingPercent">0%</div>
+                                    </div>
+                                </div>
+                                <div class="donut-stat-card">
+                                    <span class="donut-stat-marker" style="background: #0D9488;"></span>
+                                    <div class="donut-stat-content">
+                                        <div class="donut-stat-label">Broken</div>
+                                        <div class="donut-stat-number" id="legendBrokenCount">0 Assets</div>
+                                        <div class="donut-stat-pct" id="legendBrokenPercent">0%</div>
+                                    </div>
+                                </div>
+                                <div class="donut-stat-card">
+                                    <span class="donut-stat-marker" style="background: #DC2626;"></span>
+                                    <div class="donut-stat-content">
+                                        <div class="donut-stat-label">Lost</div>
+                                        <div class="donut-stat-number" id="legendLostCount">0 Assets</div>
+                                        <div class="donut-stat-pct" id="legendLostPercent">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button onclick="exportToExcel()" class="btn-warning" style="padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Excel
+                </button>
+                <button onclick="exportToPDF()" class="btn-warning" style="padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export PDF
+                </button>
+            </div>
+
+            <!-- Asset Report Summary Table -->
+            <div class="table-container">
+                <div class="report-header">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0 0 15px 0;">Ringkasan Aset per Lokasi (Area)</h3>
+                    <div class="report-title-line"></div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-filter-col="area">Lokasi (Area)</th>
+                                <th data-filter-col="total">Total Aset</th>
+                                <th data-filter-col="normal">Normal</th>
+                                <th data-filter-col="pending">Pending</th>
+                                <th data-filter-col="broken">Broken</th>
+                                <th data-filter-col="lost">Lost</th>
+                                <th data-filter-col="percentage_normal">Persentase Normal</th>
+                                <th data-filter-col="progress_stocktaking">Progress Stocktaking</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                            <tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination Controls -->
+                <div class="pagination-container">
+                    <div class="pagination-info" id="paginationInfoLaporan">Menampilkan 0-0 dari 0 data</div>
+                    <div class="pagination-buttons" id="paginationButtonsLaporan"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/loader.js"></script>
+    <script>
+        function toggleSidebarDropdown() {
+            const dropdown = document.querySelector('.sidebar-dropdown');
+            if (dropdown) dropdown.classList.toggle('open');
+        }
+
+        // ==========================================
+        // USER SESSION LOADER
+        // ==========================================
+        function loadUserInfo() {
+            const nrp = localStorage.getItem('currentNrp') || 'User';
+            const username = localStorage.getItem('currentUser') || 'User';
+            const role = localStorage.getItem('userRole') || 'admin';
+            const initial = username.charAt(0).toUpperCase();
+            
+            const els = {
+                sidebarNrp: document.getElementById('sidebarNrp'),
+                sidebarRole: document.getElementById('sidebarRole'),
+                sidebarAvatar: document.getElementById('sidebarAvatar'),
+                topAvatar: document.getElementById('topAvatar'),
+                topUserName: document.getElementById('topUserName'),
+                topUserRole: document.getElementById('topUserRole')
+            };
+            
+            if (els.sidebarNrp) els.sidebarNrp.textContent = nrp + ' (' + role.toUpperCase() + ')';
+            if (els.sidebarRole) els.sidebarRole.textContent = role.toUpperCase();
+            if (els.sidebarAvatar) els.sidebarAvatar.textContent = initial;
+            if (els.topAvatar) els.topAvatar.textContent = initial;
+            if (els.topUserName) els.topUserName.textContent = username;
+            if (els.topUserRole) els.topUserRole.textContent = role.toUpperCase();
+        }
+
+        function logout() {
+            if (typeof toggleLoader === 'function') toggleLoader(true, "Keluar dari sesi...");
+            setTimeout(() => {
+                sessionStorage.removeItem('isLoggedIn');
+                localStorage.clear();
+                window.location.replace('login.html');
+            }, 500);
+        }
+
+        loadUserInfo();
+
+        // ==========================================
+        // LOAD REAL DATA FROM DATABASE
+        // ==========================================
+        async function loadChartData() {
+            try {
+                const response = await fetch('get_laporan_data.php');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    renderCharts(result);
+                } else {
+                    fallbackCharts();
+                }
+            } catch (err) {
+                console.error('Failed to load report data, using fallback:', err);
+                fallbackCharts();
+            } finally {
+                // Always hide loader when this function completes
+                if (typeof toggleLoader === 'function') {
+                    toggleLoader(false);
+                }
+            }
+        }
+
+        function updateDonutLegend(stats) {
+            document.getElementById('donutTotalCount').textContent = stats.total;
+            document.getElementById('legendNormalCount').textContent = `${stats.normal} Assets`;
+            document.getElementById('legendNormalPercent').textContent = `${stats.normalPercent}%`;
+            document.getElementById('legendPendingCount').textContent = `${stats.pending} Assets`;
+            document.getElementById('legendPendingPercent').textContent = `${stats.pendingPercent}%`;
+            document.getElementById('legendBrokenCount').textContent = `${stats.broken} Assets`;
+            document.getElementById('legendBrokenPercent').textContent = `${stats.brokenPercent}%`;
+            document.getElementById('legendLostCount').textContent = `${stats.lost} Assets`;
+            document.getElementById('legendLostPercent').textContent = `${stats.lostPercent}%`;
+        }
+
+        function renderCharts(data) {
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.datasets.map(ds => ({
+                        label: ds.label,
+                        data: ds.data,
+                        backgroundColor: ds.backgroundColor,
+                        borderColor: ds.backgroundColor,
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        title: { display: true, text: 'Jumlah Aset per Area (Real Data)', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
+                        legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 12 } } },
+                        tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 12 }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+                        y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' }, ticks: { font: { size: 11 }, callback: function(v) { return v + ' unit'; } } }
+                    }
+                }
+            });
+
+            const donutCtx = document.getElementById('donutChart').getContext('2d');
+            const total = data.donut.data.reduce((sum, value) => sum + value, 0);
+            const normalPercent = total ? ((data.donut.data[0] / total) * 100).toFixed(0) : 0;
+            const pendingPercent = total ? ((data.donut.data[1] / total) * 100).toFixed(0) : 0;
+            const brokenPercent = total ? ((data.donut.data[2] / total) * 100).toFixed(0) : 0;
+            const lostPercent = total ? ((data.donut.data[3] / total) * 100).toFixed(0) : 0;
+
+            updateDonutLegend({
+                total,
+                normal: data.donut.data[0] || 0,
+                pending: data.donut.data[1] || 0,
+                broken: data.donut.data[2] || 0,
+                lost: data.donut.data[3] || 0,
+                normalPercent,
+                pendingPercent,
+                brokenPercent,
+                lostPercent
+            });
+
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.donut.labels,
+                    datasets: [{
+                        data: data.donut.data,
+                        backgroundColor: data.donut.backgroundColor,
+                        borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff'],
+                        borderWidth: 3,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '75%',
+                    plugins: {
+                        title: { display: true, text: 'Persentase Kondisi Aset', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    return context.label + ': ' + ((context.parsed / total) * 100).toFixed(1) + '% (' + context.parsed + ' unit)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function fallbackCharts() {
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Main Office', 'Part BKJ', 'Part BIU', 'BIU Service', 'Kel.'],
+                    datasets: [
+                        { label: 'Normal', data: [0, 0, 0, 0, 0], backgroundColor: '#1E5AA8', borderColor: '#1E5AA8', borderWidth: 1 },
+                        { label: 'Pending', data: [0, 0, 0, 0, 0], backgroundColor: '#FFCC00', borderColor: '#FFCC00', borderWidth: 1 },
+                        { label: 'Broken', data: [0, 0, 0, 0, 0], backgroundColor: '#0D9488', borderColor: '#0D9488', borderWidth: 1 },
+                        { label: 'Lost', data: [0, 0, 0, 0, 0], backgroundColor: '#dc3545', borderColor: '#dc3545', borderWidth: 1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        title: { display: true, text: 'Jumlah Aset per Area (Belum Ada Data)', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
+                        legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 12 } } }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' }, ticks: { font: { size: 11 }, callback: function(v) { return v + ' unit'; } } }
+                    }
+                }
+            });
+
+            updateDonutLegend({
+                total: 0,
+                normal: 0,
+                pending: 0,
+                broken: 0,
+                lost: 0,
+                normalPercent: 0,
+                pendingPercent: 0,
+                brokenPercent: 0,
+                lostPercent: 0
+            });
+
+            const donutCtx = document.getElementById('donutChart').getContext('2d');
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Normal', 'Pending', 'Broken', 'Lost'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#1E5AA8', '#FFCC00', '#0D9488', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '75%',
+                    plugins: {
+                        title: { display: true, text: 'Persentase Kondisi Aset', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // SUMMARY TABLE PAGINATION STATE
+        // ==========================================
+        const itemsPerPageLaporan = 10;
+        let currentPageLaporan = 1;
+        let allSummaryData = [];
+        let sourceSummaryData = [];
+
+        // ==========================================
+        // LOAD SUMMARY TABLE DATA
+        // ==========================================
+        async function loadSummaryTable() {
+            try {
+                const response = await fetch('get_laporan_data.php?summary=true');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    sourceSummaryData = result.data || [];
+                    applyColumnFilters();
+                } else {
+                    sourceSummaryData = [];
+                    allSummaryData = [];
+                    document.getElementById('summaryTableBody').innerHTML = 
+                        '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Belum ada data.</td></tr>';
+                    renderPaginationLaporan();
+                }
+            } catch (err) {
+                console.error('Failed to load summary table:', err);
+                sourceSummaryData = [];
+                allSummaryData = [];
+                document.getElementById('summaryTableBody').innerHTML = 
+                    '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Gagal memuat data.</td></tr>';
+                renderPaginationLaporan();
+            } finally {
+                if (typeof toggleLoader === 'function') {
+                    toggleLoader(false);
+                }
+            }
+        }
+
+        function renderSummaryTable() {
+            const tbody = document.getElementById('summaryTableBody');
+            tbody.innerHTML = '';
+
+            const total = allSummaryData.length;
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Tidak ada data.</td></tr>';
+                renderPaginationLaporan();
+                return;
+            }
+
+            const start = (currentPageLaporan - 1) * itemsPerPageLaporan;
+            const end = Math.min(start + itemsPerPageLaporan, total);
+            const pageData = allSummaryData.slice(start, end);
+
+            pageData.forEach(row => {
+                const percentageNormal = row.total > 0 ? ((row.normal / row.total) * 100).toFixed(1) : 0;
+                const progressStocktaking = row.total > 0 ? ((row.stocktaking_done / row.total) * 100).toFixed(1) : 0;
+                
+                let percentageColor = '#28a745';
+                if (percentageNormal < 50) percentageColor = '#dc3545';
+                else if (percentageNormal < 80) percentageColor = '#ffc107';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${row.area}</strong></td>
+                        <td>${row.total}</td>
+                        <td><span class="badge-approved">${row.normal}</span></td>
+                        <td><span class="badge-pending">${row.pending}</span></td>
+                        <td><span class="badge-rejected">${row.broken}</span></td>
+                        <td><span class="badge-lost">${row.lost}</span></td>
+                        <td style="color: ${percentageColor}; font-weight: 600;">${percentageNormal}%</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="flex: 1; background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden; min-width: 80px;">
+                                    <div style="width: ${progressStocktaking}%; background: #1E5AA8; height: 100%; transition: width 0.3s;"></div>
+                                </div>
+                                <span style="font-weight: 600; min-width: 45px;">${progressStocktaking}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            renderPaginationLaporan();
+        }
+
+        function renderPaginationLaporan() {
+            const total = allSummaryData.length;
+            const totalPages = Math.ceil(total / itemsPerPageLaporan);
+            const info = document.getElementById('paginationInfoLaporan');
+            const btns = document.getElementById('paginationButtonsLaporan');
+
+            if (total === 0) {
+                info.textContent = 'Menampilkan 0-0 dari 0 data';
+                btns.innerHTML = '';
+                return;
+            }
+
+            const start = (currentPageLaporan - 1) * itemsPerPageLaporan + 1;
+            const end = Math.min(currentPageLaporan * itemsPerPageLaporan, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+
+            let html = '';
+            html += `<button class="pagination-btn" onclick="goToPageLaporan(${currentPageLaporan - 1})" ${currentPageLaporan === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPageLaporan) {
+                    html += `<button class="pagination-btn pagination-active">${i}</button>`;
+                } else if (i === 1 || i === totalPages || Math.abs(i - currentPageLaporan) <= 2) {
+                    html += `<button class="pagination-btn" onclick="goToPageLaporan(${i})">${i}</button>`;
+                } else if (i === currentPageLaporan - 3 || i === currentPageLaporan + 3) {
+                    html += `<span class="pagination-ellipsis">...</span>`;
+                }
+            }
+            
+            html += `<button class="pagination-btn" onclick="goToPageLaporan(${currentPageLaporan + 1})" ${currentPageLaporan === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            btns.innerHTML = html;
+        }
+
+        function goToPageLaporan(page) {
+            const totalPages = Math.ceil(allSummaryData.length / itemsPerPageLaporan);
+            if (page < 1 || page > totalPages) return;
+            currentPageLaporan = page;
+            renderSummaryTable();
+        }
+
+        function applyColumnFilters() {
+            const formatters = {
+                percentage_normal: row => row.total > 0 ? ((row.normal / row.total) * 100).toFixed(1) : '0',
+                progress_stocktaking: row => row.total > 0 ? ((row.stocktaking_done / row.total) * 100).toFixed(1) : '0'
+            };
+
+            sourceSummaryData = sourceSummaryData || [];
+            allSummaryData = sourceSummaryData.filter(row => {
+                if (typeof matchesSharedPopupFilters === 'function') {
+                    return matchesSharedPopupFilters(row, formatters);
+                }
+                return true;
+            });
+            currentPageLaporan = 1;
+            renderSummaryTable();
+        }
+
+        // ==========================================
+        // EXPORT FUNCTIONS
+        // ==========================================
+        function exportToExcel() {
+            window.location.href = 'export_excel.php';
+        }
+
+                    function exportToPDF() {
+                var printWindow = window.open('', '_blank', 'width=1000,height=800');
+                
+                // Mengambil elemen tabel dan bagian rekapitulasi secara langsung
+                var tableHTML = document.querySelector('table') ? document.querySelector('table').outerHTML : '<p>Tabel data tidak ditemukan</p>';
+                var sectionTitle = document.querySelector('.section-title') ? document.querySelector('.section-title').outerHTML : '<h3>RINGKASAN ASET</h3>';
+
+                printWindow.document.write('<!DOCTYPE html>');
+                printWindow.document.write('<html><head>');
+                printWindow.document.write('<title>Laporan Aset - PT United Tractors</title>');
+                printWindow.document.write('<style>');
+                printWindow.document.write('body { font-family: Arial, sans-serif; margin: 30px; color: #333; }');
+                printWindow.document.write('h2 { color: #1E5AA8; text-align: center; margin: 0; }');
+                printWindow.document.write('.subtitle { text-align: center; color: #666; margin-bottom: 25px; border-bottom: 2px solid #1E5AA8; padding-bottom: 10px; }');
+                printWindow.document.write('.section-title { font-size: 14px; font-weight: bold; background: #1E5AA8; color: #FFCC00; padding: 8px 12px; margin-top: 20px; }');
+                printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 10px; }');
+                printWindow.document.write('th { background-color: #FFCC00; color: #000; padding: 10px; border: 1px solid #999; text-align: left; }');
+                printWindow.document.write('td { padding: 8px; border: 1px solid #999; }');
+                printWindow.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
+                printWindow.document.write('</style>');
+                printWindow.document.write('</head><body>');
+                printWindow.document.write('<h2>LAPORAN REKAPITULASI ASET</h2>');
+                printWindow.document.write('<div class="subtitle"><p>PT United Tractors Tbk</p></div>');
+                printWindow.document.write(sectionTitle);
+                printWindow.document.write(tableHTML);
+                printWindow.document.write('</body></html>');
+                
+                printWindow.document.close();
+                
+                setTimeout(function() {
+                    printWindow.focus();
+                    printWindow.print();
+                }, 600);
+            }
+
+        // Load all data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChartData();
+            loadSummaryTable();
+            
+            // Safety net: force hide loader after 5 seconds no matter what
+            setTimeout(function() {
+                if (typeof toggleLoader === 'function') {
+                    toggleLoader(false);
+                }
+            }, 5000);
+        });
+    </script>
+    <script src="js/table-filters.js"></script>
+</body>
+</html>

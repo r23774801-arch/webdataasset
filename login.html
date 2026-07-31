@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PT United Tractors Asset Dashboard</title>
+    <link rel="icon" href="img/ikon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+    <link rel="stylesheet" href="css/enterprise-ui.css">
+</head>
+<body class="login-body">
+    <div class="login-layout">
+        <section class="login-side login-side-brand" aria-label="PT United Tractors enterprise portal">
+            <div class="hero-pattern" aria-hidden="true"></div>
+            <div class="hero-panel">
+                <div class="hero-chip">
+                    <span class="hero-chip-mark">UT</span>
+                    Enterprise Asset Portal
+                </div>
+                <p class="hero-topline">PT United Tractors</p>
+                <h1 class="hero-title">Integrated asset governance for reliable operations.</h1>
+                <p class="hero-copy">Kelola akses, inventaris, dan pelaporan aset dalam satu portal korporasi yang rapi, cepat, dan siap mendukung kontrol operasional lintas departemen.</p>
+                <ul class="hero-capabilities" aria-label="Portal capabilities">
+                    <li>
+                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                        <span>Enterprise access experience for asset, inventory, and reporting workflows.</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-layer-group" aria-hidden="true"></i>
+                        <span>Clear operational context with clean navigation and structured data entry.</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-chart-line" aria-hidden="true"></i>
+                        <span>Designed for fast daily use across desktop, tablet, and mobile screens.</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="corporate-illustration" aria-hidden="true">
+                <div class="illustration-frame">
+                    <div class="illustration-header">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="illustration-grid">
+                        <span class="tile tile-yellow"></span>
+                        <span class="tile tile-dark"></span>
+                        <span class="tile tile-light"></span>
+                        <span class="tile tile-line"></span>
+                        <span class="tile tile-wide"></span>
+                    </div>
+                </div>
+                <div class="illustration-rail"></div>
+                <div class="illustration-block"></div>
+            </div>
+        </section>
+
+        <section class="login-side login-side-form" aria-label="Authentication forms">
+            <div class="auth-card">
+                <div class="auth-branding">
+                    <img src="img/logo.png" alt="UT Logo" class="auth-logo" onerror="this.style.display='none'">
+                    <div>
+                        <span class="auth-company">PT United Tractors</span>
+                        <h1 class="auth-title">Masuk ke Portal Manajemen Aset</h1>
+                    </div>
+                </div>
+                <p class="auth-subtitle">Masukkan kredensial untuk mengakses laporan, status inventaris, dan operasi aset perusahaan PT United Tractors.</p>
+
+                <div id="loginForm" class="auth-form active">
+                    <div class="input-group">
+                        <label for="loginNrp">NRP Pegawai</label>
+                        <div class="field-control">
+                            <i class="fas fa-id-badge" aria-hidden="true"></i>
+                            <input type="text" id="loginNrp" placeholder="Masukkan NRP pegawai" autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="field-control">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="current-password">
+                        </div>
+                    </div>
+                    <button class="btn-ut-primary" type="button" onclick="handleLogin()">
+                        <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
+                        MASUK
+                    </button>
+                    <div class="auth-footer">
+                        <button class="auth-link" type="button" onclick="showReset()">Lupa Password?</button>
+                        <button class="auth-link" type="button" onclick="showRegister()">Daftar Akun</button>
+                    </div>
+                </div>
+
+                <div id="registerForm" class="auth-form">
+                    <div class="input-group">
+                        <label for="regNrp">NRP Pegawai</label>
+                        <select id="regNrp" class="nrp-select" placeholder="Pilih atau ketik NRP pegawai" autocomplete="off">
+                            <option value="">Pilih atau ketik NRP pegawai</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="regUsername">Nama Lengkap / Username</label>
+                        <div class="field-control">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <input type="text" id="regUsername" placeholder="Masukkan username" autocomplete="name">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="regPassword">Password</label>
+                        <div class="field-control">
+                            <i class="fas fa-key" aria-hidden="true"></i>
+                            <input type="password" id="regPassword" placeholder="Masukkan password" autocomplete="new-password" aria-describedby="passwordRequirements passwordStrengthText">
+                        </div>
+                        <div class="password-strength" aria-live="polite">
+                            <div class="password-strength-top">
+                                <span>Password strength</span>
+                                <strong id="passwordStrengthText">Belum diisi</strong>
+                            </div>
+                            <div class="password-meter" aria-hidden="true">
+                                <span id="passwordStrengthBar"></span>
+                            </div>
+                            <ul class="password-rules" id="passwordRequirements">
+                                <li data-rule="uppercase">Uppercase</li>
+                                <li data-rule="lowercase">Lowercase</li>
+                                <li data-rule="number">Number</li>
+                                <li data-rule="symbol">Symbol</li>
+                                <li data-rule="length">Minimum length</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="regRole">Role (Departemen)</label>
+                        <select id="regRole">
+                            <option value="admin">Admin</option>
+                            <option value="it">IT</option>
+                            <option value="ga">GA</option>
+                        </select>
+                    </div>
+                    <button class="btn-ut-primary" type="button" onclick="handleRegister()">
+                        <i class="fas fa-user-plus" aria-hidden="true"></i>
+                        DAFTAR AKUN
+                    </button>
+                    <div class="auth-footer">
+                        <button class="auth-link" type="button" onclick="showLogin()">Kembali ke Login</button>
+                    </div>
+                </div>
+
+                <div id="resetForm" class="auth-form">
+                    <div class="input-group">
+                        <label for="resetNrp">NRP Pegawai</label>
+                        <div class="field-control">
+                            <i class="fas fa-id-card" aria-hidden="true"></i>
+                            <input type="text" id="resetNrp" placeholder="Masukkan NRP" autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="resetUsername">Username</label>
+                        <div class="field-control">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <input type="text" id="resetUsername" placeholder="Masukkan Username" autocomplete="name">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="resetPasswordBaru">Password Baru</label>
+                        <div class="field-control">
+                            <i class="fas fa-unlock-keyhole" aria-hidden="true"></i>
+                            <input type="password" id="resetPasswordBaru" placeholder="Password baru" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <button class="btn-ut-primary" type="button" onclick="handleReset()">
+                        <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                        RESET PASSWORD
+                    </button>
+                    <div class="auth-footer">
+                        <button class="auth-link" type="button" onclick="showLogin()">Kembali ke Login</button>
+                    </div>
+                </div>
+                <p class="login-footer-note">PT United Tractors asset management portal, building reliable operations for industrial asset governance.</p>
+            </div>
+        </section>
+    </div>
+    <script src="js/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
