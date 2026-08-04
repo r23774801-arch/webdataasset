@@ -116,10 +116,19 @@ function normalizeNrpOptions(options) {
             const label = String(option.text || option.label || option.nama || option.name || value).trim();
             if (!value) return null;
 
-            return {
+            const item = {
                 value,
                 text: label && label !== value ? `${value} - ${label}` : value
             };
+
+            // Extra display fields used only by the dropdown UI.
+            // Search, sort, and the stored value keep using `value`/`text` exactly as before.
+            const name = option.nama || option.name || option.label || option.text || '';
+            if (name) item.nama = String(name).trim();
+            const department = option.department || option.dept || option.departemen || '';
+            if (department) item.department = String(department).trim();
+
+            return item;
         })
         .filter(Boolean);
 }
@@ -147,6 +156,59 @@ function replaceNrpSelectWithInput(selectElement) {
     return input;
 }
 
+function renderNrpOption(data, escape) {
+    const value = escape(String(data.value || ''));
+    const name = data.nama ? escape(String(data.nama)) : '';
+    const department = data.department ? escape(String(data.department)) : '';
+    const hasRich = Boolean(name || department);
+
+    // Empty placeholder option (value ''): show its label as muted hint text.
+    if (!value && data.text) {
+        return `<div class="nrp-option nrp-option-placeholder">${escape(String(data.text))}</div>`;
+    }
+
+    if (!hasRich) {
+        return `<div class="nrp-option"><span class="nrp-option-nrp">${value}</span></div>`;
+    }
+
+    return `<div class="nrp-option">
+        <span class="nrp-option-nrp">${value}</span>
+        ${name ? `<span class="nrp-option-name">${name}</span>` : ''}
+        ${department ? `<span class="nrp-option-dept">${department}</span>` : ''}
+    </div>`;
+}
+
+function renderNrpItem(data, escape) {
+    const value = escape(String(data.value || ''));
+    const name = data.nama ? escape(String(data.nama)) : '';
+    return `<span class="nrp-selected">${name ? `${value} — ${name}` : value}</span>`;
+}
+
+function createNrpSkeletonRow() {
+    const row = document.createElement('div');
+    row.className = 'nrp-skeleton-row';
+    row.setAttribute('aria-hidden', 'true');
+    return row;
+}
+
+function setNrpLoading(wrapper, isLoading) {
+    if (!wrapper) return;
+    wrapper.classList.toggle('nrp-loading', isLoading);
+
+    let skeletons = wrapper.querySelector('.nrp-skeletons');
+    if (isLoading) {
+        if (!skeletons) {
+            skeletons = document.createElement('div');
+            skeletons.className = 'nrp-skeletons';
+            for (let i = 0; i < 4; i += 1) skeletons.appendChild(createNrpSkeletonRow());
+            const dropdown = wrapper.querySelector('.ts-dropdown');
+            if (dropdown) dropdown.appendChild(skeletons);
+        }
+    } else if (skeletons) {
+        skeletons.remove();
+    }
+}
+
 function initializeNrpDropdown() {
     const nrpSelect = document.getElementById('regNrp');
     if (!nrpSelect || nrpSelect.dataset.enhanced === 'true') return;
@@ -160,7 +222,13 @@ function initializeNrpDropdown() {
     }
 
     try {
-        const tomSelect = new TomSelect(nrpSelect, {
+        const source = window.UT_NRP_OPTIONS || [];
+        const isAsync = source instanceof Promise;
+
+        let tomSelect = null;
+        let nrpCloseTimer = null;
+        let nrpReopened = false;
+        tomSelect = new TomSelect(nrpSelect, {
             maxItems: 1,
             create: input => {
                 const value = input.trim();
@@ -168,12 +236,85 @@ function initializeNrpDropdown() {
             },
             persist: false,
             allowEmptyOption: true,
-            placeholder: 'Pilih atau ketik NRP pegawai',
+            placeholder: 'Cari NRP atau Nama Pegawai...',
             searchField: ['text', 'value'],
-            sortField: { field: 'text', direction: 'asc' }
+            sortField: { field: 'text', direction: 'asc' },
+            render: {
+                option: renderNrpOption,
+                item: renderNrpItem,
+                no_results: () => '<div class="nrp-empty">No employee found</div>'
+            },
+            onDropdownOpen: () => {
+                if (nrpCloseTimer) nrpReopened = true; // re-opened during the fade-out
+                if (tomSelect.dropdown) tomSelect.dropdown.classList.remove('nrp-closing');
+                setNrpLoading(tomSelect.wrapper, tomSelect.wrapper.classList.contains('nrp-loading'));
+            },
+            onDropdownClose: () => {
+                setNrpLoading(tomSelect.wrapper, false);
+            }
         });
 
         tomSelect.wrapper.classList.add('auth-nrp-select');
+
+        // Enrich existing options with display fields only — value, text, search and sort unchanged.
+        normalizeNrpOptions(isAsync ? [] : source).forEach(option => {
+            tomSelect.addOption({
+                value: option.value,
+                text: option.text,
+                nama: option.nama || '',
+                department: option.department || ''
+            });
+        });
+
+        // Gentle fade-out when the dropdown closes (Tom Select hides it instantly by default).
+        // A pending-close timer plus a reopen flag keeps the fade safe against fast re-opens
+        // while still closing normally for Escape / selection / click-outside.
+        const originalClose = tomSelect.close.bind(tomSelect);
+        tomSelect.close = function () {
+            const dropdown = tomSelect.dropdown;
+            if (!tomSelect.isOpen || !dropdown) {
+                originalClose();
+                return;
+            }
+            // A fresh close intent supersedes any pending fade.
+            if (nrpCloseTimer) {
+                window.clearTimeout(nrpCloseTimer);
+                nrpCloseTimer = null;
+            }
+            nrpReopened = false;
+            dropdown.classList.add('nrp-closing');
+            nrpCloseTimer = window.setTimeout(() => {
+                nrpCloseTimer = null;
+                dropdown.classList.remove('nrp-closing');
+                if (nrpReopened) {
+                    nrpReopened = false;
+                    return;
+                }
+                originalClose();
+            }, 150);
+        };
+
+        // Future async employee source: show skeleton rows while it resolves.
+        // The current array-based source keeps its exact synchronous behaviour.
+        if (isAsync) {
+            const wrapper = tomSelect.wrapper;
+            wrapper.classList.add('nrp-loading');
+            setNrpLoading(wrapper, true);
+            source
+                .then(list => {
+                    normalizeNrpOptions(list).forEach(option => {
+                        tomSelect.addOption({
+                            value: option.value,
+                            text: option.text,
+                            nama: option.nama || '',
+                            department: option.department || ''
+                        });
+                    });
+                    tomSelect.refreshOptions(false);
+                })
+                .catch(() => {})
+                .finally(() => setNrpLoading(wrapper, false));
+        }
     } catch (error) {
         console.warn('Tom Select initialization failed:', error);
         replaceNrpSelectWithInput(nrpSelect);
@@ -389,3 +530,4 @@ async function handleLogin() {
         showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
     }
 }
+    
