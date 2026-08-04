@@ -18,7 +18,14 @@ if (!$data) {
 // ... (kode atas sama)
 $nrp = $conn->real_escape_string($data['nrp']);
 $username = $conn->real_escape_string($data['username']);
-$role = $conn->real_escape_string($data['role']);
+$role = strtolower(trim($data['role'] ?? ''));
+
+// HANYA IT dan GA yang boleh didaftarkan. Role admin tidak pernah diizinkan lewat registrasi.
+$allowedRoles = ['it', 'ga'];
+if (!in_array($role, $allowedRoles, true)) {
+    echo json_encode(["status" => "error", "message" => "Role tidak diizinkan! Hanya IT dan GA yang dapat mendaftar."]);
+    exit;
+}
 
 // ENKRIPSI PASSWORD DI SINI
 $password = password_hash($data['password'], PASSWORD_DEFAULT); 
