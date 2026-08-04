@@ -104,3 +104,45 @@
 [Tue Aug  4 09:12:49 2026] 127.0.0.1:58690 Accepted
 [Tue Aug  4 09:12:49 2026] 127.0.0.1:58690 [200]: GET /get_asset_master_data.php?page=1&limit=10
 [Tue Aug  4 09:12:49 2026] 127.0.0.1:58690 Closing
+[Tue Aug  4 11:22:44 2026] 127.0.0.1:58473 Accepted
+[Tue Aug  4 11:22:44 2026] 127.0.0.1:58473 [200]: GET /login.html
+[Tue Aug  4 11:22:44 2026] 127.0.0.1:58473 Closing
+[Tue Aug  4 11:23:21 2026] 127.0.0.1:50419 Accepted
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50419 [200]: POST /register.php
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50419 Closing
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50421 Accepted
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50421 [200]: POST /register.php
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50421 Closing
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50423 Accepted
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50423 [200]: POST /register.php
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50423 Closing
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50425 Accepted
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50425 [200]: POST /register.php
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50425 Closing
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50428 Accepted
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50428 [200]: POST /register.php
+[Tue Aug  4 11:23:22 2026] 127.0.0.1:50428 Closing
+[Tue Aug  4 11:23:23 2026] 127.0.0.1:50430 Accepted
+[Tue Aug  4 11:23:23 2026] 127.0.0.1:50430 [200]: POST /register.php
+[Tue Aug  4 11:23:23 2026] 127.0.0.1:50430 Closing
+[Tue Aug  4 11:23:23 2026] 127.0.0.1:50432 Accepted
+[Tue Aug  4 11:23:23 2026] 127.0.0.1:50432 [200]: POST /register.php
+[Tue Aug  4 11:23:23 2026] 127.0.0.1:50432 Closing
+[Tue Aug  4 11:23:24 2026] 127.0.0.1:50434 Accepted
+[Tue Aug  4 11:23:24 2026] 127.0.0.1:50434 [200]: POST /register.php
+[Tue Aug  4 11:23:24 2026] 127.0.0.1:50434 Closing
+[Tue Aug  4 11:23:35 2026] 127.0.0.1:50439 Accepted
+[Tue Aug  4 11:23:35 2026] 127.0.0.1:50439 [200]: GET /login.html
+[Tue Aug  4 11:23:35 2026] 127.0.0.1:50439 Closing
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50440 Accepted
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50441 Accepted
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50441 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50440 [200]: GET /js/script.js
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50441 Closing
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50440 Closing
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50442 Accepted
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50442 [200]: GET /img/logo.png
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50442 Closing
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50443 Accepted
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50443 [200]: GET /js/loader.js
+[Tue Aug  4 11:23:36 2026] 127.0.0.1:50443 Closing
