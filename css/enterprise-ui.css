@@ -1074,104 +1074,6 @@ button[onclick*="save"]:hover,
     font-size: 0.92rem;
 }
 
-.corporate-illustration {
-    position: absolute;
-    right: clamp(22px, 5vw, 72px);
-    bottom: clamp(24px, 4vw, 60px);
-    width: min(36vw, 480px);
-    min-width: 320px;
-    height: 320px;
-    z-index: 1;
-    pointer-events: none;
-}
-
-.illustration-frame {
-    position: absolute;
-    right: 0;
-    bottom: 34px;
-    width: 78%;
-    aspect-ratio: 1.22;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 34px 88px rgba(0, 0, 0, 0.22);
-    backdrop-filter: blur(18px);
-    overflow: hidden;
-}
-
-.illustration-header {
-    height: 42px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 18px;
-    background: rgba(255, 255, 255, 0.12);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.illustration-header span {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.55);
-}
-
-.illustration-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    grid-auto-rows: 54px;
-    gap: 14px;
-    padding: 18px;
-}
-
-.tile {
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.18);
-}
-
-.tile-yellow {
-    background: var(--ut-yellow);
-}
-
-.tile-dark {
-    background: rgba(31, 31, 31, 0.62);
-}
-
-.tile-light {
-    background: rgba(255, 255, 255, 0.36);
-}
-
-.tile-line {
-    background: linear-gradient(90deg, var(--ut-yellow) 0 20%, rgba(255, 255, 255, 0.22) 20% 100%);
-}
-
-.tile-wide {
-    grid-column: 1 / -1;
-    background:
-        linear-gradient(90deg, rgba(255, 194, 14, 0.96) 0 34%, rgba(255, 255, 255, 0.22) 34% 100%);
-}
-
-.illustration-rail {
-    position: absolute;
-    left: 16px;
-    bottom: 6px;
-    width: 76%;
-    height: 20px;
-    border-radius: 999px;
-    background: var(--ut-yellow);
-}
-
-.illustration-block {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 92px;
-    height: 92px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    transform: translateY(-22px);
-}
 
 .login-side-form {
     display: flex;
@@ -1562,14 +1464,6 @@ button[onclick*="save"]:hover,
         align-items: flex-start;
     }
 
-    .corporate-illustration {
-        right: 18px;
-        bottom: 24px;
-        width: 300px;
-        min-width: 0;
-        height: 220px;
-        opacity: 0.74;
-    }
 }
 
 @media (max-width: 768px) {
@@ -1597,9 +1491,6 @@ button[onclick*="save"]:hover,
         margin-bottom: 22px;
     }
 
-    .corporate-illustration {
-        display: none;
-    }
 
     .auth-card {
         padding: 26px 22px;
@@ -1723,6 +1614,46 @@ button[onclick*="save"]:hover,
     box-shadow: var(--ut-shadow-sm) !important;
 }
 
+/* Sidebar Backdrop Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+body.sidebar-open {
+    overflow: hidden !important;
+}
+
+/* Page Overflow Protection */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Responsive Table Container Safeguards */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .login-card {
@@ -1778,7 +1709,7 @@ button[onclick*="save"]:hover,
 
     .container,
     .content-body {
-        padding: 20px !important;
+        padding: 16px 14px !important;
     }
 
     .top-user-badge {
@@ -1792,7 +1723,7 @@ button[onclick*="save"]:hover,
 
     .summary-card,
     .card-stat {
-        padding: 20px !important;
+        padding: 16px !important;
     }
 
     .custom-table th,
@@ -1801,7 +1732,25 @@ button[onclick*="save"]:hover,
     .custom-table td,
     .table-responsive td,
     .table-container td {
-        padding: 12px 14px !important;
+        padding: 10px 12px !important;
+    }
+
+    .filter-bar,
+    .table-toolbar,
+    .search-filter-group,
+    .action-bar {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .modal {
+        padding: 14px !important;
+    }
+
+    .modal-content {
+        max-width: min(94vw, 540px) !important;
+        padding: 24px 18px !important;
     }
 }
 

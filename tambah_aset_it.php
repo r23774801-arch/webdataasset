@@ -4,9 +4,10 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 header('Content-Type: application/json');
 include 'koneksi.php';
+require_once __DIR__ . '/app/bootstrap.php';
 
-// RBAC: Only IT role can add IT assets
-if (!isset($_SESSION['role']) || strtoupper($_SESSION['role']) !== 'IT') {
+// RBAC: Only IT and ADMIN roles can add IT assets
+if (!isset($_SESSION['role']) || !in_array(strtoupper($_SESSION['role']), ['IT', 'ADMIN'], true)) {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Hanya role IT yang dapat menambahkan data aset IT."]);
     exit;
 }
@@ -18,7 +19,6 @@ if ($input) {
     $asset_number  = $input['asset_number'] ?? '';
     $nama_barang   = $input['nama_barang'] ?? '';
     $serial_number = $input['serial_number'] ?? '';
-    $asset_class   = $input['asset_class'] ?? '';
     $pic           = $input['pic'] ?? '';
     $area          = $input['area'] ?? '';
     $location_note = $input['location_note'] ?? '';
@@ -33,7 +33,7 @@ if ($input) {
     // Hardcode kondisi to '-' for all new entries (pending status)
     $kondisi = '-';
 
-    $query = "INSERT INTO aset_it (asset_number, nama_barang, serial_number, asset_class, pic, area, location_note, utilisasi, date_of_entry, attachment, kondisi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO aset_it (asset_number, nama_barang, serial_number, pic, area, location_note, utilisasi, date_of_entry, attachment, kondisi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
     
     if (!$stmt) {
@@ -41,9 +41,28 @@ if ($input) {
         exit;
     }
     
-    $stmt->bind_param("sssssssssss", $asset_number, $nama_barang, $serial_number, $asset_class, $pic, $area, $location_note, $utilisasi, $date_of_entry, $attachment, $kondisi);
+    $stmt->bind_param("ssssssssss", $asset_number, $nama_barang, $serial_number, $pic, $area, $location_note, $utilisasi, $date_of_entry, $attachment, $kondisi);
 
     if ($stmt->execute()) {
+        $newId = (int)$conn->insert_id;
+        AuditService::log($conn, 'Created Asset', 'aset_it', $newId, ['nama_barang' => $nama_barang, 'area' => $area]);
+
+        // Mirror the new record to the Asset_IT worksheet (best-effort only).
+        SpreadsheetService::sync(SpreadsheetService::SHEET_ASSET_IT, [
+            'id'             => $newId,
+            'asset_number'   => $asset_number,
+            'nama_barang'    => $nama_barang,
+            'serial_number'  => $serial_number,
+            'pic'            => $pic,
+            'area'           => $area,
+            'location_note'  => $location_note,
+            'utilisasi'      => $utilisasi,
+            'date_of_entry'  => $date_of_entry,
+            'attachment'     => $attachment,
+            'kondisi'        => $kondisi,
+            'created_at'     => date('Y-m-d H:i:s'),
+        ]);
+
         echo json_encode(["status" => "success", "message" => "Aset IT berhasil ditambahkan!"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);

@@ -7,6 +7,38 @@
     <link rel="icon" href="img/ikon.png" type="image/png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
+    <style>
+        /* Welcome meta (date / time / role / area) */
+        .welcome-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .welcome-meta-item {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px 16px;
+            min-width: 130px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .welcome-meta-label {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: #9A7300;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+        .welcome-meta-value {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1F1F1F;
+        }
+    </style>
 </head>
 <body>
 
@@ -43,13 +75,20 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk.html" class="sidebar-dropdown-item">Barang Masuk</a>
-                    <a href="barang-keluar.html" class="sidebar-dropdown-item">Barang Keluar</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
                 </div>
-            </div>
-
-            <div class="sidebar-section-label">OTHERS</div>
-<a href="kontak.html" class="sidebar-nav-item">
+            </div>            <div class="sidebar-section-label">OTHERS</div>
+<a href="approval.html" class="sidebar-nav-item" id="navApproval" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 12l2 2 4-4"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                <span class="nav-label">Approval Stocktaking</span>
+            </a>
+            <a href="kontak.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
@@ -130,11 +169,29 @@
                         <h3 id="welcomeTitle">Good Morning, User</h3>
                         <p>Welcome back to the United Tractors Asset Management System.</p>
                         <p>Manage company assets, monitor stocktaking progress, and keep all asset information organized in one place.</p>
+                        <div class="welcome-meta">
+                            <div class="welcome-meta-item">
+                                <span class="welcome-meta-label">Date</span>
+                                <span class="welcome-meta-value" id="welcomeDate">-</span>
+                            </div>
+                            <div class="welcome-meta-item">
+                                <span class="welcome-meta-label">Time</span>
+                                <span class="welcome-meta-value" id="welcomeTime">-</span>
+                            </div>
+                            <div class="welcome-meta-item">
+                                <span class="welcome-meta-label">Role</span>
+                                <span class="welcome-meta-value" id="welcomeRole">-</span>
+                            </div>
+                            <div class="welcome-meta-item">
+                                <span class="welcome-meta-label">Assigned Area</span>
+                                <span class="welcome-meta-value" id="welcomeArea">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
 
-                <!-- Summary Cards: Total Asset -->
+                <!-- Summary Cards: Dashboard Stats -->
                 <div class="summary-cards-container">
                     <div class="summary-card">
                         <div class="card-icon">
@@ -150,9 +207,9 @@
                                 <line x1="15" y1="18" x2="15" y2="18.01"></line>
                             </svg>
                         </div>
-                        <div class="card-title">Total Asset IT</div>
-                        <div class="card-value" id="totalAssetIt">0</div>
-                        <div class="card-subtitle">Unit</div>
+                        <div class="card-title">IT Asset</div>
+                        <div class="card-value" id="statItAsset">0</div>
+                        <div class="card-subtitle">Total Asset IT</div>
                     </div>
                     <div class="summary-card">
                         <div class="card-icon">
@@ -163,9 +220,88 @@
                                 <line x1="7" y1="18" x2="7" y2="18.01"></line>
                             </svg>
                         </div>
-                        <div class="card-title">Total Asset GA</div>
-                        <div class="card-value" id="totalAssetGa">0</div>
-                        <div class="card-subtitle">Unit</div>
+                        <div class="card-title">GA Asset</div>
+                        <div class="card-value" id="statGaAsset">0</div>
+                        <div class="card-subtitle">Total Asset GA</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 11 12 14 22 4"></polyline>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                        </div>
+                        <div class="card-title">Barang Masuk IT</div>
+                        <div class="card-value" id="statBarangMasukIt">0</div>
+                        <div class="card-subtitle">Inbound IT</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="card-title">Barang Masuk GA</div>
+                        <div class="card-value" id="statBarangMasukGa">0</div>
+                        <div class="card-subtitle">Inbound GA</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                        </div>
+                        <div class="card-title">Barang Keluar IT</div>
+                        <div class="card-value" id="statBarangKeluarIt">0</div>
+                        <div class="card-subtitle">Outbound IT</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 8l4 4-4 4"></path>
+                                <path d="M3 12h18"></path>
+                            </svg>
+                        </div>
+                        <div class="card-title">Barang Keluar GA</div>
+                        <div class="card-value" id="statBarangKeluarGa">0</div>
+                        <div class="card-subtitle">Outbound GA</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="card-title">Pending Approval</div>
+                        <div class="card-value" id="statPendingApproval">0</div>
+                        <div class="card-subtitle">Menunggu Persetujuan</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="card-title">Approved</div>
+                        <div class="card-value" id="statApproved">0</div>
+                        <div class="card-subtitle">Disetujui</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="card-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div class="card-title">Rejected</div>
+                        <div class="card-value" id="statRejected">0</div>
+                        <div class="card-subtitle">Ditolak</div>
                     </div>
                 </div>
 
@@ -224,6 +360,40 @@
                 const greeting = hour < 12 ? 'Good Morning' : (hour < 18 ? 'Good Afternoon' : 'Good Evening');
                 welcomeTitle.textContent = `${greeting}, ${username}`;
             }
+
+            const welcomeRole = document.getElementById('welcomeRole');
+            if (welcomeRole) welcomeRole.textContent = role.toUpperCase();
+
+            // Show the Approval link for admins only
+            const navApproval = document.getElementById('navApproval');
+            if (navApproval) navApproval.style.display = role.toLowerCase() === 'admin' ? 'flex' : 'none';
+        }
+
+        // ==========================================
+        // WELCOME DATE / TIME / ASSIGNED AREA
+        // ==========================================
+        function updateWelcomeClock() {
+            const now = new Date();
+            const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+            const dateEl = document.getElementById('welcomeDate');
+            const timeEl = document.getElementById('welcomeTime');
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('en-GB', options);
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        }
+
+        async function loadWelcomeProfile() {
+            try {
+                const response = await fetch('get_session_info.php');
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    const areaEl = document.getElementById('welcomeArea');
+                    if (areaEl) areaEl.textContent = result.data.area ? result.data.area : 'All Areas';
+                }
+            } catch (error) {
+                console.error('Failed to load welcome profile:', error);
+            }
         }
 
         function logout() {
@@ -236,27 +406,55 @@
         }
 
         loadUserInfo();
+        updateWelcomeClock();
+        setInterval(updateWelcomeClock, 1000);
+        loadWelcomeProfile();
+
+        // ==========================================
+        // ADMIN PENDING APPROVAL NOTIFICATION
+        // ==========================================
+        async function loadAdminApprovalNotification() {
+            const role = localStorage.getItem('userRole') || '';
+            if (role.toLowerCase() !== 'admin') return;
+            try {
+                const response = await fetch('get_stocktaking_submissions.php?status=Pending');
+                const result = await response.json();
+                if (result.status === 'success' && result.data && result.data.length > 0) {
+                    const notification = document.getElementById('admin-notification');
+                    const badge = document.getElementById('notification-badge');
+                    const message = document.getElementById('notification-message');
+                    if (notification) notification.style.display = 'flex';
+                    if (badge) badge.textContent = result.data.length;
+                    if (message) message.textContent = 'Ada pengajuan stocktaking yang menunggu persetujuan Anda!';
+                }
+            } catch (error) {
+                console.error('Failed to load approval notification:', error);
+            }
+        }
+        loadAdminApprovalNotification();
 
         // ==========================================
         // FETCH SUMMARY CARD TOTALS FROM BACKEND
         // ==========================================
         async function loadAssetTotals() {
             try {
-                // Fetch IT assets
-                const itResponse = await fetch('get_aset_it.php');
-                const itResult = await itResponse.json();
-                if (itResult.status === 'success') {
-                    document.getElementById('totalAssetIt').textContent = itResult.data.length;
-                }
-
-                // Fetch GA assets
-                const gaResponse = await fetch('get_aset_ga.php');
-                const gaResult = await gaResponse.json();
-                if (gaResult.status === 'success') {
-                    document.getElementById('totalAssetGa').textContent = gaResult.data.length;
+                const response = await fetch('get_dashboard_stats.php');
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    const d = result.data;
+                    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+                    set('statItAsset', d.it_asset ?? 0);
+                    set('statGaAsset', d.ga_asset ?? 0);
+                    set('statBarangMasukIt', d.barang_masuk_it ?? 0);
+                    set('statBarangMasukGa', d.barang_masuk_ga ?? 0);
+                    set('statBarangKeluarIt', d.barang_keluar_it ?? 0);
+                    set('statBarangKeluarGa', d.barang_keluar_ga ?? 0);
+                    set('statPendingApproval', d.pending_approval ?? 0);
+                    set('statApproved', d.approved ?? 0);
+                    set('statRejected', d.rejected ?? 0);
                 }
             } catch (error) {
-                console.error('Failed to load asset totals:', error);
+                console.error('Failed to load dashboard stats:', error);
             }
         }
         loadAssetTotals();

@@ -65,53 +65,7 @@
             white-space: nowrap;
         }
 
-        .report-kpi-row {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .kpi-card {
-            padding: 14px 16px;
-            border-radius: 22px;
-            background: var(--ut-surface);
-            border: 1px solid rgba(255, 199, 24, 0.18);
-            box-shadow: 0 14px 28px rgba(17, 24, 39, 0.08);
-        }
-
-        .kpi-label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            color: #475569;
-            margin-bottom: 12px;
-        }
-
-        .kpi-value {
-            font-size: 1.9rem;
-            font-weight: 900;
-            color: var(--ut-charcoal);
-            margin-bottom: 8px;
-        }
-
-        .kpi-note {
-            color: #64748b;
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 0.85fr;
-            gap: 16px;
-            align-items: start;
-        }
-
-        .chart-container,
-        .donut-card {
+        .chart-container {
             border-radius: 26px;
             background: var(--ut-surface);
             padding: 20px;
@@ -145,172 +99,179 @@
             letter-spacing: 0.12em;
         }
 
-        .chart-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .chart-actions button {
-            padding: 12px 18px;
-            border-radius: 16px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .chart-actions button:hover {
-            transform: translateY(-1px);
-        }
-
-        .chart-actions .btn-export {
-            background: #111827;
-            color: #ffffff;
-            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.18);
-        }
-
-        .chart-actions .btn-export.btn-warning {
-            background: var(--ut-yellow);
-            color: #111827;
-            box-shadow: 0 14px 30px rgba(255, 194, 14, 0.22);
-        }
-
         .bar-chart-frame {
             flex: 1;
+            height: 360px;
             min-height: 340px;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .bar-chart-frame canvas {
             width: 100% !important;
             height: 100% !important;
-            max-height: 460px;
         }
 
-        .donut-card-header {
+        .summary-card-header {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
             margin-bottom: 16px;
         }
 
-        .donut-card-title {
-            margin: 0;
-            font-size: 1.1rem;
+        .summary-card-title {
+            margin: 2px 0 0 0;
+            font-size: 1.35rem;
             font-weight: 900;
             color: var(--ut-charcoal);
+            line-height: 1.2;
+            letter-spacing: -0.01em;
         }
 
-        .donut-card-subtitle {
-            margin: 0;
-            font-size: 0.96rem;
-            color: #64748b;
-            line-height: 1.7;
-        }
-
-        .donut-panel {
-            display: grid;
-            grid-template-columns: 1fr 0.88fr;
-            gap: 12px;
-            align-items: center;
-            flex: 1;
-        }
-
-        .donut-chart-panel {
-            position: relative;
-            min-height: 300px;
-            padding: 16px;
+        .overall-summary {
+            background: var(--ut-surface);
             border-radius: 26px;
+            padding: 20px;
+            box-shadow: 0 20px 52px rgba(17, 24, 39, 0.08);
+            border: 1px solid rgba(255, 199, 24, 0.16);
+            margin-bottom: 16px;
+        }
+
+        .overall-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .overall-hero {
             background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-            box-shadow: 0 22px 52px rgba(17, 24, 39, 0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .donut-chart-panel canvas {
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 440px;
-        }
-
-        .donut-center {
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            background: #ffffff;
             border: 1px solid rgba(17, 24, 39, 0.08);
-            box-shadow: 0 24px 44px rgba(17, 24, 39, 0.08);
+            border-radius: 22px;
+            padding: 18px 20px;
+            box-shadow: 0 16px 34px rgba(17, 24, 39, 0.06);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
+            gap: 8px;
+            min-height: 132px;
         }
 
-        .donut-center-value {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--ut-charcoal);
-        }
-
-        .donut-center-label {
-            margin-top: 6px;
-            font-size: 0.88rem;
-            color: #64748b;
+        .hero-stat-label {
+            font-size: 0.78rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.14em;
+            color: #64748b;
         }
 
-        .donut-stats {
+        .hero-stat-value {
+            font-size: clamp(1.8rem, 3vw, 2.4rem);
+            font-weight: 900;
+            color: var(--ut-charcoal);
+            line-height: 1.1;
+        }
+
+        .hero-stat-percent {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #b88600;
+        }
+
+        .progress-track {
+            height: 12px;
+            border-radius: 999px;
+            background: #eef1f5;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--ut-yellow), #e8b500);
+            width: 0%;
+            transition: width 0.8s ease;
+            box-shadow: 0 4px 12px rgba(255, 194, 14, 0.35);
+        }
+
+        .asset-summary-grid {
             display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 16px;
+            margin-top: 16px;
         }
 
-        .donut-stat-card {
+        .asset-summary-card {
+            background: var(--ut-surface);
+            border-radius: 26px;
+            padding: 20px;
+            box-shadow: 0 20px 52px rgba(17, 24, 39, 0.08);
+            border: 1px solid rgba(255, 199, 24, 0.16);
+        }
+
+        .asset-progress-block {
+            margin-bottom: 18px;
+        }
+
+        .condition-cards {
             display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 14px;
-            align-items: center;
-            padding: 14px 16px;
-            border-radius: 22px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .condition-card {
             background: #ffffff;
             border: 1px solid rgba(17, 24, 39, 0.08);
-            box-shadow: 0 16px 34px rgba(17, 24, 39, 0.06);
-        }
-
-        .donut-stat-marker {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            box-shadow: 0 4px 14px rgba(17, 24, 39, 0.12);
-        }
-
-        .donut-stat-content {
-            display: grid;
+            border-radius: 18px;
+            padding: 14px 16px;
+            box-shadow: 0 12px 26px rgba(17, 24, 39, 0.05);
+            display: flex;
+            flex-direction: column;
             gap: 6px;
+            min-height: 100px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .donut-stat-label {
-            font-size: 0.95rem;
+        .condition-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 34px rgba(17, 24, 39, 0.1);
+        }
+
+        .condition-card-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .condition-card-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: 0 0 10px;
+            box-shadow: 0 4px 12px rgba(17, 24, 39, 0.14);
+        }
+
+        .condition-card-label {
+            font-size: 0.78rem;
             font-weight: 700;
-            color: var(--ut-charcoal);
-        }
-
-        .donut-stat-number {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--ut-charcoal);
-        }
-
-        .donut-stat-pct {
-            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             color: #64748b;
+        }
+
+        .condition-card-count {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: var(--ut-charcoal);
+            line-height: 1.15;
+        }
+
+        .condition-card-percent {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #b88600;
         }
 
         .table-container {
@@ -321,6 +282,54 @@
             width: 100%;
             margin-top: 18px;
             overflow: visible;
+        }
+
+        .report-section-card {
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 20px 56px rgba(17, 24, 39, 0.08);
+            width: 100%;
+            margin-bottom: 28px;
+            overflow: visible;
+        }
+
+        .report-toolbar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .report-toolbar-row.justify-end {
+            justify-content: flex-end;
+        }
+
+        .report-export-btns {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .report-btn-export {
+            padding: 10px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 10px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .report-btn-export:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
 
         .table-container table {
@@ -366,13 +375,30 @@
             margin-top: 14px;
         }
 
-        @media (max-width: 1080px) {
-            .report-kpi-row,
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
+        #assetMasterSearch:focus {
+            outline: none;
+            border-color: var(--ut-yellow);
+            box-shadow: 0 0 0 3px rgba(255, 194, 14, 0.2);
+        }
 
-            .donut-panel {
+        .asset-master-scroll {
+            overflow: auto;
+            max-height: 560px;
+        }
+
+        .asset-master-scroll table {
+            min-width: 100%;
+        }
+
+        .asset-master-scroll thead th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: #0f172a !important;
+        }
+
+        @media (max-width: 1080px) {
+            .asset-summary-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -386,26 +412,12 @@
                 margin-bottom: 14px;
             }
 
-            .report-kpi-row {
-                gap: 12px;
-                margin-bottom: 18px;
-            }
-
-            .kpi-card {
-                padding: 14px 16px;
-            }
-
-            .chart-container,
-            .donut-card {
+            .chart-container {
                 min-height: 320px;
                 padding: 18px;
             }
 
             .bar-chart-frame {
-                min-height: 300px;
-            }
-
-            .donut-chart-panel {
                 min-height: 300px;
             }
 
@@ -427,7 +439,6 @@
             }
 
             .chart-container,
-            .donut-card,
             .table-container {
                 padding: 22px;
             }
@@ -436,13 +447,12 @@
                 min-height: 320px;
             }
 
-            .donut-chart-panel {
-                min-height: 340px;
+            .overall-stats {
+                grid-template-columns: 1fr;
             }
 
-            .donut-center {
-                width: 150px;
-                height: 150px;
+            .condition-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
     </style>
@@ -484,12 +494,21 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk.html" class="sidebar-dropdown-item">Barang Masuk</a>
-                    <a href="barang-keluar.html" class="sidebar-dropdown-item">Barang Keluar</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
                 </div>
             </div>
 
 <div class="sidebar-section-label">OTHERS</div>
+            <a href="approval.html" class="sidebar-nav-item" id="navApproval" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 12l2 2 4-4"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                <span class="nav-label">Approval Stocktaking</span>
+            </a>
 <a href="kontak.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -575,6 +594,30 @@
                     <div class="report-status-pill">Executive dashboard view</div>
                 </div>
 
+                <!-- Overall Asset Summary -->
+                <section class="overall-summary" style="margin-top: 4px;">
+                    <div class="summary-card-header">
+                        <div>
+                            <div class="card-label">Ringkasan Keseluruhan</div>
+                            <h3 class="summary-card-title">Overall Asset Summary</h3>
+                        </div>
+                    </div>
+                    <div class="overall-stats">
+                        <div class="overall-hero">
+                            <span class="hero-stat-label">Total Asset</span>
+                            <div class="hero-stat-value" id="overallTotal">0</div>
+                        </div>
+                        <div class="overall-hero">
+                            <span class="hero-stat-label">Stocktaked</span>
+                            <div class="hero-stat-value" id="overallStocktaked">0 / 0</div>
+                            <div class="hero-stat-percent" id="overallPercent">0%</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="overallProgressBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="report-charts">
                     <section class="chart-container bar-chart-card">
                         <div class="chart-card-header">
@@ -587,115 +630,262 @@
                             <canvas id="barChart"></canvas>
                         </div>
                     </section>
+                </div>
 
-                    <section class="donut-card">
-                        <div class="donut-card-header">
-                            <div class="donut-card-title">Persentase Kondisi Aset</div>
-                            <div class="donut-card-subtitle">Ringkasan kondisi aset perusahaan secara visual.</div>
+                <!-- IT & GA Asset Summary -->
+                <div class="asset-summary-grid">
+                    <section class="asset-summary-card">
+                        <div class="summary-card-header">
+                        <div>
+                            <div class="card-label">Ringkasan IT</div>
+                            <h3 class="summary-card-title">IT Asset Summary</h3>
                         </div>
-                        <div class="donut-panel">
-                            <div class="donut-chart-panel">
-                                <canvas id="donutChart"></canvas>
-                                <div class="donut-center">
-                                    <div class="donut-center-value" id="donutTotalCount">0</div>
-                                    <div class="donut-center-label">Total Assets</div>
-                                </div>
-                            </div>
-                            <div class="donut-stats">
-                                <div class="donut-stat-card">
-                                    <span class="donut-stat-marker" style="background: #1E5AA8;"></span>
-                                    <div class="donut-stat-content">
-                                        <div class="donut-stat-label">Normal</div>
-                                        <div class="donut-stat-number" id="legendNormalCount">0 Assets</div>
-                                        <div class="donut-stat-pct" id="legendNormalPercent">0%</div>
-                                    </div>
-                                </div>
-                                <div class="donut-stat-card">
-                                    <span class="donut-stat-marker" style="background: #FFCC00;"></span>
-                                    <div class="donut-stat-content">
-                                        <div class="donut-stat-label">Pending</div>
-                                        <div class="donut-stat-number" id="legendPendingCount">0 Assets</div>
-                                        <div class="donut-stat-pct" id="legendPendingPercent">0%</div>
-                                    </div>
-                                </div>
-                                <div class="donut-stat-card">
-                                    <span class="donut-stat-marker" style="background: #0D9488;"></span>
-                                    <div class="donut-stat-content">
-                                        <div class="donut-stat-label">Broken</div>
-                                        <div class="donut-stat-number" id="legendBrokenCount">0 Assets</div>
-                                        <div class="donut-stat-pct" id="legendBrokenPercent">0%</div>
-                                    </div>
-                                </div>
-                                <div class="donut-stat-card">
-                                    <span class="donut-stat-marker" style="background: #DC2626;"></span>
-                                    <div class="donut-stat-content">
-                                        <div class="donut-stat-label">Lost</div>
-                                        <div class="donut-stat-number" id="legendLostCount">0 Assets</div>
-                                        <div class="donut-stat-pct" id="legendLostPercent">0%</div>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="asset-progress-block">
+                            <span class="hero-stat-label">Stocktaked</span>
+                            <div class="hero-stat-value" id="itStocktaked">0 / 0</div>
+                            <div class="hero-stat-percent" id="itPercent">0%</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="itProgressBar"></div>
                             </div>
                         </div>
+                        <div class="condition-cards" id="itConditionCards"></div>
+                    </section>
+                    <section class="asset-summary-card">
+                        <div class="summary-card-header">
+                        <div>
+                            <div class="card-label">Ringkasan GA</div>
+                            <h3 class="summary-card-title">GA Asset Summary</h3>
+                        </div>
+                        </div>
+                        <div class="asset-progress-block">
+                            <span class="hero-stat-label">Stocktaked</span>
+                            <div class="hero-stat-value" id="gaStocktaked">0 / 0</div>
+                            <div class="hero-stat-percent" id="gaPercent">0%</div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="gaProgressBar"></div>
+                            </div>
+                        </div>
+                        <div class="condition-cards" id="gaConditionCards"></div>
                     </section>
                 </div>
-            </div>
 
-            <!-- Export Buttons -->
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                <button onclick="exportToExcel()" class="btn-warning" style="padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Export Excel
-                </button>
-                <button onclick="exportToPDF()" class="btn-warning" style="padding: 10px 20px; display: inline-flex; align-items: center; gap: 8px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Export PDF
-                </button>
-            </div>
+                <!-- Barang Masuk / Keluar Summary -->
+                <section class="overall-summary" style="margin-top: 16px;">
+                    <div class="summary-card-header">
+                        <div>
+                            <div class="card-label">Barang Masuk / Keluar</div>
+                            <h3 class="summary-card-title">Barang Summary (IT & GA)</h3>
+                        </div>
+                    </div>
+                    <div class="condition-cards">
+                        <div class="condition-card">
+                            <div class="condition-card-top">
+                                <span class="condition-card-dot" style="background:#1E5AA8;"></span>
+                                <span class="condition-card-label">Barang Masuk IT</span>
+                            </div>
+                            <div class="condition-card-count" id="barangMasukItCount">0</div>
+                            <div class="condition-card-percent">records</div>
+                        </div>
+                        <div class="condition-card">
+                            <div class="condition-card-top">
+                                <span class="condition-card-dot" style="background:#0D9488;"></span>
+                                <span class="condition-card-label">Barang Masuk GA</span>
+                            </div>
+                            <div class="condition-card-count" id="barangMasukGaCount">0</div>
+                            <div class="condition-card-percent">records</div>
+                        </div>
+                        <div class="condition-card">
+                            <div class="condition-card-top">
+                                <span class="condition-card-dot" style="background:#16A34A;"></span>
+                                <span class="condition-card-label">Barang Keluar IT</span>
+                            </div>
+                            <div class="condition-card-count" id="barangKeluarItCount">0</div>
+                            <div class="condition-card-percent">records</div>
+                        </div>
+                        <div class="condition-card">
+                            <div class="condition-card-top">
+                                <span class="condition-card-dot" style="background:#FFCC00;"></span>
+                                <span class="condition-card-label">Barang Keluar GA</span>
+                            </div>
+                            <div class="condition-card-count" id="barangKeluarGaCount">0</div>
+                            <div class="condition-card-percent">records</div>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px; margin-top:16px;" class="barang-report-grid">
+                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:#1E5AA8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk IT — Terbaru</div>
+                            <div id="barangMasukItRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:#0D9488; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk GA — Terbaru</div>
+                            <div id="barangMasukGaRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:#16A34A; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar IT — Terbaru</div>
+                            <div id="barangKeluarItRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        </div>
+                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:#B88600; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar GA — Terbaru</div>
+                            <div id="barangKeluarGaRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Asset Report Summary Table -->
-            <div class="table-container">
-                <div class="report-header">
-                    <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0 0 15px 0;">Ringkasan Aset per Lokasi (Area)</h3>
-                    <div class="report-title-line"></div>
+                <!-- Transfer History -->
+                <div class="report-section-card">
+                    <div class="report-header" style="margin-bottom: 16px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0;">Transfer History</h3>
+                        <div class="report-title-line"></div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Asset Number</th>
+                                    <th>Asset Name</th>
+                                    <th>Tipe</th>
+                                    <th>Area Lama</th>
+                                    <th>Area Baru</th>
+                                    <th>Dept Lama</th>
+                                    <th>Dept Baru</th>
+                                    <th>PIC</th>
+                                    <th>Tanggal Transfer</th>
+                                    <th>Transferred By</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transferHistoryBody">
+                                <tr><td colspan="11" style="text-align:center; padding:20px; color:#777;">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th data-filter-col="area">Lokasi (Area)</th>
-                                <th data-filter-col="total">Total Aset</th>
-                                <th data-filter-col="normal">Normal</th>
-                                <th data-filter-col="pending">Pending</th>
-                                <th data-filter-col="broken">Broken</th>
-                                <th data-filter-col="lost">Lost</th>
-                                <th data-filter-col="percentage_normal">Persentase Normal</th>
-                                <th data-filter-col="progress_stocktaking">Progress Stocktaking</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summaryTableBody">
-                            <tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
+
+                <!-- Asset Master Data -->
+                <div class="report-section-card">
+                    <div class="report-header" style="margin-bottom: 16px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0;">Asset Master Data</h3>
+                        <div class="report-title-line"></div>
+                    </div>
+                    <div class="report-toolbar-row">
+                        <input type="text" id="assetMasterSearch" style="width: 380px; max-width: 100%; height: 42px; box-sizing: border-box; padding: 0 14px; border: 1.5px solid rgba(17, 24, 39, 0.16); border-radius: 10px; font-size: 0.9rem; background: #f8fafc; color: #1e293b;" placeholder="Cari asset (nomor, nama, serial, PIC, area, dept)...">
+                        <div class="report-export-btns">
+                            <button onclick="exportAssetMasterExcel()" class="btn-warning report-btn-export">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Export Asset Master Excel
+                            </button>
+                            <button onclick="exportAssetMasterPDF()" class="btn-warning report-btn-export">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Export Asset Master PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="asset-master-scroll table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th data-filter-col="am_type" data-filter-placeholder="IT atau GA">Asset Type</th>
+                                    <th data-filter-col="am_asset_number">Asset Number</th>
+                                    <th data-filter-col="am_nama_barang">Asset Name</th>
+                                    <th data-filter-col="am_asset_class">Asset Class</th>
+                                    <th data-filter-col="am_serial_number">Serial Number</th>
+                                    <th data-filter-col="am_brand">Brand</th>
+                                    <th data-filter-col="am_pic">PIC</th>
+                                    <th data-filter-col="am_area">Area</th>
+                                    <th data-filter-col="am_department">Department</th>
+                                    <th data-filter-col="am_utilisasi">Utilization</th>
+                                    <th data-filter-col="am_kondisi">Condition</th>
+                                    <th data-filter-col="am_stocktaking_status">Stocktaking Status</th>
+                                    <th data-filter-col="am_date_of_entry" data-filter-placeholder="DD/MM/YYYY">Date of Entry</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetMasterBody">
+                                <tr><td colspan="14" style="text-align:center; padding:20px; color:#777;">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfoAssetMaster">Menampilkan 0-0 dari 0 data</div>
+                        <div class="pagination-buttons" id="paginationButtonsAssetMaster"></div>
+                    </div>
                 </div>
-                <!-- Pagination Controls -->
-                <div class="pagination-container">
-                    <div class="pagination-info" id="paginationInfoLaporan">Menampilkan 0-0 dari 0 data</div>
-                    <div class="pagination-buttons" id="paginationButtonsLaporan"></div>
+
+                <!-- Asset Report Summary Table -->
+                <div class="report-section-card">
+                    <div class="report-header" style="margin-bottom: 16px;">
+                        <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0;">Ringkasan Aset per Lokasi (Area)</h3>
+                        <div class="report-title-line"></div>
+                    </div>
+                    <div class="report-toolbar-row justify-end">
+                        <div class="report-export-btns">
+                            <button onclick="exportToExcel()" class="btn-warning report-btn-export">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Export Excel
+                            </button>
+                            <button onclick="exportToPDF()" class="btn-warning report-btn-export">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Export PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-filter-col="area">Lokasi (Area)</th>
+                                    <th data-filter-col="total">Total Aset</th>
+                                    <th data-filter-col="normal">Normal</th>
+                                    <th data-filter-col="pending">Pending</th>
+                                    <th data-filter-col="broken">Broken</th>
+                                    <th data-filter-col="lost">Lost</th>
+                                    <th data-filter-col="transfer">Transfer</th>
+                                    <th data-filter-col="percentage_normal">Persentase Normal</th>
+                                    <th data-filter-col="progress_stocktaking">Progress Stocktaking</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryTableBody">
+                                <tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination Controls -->
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfoLaporan">Menampilkan 0-0 dari 0 data</div>
+                        <div class="pagination-buttons" id="paginationButtonsLaporan"></div>
+                    </div>
                 </div>
-            </div>
         </div>
     </div>
 
     <script src="js/loader.js"></script>
     <script>
+        function esc(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function toggleSidebarDropdown() {
             const dropdown = document.querySelector('.sidebar-dropdown');
             if (dropdown) dropdown.classList.toggle('open');
@@ -762,21 +952,12 @@
             }
         }
 
-        function updateDonutLegend(stats) {
-            document.getElementById('donutTotalCount').textContent = stats.total;
-            document.getElementById('legendNormalCount').textContent = `${stats.normal} Assets`;
-            document.getElementById('legendNormalPercent').textContent = `${stats.normalPercent}%`;
-            document.getElementById('legendPendingCount').textContent = `${stats.pending} Assets`;
-            document.getElementById('legendPendingPercent').textContent = `${stats.pendingPercent}%`;
-            document.getElementById('legendBrokenCount').textContent = `${stats.broken} Assets`;
-            document.getElementById('legendBrokenPercent').textContent = `${stats.brokenPercent}%`;
-            document.getElementById('legendLostCount').textContent = `${stats.lost} Assets`;
-            document.getElementById('legendLostPercent').textContent = `${stats.lostPercent}%`;
-        }
-
         function renderCharts(data) {
-            const barCtx = document.getElementById('barChart').getContext('2d');
-            new Chart(barCtx, {
+            const barCtx = document.getElementById('barChart');
+            if (!barCtx) return;
+            // Destroy any existing chart on this canvas before re-rendering (no flicker/shake).
+            if (window.barChartInstance) window.barChartInstance.destroy();
+            window.barChartInstance = new Chart(barCtx.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: data.labels,
@@ -790,7 +971,7 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: { display: true, text: 'Jumlah Aset per Area (Real Data)', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
                         legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 12 } } },
@@ -802,63 +983,13 @@
                     }
                 }
             });
-
-            const donutCtx = document.getElementById('donutChart').getContext('2d');
-            const total = data.donut.data.reduce((sum, value) => sum + value, 0);
-            const normalPercent = total ? ((data.donut.data[0] / total) * 100).toFixed(0) : 0;
-            const pendingPercent = total ? ((data.donut.data[1] / total) * 100).toFixed(0) : 0;
-            const brokenPercent = total ? ((data.donut.data[2] / total) * 100).toFixed(0) : 0;
-            const lostPercent = total ? ((data.donut.data[3] / total) * 100).toFixed(0) : 0;
-
-            updateDonutLegend({
-                total,
-                normal: data.donut.data[0] || 0,
-                pending: data.donut.data[1] || 0,
-                broken: data.donut.data[2] || 0,
-                lost: data.donut.data[3] || 0,
-                normalPercent,
-                pendingPercent,
-                brokenPercent,
-                lostPercent
-            });
-
-            new Chart(donutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.donut.labels,
-                    datasets: [{
-                        data: data.donut.data,
-                        backgroundColor: data.donut.backgroundColor,
-                        borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff'],
-                        borderWidth: 3,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '75%',
-                    plugins: {
-                        title: { display: true, text: 'Persentase Kondisi Aset', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    return context.label + ': ' + ((context.parsed / total) * 100).toFixed(1) + '% (' + context.parsed + ' unit)';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         function fallbackCharts() {
-            const barCtx = document.getElementById('barChart').getContext('2d');
-            new Chart(barCtx, {
+            const barCtx = document.getElementById('barChart');
+            if (!barCtx) return;
+            if (window.barChartInstance) window.barChartInstance.destroy();
+            window.barChartInstance = new Chart(barCtx.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: ['Main Office', 'Part BKJ', 'Part BIU', 'BIU Service', 'Kel.'],
@@ -866,12 +997,13 @@
                         { label: 'Normal', data: [0, 0, 0, 0, 0], backgroundColor: '#1E5AA8', borderColor: '#1E5AA8', borderWidth: 1 },
                         { label: 'Pending', data: [0, 0, 0, 0, 0], backgroundColor: '#FFCC00', borderColor: '#FFCC00', borderWidth: 1 },
                         { label: 'Broken', data: [0, 0, 0, 0, 0], backgroundColor: '#0D9488', borderColor: '#0D9488', borderWidth: 1 },
-                        { label: 'Lost', data: [0, 0, 0, 0, 0], backgroundColor: '#dc3545', borderColor: '#dc3545', borderWidth: 1 }
+                        { label: 'Lost', data: [0, 0, 0, 0, 0], backgroundColor: '#dc3545', borderColor: '#dc3545', borderWidth: 1 },
+                        { label: 'Transfer', data: [0, 0, 0, 0, 0], backgroundColor: '#8B5CF6', borderColor: '#8B5CF6', borderWidth: 1 }
                     ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: { display: true, text: 'Jumlah Aset per Area (Belum Ada Data)', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
                         legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 12 } } }
@@ -882,39 +1014,72 @@
                     }
                 }
             });
+        }
 
-            updateDonutLegend({
-                total: 0,
-                normal: 0,
-                pending: 0,
-                broken: 0,
-                lost: 0,
-                normalPercent: 0,
-                pendingPercent: 0,
-                brokenPercent: 0,
-                lostPercent: 0
-            });
+        // ==========================================
+        // DASHBOARD SUMMARY (Overall / IT / GA)
+        // ==========================================
+        const CONDITION_CARD_META = [
+            { key: 'total', label: 'Total Asset', color: '#1E5AA8' },
+            { key: 'normal', label: 'Normal', color: '#16A34A' },
+            { key: 'broken', label: 'Broken', color: '#0D9488' },
+            { key: 'lost', label: 'Lost', color: '#DC2626' },
+            { key: 'pending', label: 'Pending', color: '#FFCC00' },
+            { key: 'transfer', label: 'Transfer', color: '#8B5CF6' }
+        ];
 
-            const donutCtx = document.getElementById('donutChart').getContext('2d');
-            new Chart(donutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Normal', 'Pending', 'Broken', 'Lost'],
-                    datasets: [{
-                        data: [0, 0, 0, 0],
-                        backgroundColor: ['#1E5AA8', '#FFCC00', '#0D9488', '#dc3545']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '75%',
-                    plugins: {
-                        title: { display: true, text: 'Persentase Kondisi Aset', font: { size: 16, weight: 'bold' }, padding: { bottom: 20 } },
-                        legend: { display: false }
-                    }
+        async function loadDashboardSummary() {
+            try {
+                const response = await fetch('get_laporan_data.php?dashboard=true');
+                const result = await response.json();
+                if (result.status === 'success') {
+                    renderOverallSummary(result.overall);
+                    renderAssetSummary('it', result.it);
+                    renderAssetSummary('ga', result.ga);
                 }
-            });
+            } catch (err) {
+                console.error('Failed to load dashboard summary:', err);
+            }
+        }
+
+        function renderOverallSummary(stats) {
+            const total = stats.total || 0;
+            const stocktaked = stats.stocktaked || 0;
+            const progress = stats.progress || 0;
+            document.getElementById('overallTotal').textContent = total;
+            document.getElementById('overallStocktaked').textContent = stocktaked + ' / ' + total;
+            document.getElementById('overallPercent').textContent = progress + '%';
+            document.getElementById('overallProgressBar').style.width = progress + '%';
+        }
+
+        function renderAssetSummary(prefix, stats) {
+            const total = stats.total || 0;
+            const stocktaked = stats.stocktaked || 0;
+            const progress = stats.progress || 0;
+            document.getElementById(prefix + 'Stocktaked').textContent = stocktaked + ' / ' + total;
+            document.getElementById(prefix + 'Percent').textContent = progress + '%';
+            document.getElementById(prefix + 'ProgressBar').style.width = progress + '%';
+            renderConditionCards(prefix + 'ConditionCards', stats);
+        }
+
+        function renderConditionCards(containerId, stats) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const total = stats.total || 0;
+            container.innerHTML = CONDITION_CARD_META.map(function (card) {
+                const count = stats[card.key] || 0;
+                const percent = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
+                return `
+                    <div class="condition-card">
+                        <div class="condition-card-top">
+                            <span class="condition-card-dot" style="background: ${card.color};"></span>
+                            <span class="condition-card-label">${card.label}</span>
+                        </div>
+                        <div class="condition-card-count">${count}</div>
+                        <div class="condition-card-percent">${percent}%</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // ==========================================
@@ -940,7 +1105,7 @@
                     sourceSummaryData = [];
                     allSummaryData = [];
                     document.getElementById('summaryTableBody').innerHTML = 
-                        '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Belum ada data.</td></tr>';
+                        '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Belum ada data.</td></tr>';
                     renderPaginationLaporan();
                 }
             } catch (err) {
@@ -948,7 +1113,7 @@
                 sourceSummaryData = [];
                 allSummaryData = [];
                 document.getElementById('summaryTableBody').innerHTML = 
-                    '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Gagal memuat data.</td></tr>';
+                    '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Gagal memuat data.</td></tr>';
                 renderPaginationLaporan();
             } finally {
                 if (typeof toggleLoader === 'function') {
@@ -963,7 +1128,7 @@
 
             const total = allSummaryData.length;
             if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Tidak ada data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Tidak ada data.</td></tr>';
                 renderPaginationLaporan();
                 return;
             }
@@ -988,6 +1153,7 @@
                         <td><span class="badge-pending">${row.pending}</span></td>
                         <td><span class="badge-rejected">${row.broken}</span></td>
                         <td><span class="badge-lost">${row.lost}</span></td>
+                        <td><span class="badge-transfer">${row.transfer}</span></td>
                         <td style="color: ${percentageColor}; font-weight: 600;">${percentageNormal}%</td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 10px;">
@@ -1050,63 +1216,344 @@
                 progress_stocktaking: row => row.total > 0 ? ((row.stocktaking_done / row.total) * 100).toFixed(1) : '0'
             };
 
+            // Only the Area Summary table's own columns are matched client-side;
+            // the Asset Master table has its own server-side filters (am_*).
+            const summaryCols = ['area', 'total', 'normal', 'pending', 'broken', 'lost', 'transfer', 'percentage_normal', 'progress_stocktaking'];
+            let popupFilters = {};
+            if (typeof window.getSharedPopupFilters === 'function') {
+                popupFilters = window.getSharedPopupFilters();
+            }
+
             sourceSummaryData = sourceSummaryData || [];
             allSummaryData = sourceSummaryData.filter(row => {
-                if (typeof matchesSharedPopupFilters === 'function') {
-                    return matchesSharedPopupFilters(row, formatters);
+                for (const col of Object.keys(popupFilters)) {
+                    if (!summaryCols.includes(col)) continue;
+                    const fd = popupFilters[col];
+                    const raw = formatters[col] ? formatters[col](row) : (row[col] ?? '');
+                    const fieldValue = String(raw || '').toLowerCase();
+                    const value = fd.value;
+                    if (fd.condition === 'equals' ? fieldValue !== value
+                        : fd.condition === 'starts_with' ? !fieldValue.startsWith(value)
+                        : !fieldValue.includes(value)) {
+                        return false;
+                    }
                 }
                 return true;
             });
             currentPageLaporan = 1;
             renderSummaryTable();
+
+            // Asset Master Data reacts to its own column filters as well.
+            if (document.getElementById('assetMasterBody')) {
+                assetMasterState.page = 1;
+                loadAssetMasterData();
+            }
         }
+
+        // ==========================================
+        // ASSET MASTER DATA (IT + GA combined)
+        // ==========================================
+        const ASSET_MASTER_PAGE_SIZE = 10;
+        const assetMasterState = { page: 1, total: 0, totalPages: 1, search: '' };
+        let assetMasterSearchTimer = null;
+
+        // Map Asset Master filter keys -> API filter keys.
+        const ASSET_MASTER_FILTER_MAP = {
+            am_type: 'asset_type',
+            am_asset_number: 'asset_number',
+            am_nama_barang: 'nama_barang',
+            am_asset_class: 'asset_class',
+            am_serial_number: 'serial_number',
+            am_brand: 'asset_class',
+            am_pic: 'pic',
+            am_area: 'area',
+            am_department: 'location_note',
+            am_date_of_entry: 'date_of_entry',
+            am_utilisasi: 'utilisasi',
+            am_kondisi: 'kondisi',
+            am_stocktaking_status: 'stocktaking_status'
+        };
+
+        function getAssetMasterFilterParams() {
+            const params = {};
+            if (typeof window.getSharedPopupFilters === 'function') {
+                const all = window.getSharedPopupFilters();
+                for (const [key, fd] of Object.entries(all)) {
+                    if (ASSET_MASTER_FILTER_MAP[key]) {
+                        params[ASSET_MASTER_FILTER_MAP[key]] = fd.value;
+                    }
+                }
+            }
+            return params;
+        }
+
+        function formatShortDate(v) {
+            if (!v || v === '0000-00-00' || v === '0000-00-00 00:00:00') return '-';
+            const d = new Date(String(v).slice(0, 10));
+            if (isNaN(d.getTime())) return '-';
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return dd + '/' + mm + '/' + d.getFullYear();
+        }
+
+        function conditionBadgeClass(cond) {
+            const c = (cond || '').toLowerCase();
+            if (c === 'normal') return 'badge-approved';
+            if (c === 'broken') return 'badge-rejected';
+            if (c === 'lost') return 'badge-lost';
+            if (c === 'transfer') return 'badge-transfer';
+            return 'badge-pending';
+        }
+
+        function statusBadgeClass(st) {
+            const s = (st || '').toLowerCase();
+            if (s === 'stocktaked') return 'badge-approved';
+            if (s === 'rejected') return 'badge-rejected';
+            return 'badge-pending';
+        }
+
+        async function loadAssetMasterData() {
+            const tbody = document.getElementById('assetMasterBody');
+            const qs = new URLSearchParams();
+            qs.set('page', assetMasterState.page);
+            qs.set('limit', ASSET_MASTER_PAGE_SIZE);
+            if (assetMasterState.search) qs.set('q', assetMasterState.search);
+            const filters = getAssetMasterFilterParams();
+            for (const [k, v] of Object.entries(filters)) qs.set('filters[' + k + ']', v);
+            try {
+                const res = await fetch('get_asset_master_data.php?' + qs.toString());
+                const result = await res.json();
+                if (result.status !== 'success') throw new Error('API error');
+                assetMasterState.total = result.total;
+                assetMasterState.totalPages = result.total_pages || 1;
+                renderAssetMasterTable(result.data || []);
+                renderAssetMasterPagination();
+            } catch (err) {
+                console.error('Failed to load asset master data:', err);
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px; color:#777;">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function renderAssetMasterTable(rows) {
+            const tbody = document.getElementById('assetMasterBody');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px; color:#777;">Tidak ada data.</td></tr>';
+                return;
+            }
+            const startNo = (assetMasterState.page - 1) * ASSET_MASTER_PAGE_SIZE;
+            tbody.innerHTML = rows.map((r, i) => {
+                const no = startNo + i + 1;
+                const type = (r.asset_type || '-').toUpperCase();
+                const typeBadge = type === 'IT'
+                    ? '<span class="badge-approved">IT</span>'
+                    : '<span class="badge-transfer">GA</span>';
+                const cond = (r.kondisi || '').trim() || 'Pending';
+                const condNorm = cond === '-' ? 'Pending' : cond;
+                return `<tr>
+                    <td>${no}</td>
+                    <td>${typeBadge}</td>
+                    <td>${esc(r.asset_number || '-')}</td>
+                    <td>${esc(r.nama_barang || '-')}</td>
+                    <td>${esc(r.asset_class || '-')}</td>
+                    <td>${esc(r.serial_number || '-')}</td>
+                    <td>${esc(r.asset_class || '-')}</td>
+                    <td>${esc(r.pic || '-')}</td>
+                    <td>${esc(r.area || '-')}</td>
+                    <td>${esc(r.location_note || '-')}</td>
+                    <td>${esc(r.utilisasi || '-')}</td>
+                    <td><span class="${conditionBadgeClass(condNorm)}">${esc(condNorm)}</span></td>
+                    <td><span class="${statusBadgeClass(r.stocktaking_status)}">${esc(r.stocktaking_status || '-')}</span></td>
+                    <td>${formatShortDate(r.date_of_entry)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderAssetMasterPagination() {
+            const total = assetMasterState.total;
+            const totalPages = assetMasterState.totalPages;
+            const info = document.getElementById('paginationInfoAssetMaster');
+            const btns = document.getElementById('paginationButtonsAssetMaster');
+            if (!total) {
+                info.textContent = 'Menampilkan 0-0 dari 0 data';
+                btns.innerHTML = '';
+                return;
+            }
+            const start = (assetMasterState.page - 1) * ASSET_MASTER_PAGE_SIZE + 1;
+            const end = Math.min(assetMasterState.page * ASSET_MASTER_PAGE_SIZE, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+            let html = `<button class="pagination-btn" onclick="goToPageAssetMaster(${assetMasterState.page - 1})" ${assetMasterState.page === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === assetMasterState.page) {
+                    html += `<button class="pagination-btn pagination-active">${i}</button>`;
+                } else if (i === 1 || i === totalPages || Math.abs(i - assetMasterState.page) <= 2) {
+                    html += `<button class="pagination-btn" onclick="goToPageAssetMaster(${i})">${i}</button>`;
+                } else if (i === assetMasterState.page - 3 || i === assetMasterState.page + 3) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+            html += `<button class="pagination-btn" onclick="goToPageAssetMaster(${assetMasterState.page + 1})" ${assetMasterState.page === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            btns.innerHTML = html;
+        }
+
+        function goToPageAssetMaster(page) {
+            if (page < 1 || page > assetMasterState.totalPages) return;
+            assetMasterState.page = page;
+            loadAssetMasterData();
+        }
+
+        function initAssetMasterSearch() {
+            const input = document.getElementById('assetMasterSearch');
+            if (!input) return;
+            input.addEventListener('input', function () {
+                clearTimeout(assetMasterSearchTimer);
+                assetMasterSearchTimer = setTimeout(function () {
+                    assetMasterState.search = input.value.trim();
+                    assetMasterState.page = 1;
+                    loadAssetMasterData();
+                }, 350);
+            });
+        }
+
+        function buildAssetMasterExportUrl(endpoint) {
+            const qs = new URLSearchParams();
+            if (assetMasterState.search) qs.set('q', assetMasterState.search);
+            const filters = getAssetMasterFilterParams();
+            for (const [k, v] of Object.entries(filters)) qs.set('filters[' + k + ']', v);
+            const str = qs.toString();
+            return str ? (endpoint + '?' + str) : endpoint;
+        }
+
+        function exportAssetMasterExcel() {
+            downloadExport(buildAssetMasterExportUrl('export_asset_master_excel.php'));
+        }
+
+        function exportAssetMasterPDF() {
+            downloadExport(buildAssetMasterExportUrl('export_asset_master_pdf.php'));
+        }
+
+        // Auto-refresh the Asset Master table whenever the user returns to this
+        // page so it reflects the latest Asset IT/GA data (create, update, delete,
+        // stocktaking, transfer) without a manual refresh.
+        window.addEventListener('focus', function () {
+            if (document.getElementById('assetMasterBody')) loadAssetMasterData();
+        });
 
         // ==========================================
         // EXPORT FUNCTIONS
         // ==========================================
-        function exportToExcel() {
-            window.location.href = 'export_excel.php';
+        // Downloads are triggered through a hidden iframe so the browser never
+        // navigates away from laporan.html (no blank page after exporting).
+        function downloadExport(url) {
+            let frame = document.getElementById('exportDownloadFrame');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'exportDownloadFrame';
+                frame.setAttribute('aria-hidden', 'true');
+                frame.style.display = 'none';
+                frame.style.width = '0';
+                frame.style.height = '0';
+                frame.style.border = '0';
+                document.body.appendChild(frame);
+            }
+            frame.src = url;
         }
 
-                    function exportToPDF() {
-                var printWindow = window.open('', '_blank', 'width=1000,height=800');
-                
-                // Mengambil elemen tabel dan bagian rekapitulasi secara langsung
-                var tableHTML = document.querySelector('table') ? document.querySelector('table').outerHTML : '<p>Tabel data tidak ditemukan</p>';
-                var sectionTitle = document.querySelector('.section-title') ? document.querySelector('.section-title').outerHTML : '<h3>RINGKASAN ASET</h3>';
+        function exportToExcel() {
+            downloadExport('export_excel.php');
+        }
 
-                printWindow.document.write('<!DOCTYPE html>');
-                printWindow.document.write('<html><head>');
-                printWindow.document.write('<title>Laporan Aset - PT United Tractors</title>');
-                printWindow.document.write('<style>');
-                printWindow.document.write('body { font-family: Arial, sans-serif; margin: 30px; color: #333; }');
-                printWindow.document.write('h2 { color: #1E5AA8; text-align: center; margin: 0; }');
-                printWindow.document.write('.subtitle { text-align: center; color: #666; margin-bottom: 25px; border-bottom: 2px solid #1E5AA8; padding-bottom: 10px; }');
-                printWindow.document.write('.section-title { font-size: 14px; font-weight: bold; background: #1E5AA8; color: #FFCC00; padding: 8px 12px; margin-top: 20px; }');
-                printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 10px; }');
-                printWindow.document.write('th { background-color: #FFCC00; color: #000; padding: 10px; border: 1px solid #999; text-align: left; }');
-                printWindow.document.write('td { padding: 8px; border: 1px solid #999; }');
-                printWindow.document.write('tr:nth-child(even) { background-color: #f9f9f9; }');
-                printWindow.document.write('</style>');
-                printWindow.document.write('</head><body>');
-                printWindow.document.write('<h2>LAPORAN REKAPITULASI ASET</h2>');
-                printWindow.document.write('<div class="subtitle"><p>PT United Tractors Tbk</p></div>');
-                printWindow.document.write(sectionTitle);
-                printWindow.document.write(tableHTML);
-                printWindow.document.write('</body></html>');
-                
-                printWindow.document.close();
-                
-                setTimeout(function() {
-                    printWindow.focus();
-                    printWindow.print();
-                }, 600);
+        function exportToPDF() {
+            downloadExport('export_pdf.php');
+        }
+
+        // ==========================================
+        // BARANG REPORT (Masuk/Keluar IT/GA)
+        // ==========================================
+        async function loadBarangReport() {
+            try {
+                const response = await fetch('get_laporan_data.php?barang=true');
+                const result = await response.json();
+                if (result.status !== 'success') return;
+                const d = result.data;
+
+                const setCount = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+                setCount('barangMasukItCount', d.masuk_it.count);
+                setCount('barangMasukGaCount', d.masuk_ga.count);
+                setCount('barangKeluarItCount', d.keluar_it.count);
+                setCount('barangKeluarGaCount', d.keluar_ga.count);
+
+                const renderRows = (elId, rows, hasSupplier) => {
+                    const el = document.getElementById(elId);
+                    if (!el) return;
+                    if (!rows || rows.length === 0) {
+                        el.innerHTML = '<span style="color:#94a3b8;">Belum ada data.</span>';
+                        return;
+                    }
+                    el.innerHTML = rows.slice(0, 6).map(r => {
+                        const parts = [
+                            '<strong>' + esc(r.asset_name) + '</strong>',
+                            esc(r.asset_number) || '-',
+                            'Jml: ' + esc(r.jumlah ?? 0),
+                            hasSupplier ? ('Sup: ' + (esc(r.supplier) || '-')) : null,
+                            esc(r.tanggal) || '-',
+                            esc(r.pic) || '-',
+                            esc(r.area) || '-'
+                        ].filter(Boolean);
+                        return '<div style="padding:6px 0; border-bottom:1px solid #f1f5f9; display:flex; flex-wrap:wrap; gap:6px 12px;">' + parts.map(p => '<span>' + p + '</span>').join('') + '</div>';
+                    }).join('');
+                };
+
+                renderRows('barangMasukItRows', d.masuk_it.rows, true);
+                renderRows('barangMasukGaRows', d.masuk_ga.rows, true);
+                renderRows('barangKeluarItRows', d.keluar_it.rows, false);
+                renderRows('barangKeluarGaRows', d.keluar_ga.rows, false);
+            } catch (err) {
+                console.error('Failed to load barang report:', err);
             }
+        }
+
+        // ==========================================
+        // TRANSFER HISTORY
+        // ==========================================
+        async function loadTransferHistory() {
+            try {
+                const response = await fetch('get_laporan_data.php?transfer=true');
+                const result = await response.json();
+                const tbody = document.getElementById('transferHistoryBody');
+                if (!tbody) return;
+                if (result.status !== 'success' || !result.data || result.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px; color:#777;">Belum ada riwayat transfer.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = result.data.map(t => `
+                    <tr>
+                        <td>${esc(t.asset_number || '-')}</td>
+                        <td>${esc(t.asset_name || '-')}</td>
+                        <td>${esc(t.asset_type || '-')}</td>
+                        <td>${esc(t.old_area || '-')}</td>
+                        <td><span class="badge-transfer">${esc(t.new_area || '-')}</span></td>
+                        <td>${esc(t.old_department || '-')}</td>
+                        <td>${esc(t.new_department || '-')}</td>
+                        <td>${esc(t.pic || '-')}</td>
+                        <td>${esc(t.transfer_date || '-')}</td>
+                        <td>${esc(t.transferred_by || '-')}</td>
+                        <td style="white-space:normal; min-width:160px;">${esc(t.remarks || '-')}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to load transfer history:', err);
+            }
+        }
 
         // Load all data on page load
         document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardSummary();
             loadChartData();
             loadSummaryTable();
+            loadBarangReport();
+            loadTransferHistory();
+            loadAssetMasterData();
+            initAssetMasterSearch();
             
             // Safety net: force hide loader after 5 seconds no matter what
             setTimeout(function() {

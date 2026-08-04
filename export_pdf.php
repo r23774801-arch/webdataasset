@@ -1,75 +1,71 @@
 <?php
-include "koneksi.php";
-$db_connection = isset($conn) ? $conn : (isset($koneksi) ? $koneksi : null);
-?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8">
-    <title>Laporan Aset - PT United Tractors</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 30px; color: #333; }
-        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #1E5AA8; padding-bottom: 10px; }
-        .header h2 { color: #1E5AA8; margin: 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 30px; }
-        th { background-color: #FFCC00; color: #000; padding: 10px; border: 1px solid #999; text-align: left; }
-        td { padding: 8px; border: 1px solid #999; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .text-center { text-align: center; }
-        .section-title { font-size: 14px; font-weight: bold; background: #1E5AA8; color: #FFCC00; padding: 8px 12px; margin-top: 20px; }
-    </style>
-</head>
-<body>
+session_start();
+ini_set('display_errors', 0);
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
-<div class="header">
-    <h2>LAPORAN REKAPITULASI ASET</h2>
-    <p>PT United Tractors Tbk</p>
-    <p><small>Tanggal Cetak: <?php echo date('d F Y'); ?></small></p>
-</div>
+include 'koneksi.php';
+require_once __DIR__ . '/app/bootstrap.php';
 
-<div class="section-title">RINGKASAN ASET PER LOKASI (AREA)</div>
-<table>
-    <thead>
-        <tr>
-            <th class="text-center" width="50px">No</th>
-            <th>Lokasi (Area)</th>
-            <th class="text-center">Total Aset</th>
-            <th class="text-center">Normal</th>
-            <th class="text-center">Broken</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        if ($db_connection) {
-            $query = mysqli_query($db_connection, "SELECT area, COUNT(*) as total, SUM(CASE WHEN kondisi='Normal' THEN 1 ELSE 0 END) as normal, SUM(CASE WHEN kondisi='Broken' THEN 1 ELSE 0 END) as broken FROM aset_it GROUP BY area");
-            if ($query && mysqli_num_rows($query) > 0) {
-                $no = 1;
-                while ($row = mysqli_fetch_assoc($query)) {
-                    echo "<tr>";
-                    echo "<td class='text-center'>" . $no++ . "</td>";
-                    echo "<td><strong>" . htmlspecialchars($row['area']) . "</strong></td>";
-                    echo "<td class='text-center'>" . $row['total'] . "</td>";
-                    echo "<td class='text-center' style='color:green; font-weight:bold;'>" . $row['normal'] . "</td>";
-                    echo "<td class='text-center' style='color:red; font-weight:bold;'>" . $row['broken'] . "</td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='5' class='text-center'>Belum ada data aset IT</td></tr>";
-            }
-        } else {
-            echo "<tr><td colspan='5' class='text-center' style='color:red;'>Koneksi database gagal</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
+require_login();
 
-<script>
-    window.onload = function() {
-        setTimeout(function() {
-            window.print();
-        }, 500);
-    };
-</script>
+// ==========================================
+// Asset report PDF — direct download.
+// Content mirrors the on-page "Ringkasan Aset
+// per Lokasi (Area)" table (ReportService keeps
+// the data source identical to the web report).
+// ==========================================
+$summary = ReportService::areaSummary($conn);
 
-</body>
-</html>
+$pdf = new PdfService('LAPORAN REKAPITULASI ASET', 'PT United Tractors Tbk  -  Dicetak ' . date('d F Y'));
+$pdf->addPage();
+
+$y = $pdf->getMargin() + 44;
+$pdf->setFont(11, true);
+$pdf->text($pdf->getMargin(), $y, 'RINGKASAN ASET PER LOKASI (AREA)', [0.12, 0.35, 0.66]);
+$y += 17;
+
+$headers = [
+    ['No', 24, 'center'],
+    ['Lokasi (Area)', 110, 'left'],
+    ['Total Aset', 44, 'center'],
+    ['Normal', 38, 'center'],
+    ['Pending', 42, 'center'],
+    ['Broken', 42, 'center'],
+    ['Lost', 38, 'center'],
+    ['Transfer', 44, 'center'],
+    ['Persentase Normal', 62, 'center'],
+    ['Progress Stocktaking', 62, 'center'],
+];
+
+$rows = [];
+$no = 1;
+foreach ($summary as $s) {
+    $total      = (int)$s['total'];
+    $pctNormal  = $total > 0 ? number_format(($s['normal'] / $total) * 100, 1) : '0';
+    $pctProgress = $total > 0 ? number_format(($s['stocktaking_done'] / $total) * 100, 1) : '0';
+    $rows[] = [
+        $no++,
+        $s['area'],
+        $total,
+        $s['normal'],
+        $s['pending'],
+        $s['broken'],
+        $s['lost'],
+        $s['transfer'],
+        $pctNormal . '%',
+        $pctProgress . '%',
+    ];
+}
+if (empty($rows)) {
+    $rows[] = ['-', 'Belum ada data', '-', '-', '-', '-', '-', '-', '-', '-'];
+}
+
+$pdf->table($pdf->getMargin(), $y, $headers, $rows, ['font_size' => 8, 'row_height' => 14]);
+
+header('Content-Type: application/pdf');
+header('Content-Disposition: attachment; filename="laporan_aset_' . date('Y-m-d') . '.pdf"');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+
+echo $pdf->output();
+$conn->close();

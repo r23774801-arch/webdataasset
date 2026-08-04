@@ -13,6 +13,12 @@ if (!$userRole) {
     exit;
 }
 
+// RBAC: Admin cannot edit asset condition data (admin only approves stocktaking).
+if ($userRole === 'ADMIN') {
+    echo json_encode(["status" => "error", "message" => "Akses ditolak. Admin tidak dapat mengubah data aset."]);
+    exit;
+}
+
 $input = json_decode(file_get_contents('php://input'), true);
 
 if ($input && isset($input['id']) && isset($input['kondisi'])) {

@@ -43,8 +43,10 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk.html" class="sidebar-dropdown-item">Barang Masuk</a>
-                    <a href="barang-keluar.html" class="sidebar-dropdown-item">Barang Keluar</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
                 </div>
             </div>
 
@@ -130,6 +132,18 @@
                     </button>
                     <h2 style="margin-top: 10px;">Stocktaking Aset</h2>
                 </div>
+            </div>
+
+            <!-- User Submission Status Panel -->
+            <div class="table-container" id="submissionStatusPanel" style="margin-bottom: 20px; padding: 18px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div style="font-size: 0.78rem; font-weight: 800; color: #9A7300; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;">Status Pengajuan Stocktaking</div>
+                        <div id="submissionStatusBadge"></div>
+                    </div>
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap;" id="submissionStatusMeta"></div>
+                </div>
+                <div id="submissionStatusReason" style="margin-top: 14px; display: none;"></div>
             </div>
 
             <!-- Search Box -->
@@ -333,6 +347,73 @@
 
         // Load data on page load
         loadStocktakingData();
+        loadSubmissionStatus();
+
+        // ========== USER SUBMISSION STATUS (Approved / Rejected) ==========
+        async function loadSubmissionStatus() {
+            const role = (localStorage.getItem('userRole') || '').toLowerCase();
+            if (role !== 'it' && role !== 'ga') return;
+            const assetType = role === 'it' ? 'IT' : 'GA';
+
+            try {
+                const response = await fetch('get_stocktaking_submissions.php?latest=1&asset_type=' + assetType);
+                const result = await response.json();
+                if (result.status !== 'success' || !result.data) return;
+
+                const sub = result.data;
+                const panel = document.getElementById('submissionStatusPanel');
+                if (!panel) return;
+
+                const badge = document.getElementById('submissionStatusBadge');
+                const meta = document.getElementById('submissionStatusMeta');
+                const reasonBox = document.getElementById('submissionStatusReason');
+
+                const badgeHtml = {
+                    Pending:  '<span class="approval-status-badge stk-pending">Pending</span>',
+                    Approved: '<span class="approval-status-badge stk-approved">Approved</span>',
+                    Rejected: '<span class="approval-status-badge stk-rejected">Rejected</span>'
+                }[sub.status] || '<span class="approval-status-badge stk-pending">Pending</span>';
+
+                badge.innerHTML = badgeHtml + ' <span style="font-weight:700; margin-left:8px;">' + esc(sub.submission_code || ('STK-' + sub.id)) + '</span>';
+
+                const items = [
+                    ['Submission Date', sub.submission_date || '-']
+                ];
+                if (sub.status === 'Approved') {
+                    items.push(['Approved By', sub.approved_by_name || sub.approved_by || '-']);
+                    items.push(['Approval Date', sub.approval_date || '-']);
+                } else if (sub.status === 'Rejected') {
+                    items.push(['Rejected By', sub.rejected_by_name || sub.rejected_by || '-']);
+                    items.push(['Rejection Date', sub.rejection_date || '-']);
+                }
+                meta.innerHTML = items.map(function (pair) {
+                    return '<div><span style="display:block; font-size:0.68rem; font-weight:800; color:#9A7300; text-transform:uppercase; letter-spacing:0.6px;">' + esc(pair[0]) + '</span>' +
+                           '<span style="font-size:0.92rem; font-weight:700; color:#1F1F1F;">' + esc(pair[1]) + '</span></div>';
+                }).join('');
+
+                if (sub.status === 'Rejected' && sub.rejection_reason) {
+                    reasonBox.style.display = 'block';
+                    reasonBox.innerHTML = '<div style="font-size:0.7rem; font-weight:800; color:#C62828; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Rejection Reason</div>' +
+                        '<div style="font-size:0.95rem; color:#7F1D1D; line-height:1.6;">' + esc(sub.rejection_reason) + '</div>';
+                    reasonBox.style.background = '#FFEBEE';
+                    reasonBox.style.border = '1px solid #F5C6CB';
+                    reasonBox.style.borderRadius = '10px';
+                    reasonBox.style.padding = '12px 14px';
+                } else {
+                    reasonBox.style.display = 'none';
+                }
+
+                panel.style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load submission status:', error);
+            }
+        }
+
+        function esc(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
     </script>
 </body>
 </html>

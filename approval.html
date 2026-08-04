@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Stocktaking - PT United Tractors</title>
+    <link rel="icon" href="img/ikon.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/enterprise-ui.css">
+    <style>
+        .approval-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .approval-tab {
+            border: 1px solid #e9ecef;
+            background: #ffffff;
+            color: #4B5563;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .approval-tab:hover {
+            border-color: #FFC20E;
+            color: #1F1F1F;
+        }
+        .approval-tab.active {
+            background: #FFC20E;
+            border-color: #FFC20E;
+            color: #1F1F1F;
+        }
+        .approval-status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .stk-pending { background-color: #fff4cc; color: #9A7300; }
+        .stk-approved { background-color: #e8f5e9; color: #2e7d32; }
+        .stk-rejected { background-color: #ffebee; color: #c62828; }
+
+        .approval-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .approval-meta-item {
+            background: #F5F6F8;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .approval-meta-label {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: #9A7300;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .approval-meta-value {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #1F1F1F;
+            margin-top: 4px;
+        }
+
+        .approval-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .approval-summary-item {
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            color: #fff;
+        }
+        .approval-summary-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .approval-summary-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        .review-modal-body {
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+        .btn-approve {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-approve:hover { background-color: #43a047; }
+        .btn-approve:disabled {
+            background-color: #bdbdbd;
+            cursor: not-allowed;
+        }
+        .btn-reject {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-reject:hover { background-color: #c62828; }
+        .btn-export {
+            background: #ffffff;
+            color: #1E5AA8;
+            border: 1px solid #1E5AA8;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-export:hover { background: #1E5AA8; color: #ffffff; }
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .reject-reason-input {
+            width: 100%;
+            min-height: 96px;
+            padding: 12px 14px;
+            border: 1px solid #D8DEE8;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #1F1F1F;
+            resize: vertical;
+            margin-top: 8px;
+        }
+        .reject-reason-input:focus {
+            outline: none;
+            border-color: #FFC20E;
+            box-shadow: 0 0 0 3px rgba(255, 194, 14, 0.18);
+        }
+
+        /* ===== Phase 4.2: Responsive approval table (asset-page pattern) =====
+           Table scrolls horizontally ONLY inside .table-responsive;
+           the page, sidebar and header never scroll horizontally. */
+        .approval-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 1840px; /* sum of colgroup widths — keeps every column readable */
+        }
+        .approval-table th,
+        .approval-table td {
+            padding: 10px 12px !important;
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        .approval-table th {
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .approval-table td {
+            white-space: nowrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        .approval-table td.reason-cell {
+            white-space: normal;
+        }
+        .approval-table .approval-status-badge {
+            white-space: nowrap;
+            display: inline-block;
+            line-height: 1.4;
+        }
+        .approval-table .btn-warning {
+            white-space: nowrap;
+            padding: 8px 14px !important;
+            min-height: 0 !important;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="img/logo.png" alt="UT Logo">
+            <div class="sidebar-brand-text">UT Asset Dashboard</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">UTAMA</div>
+            <a href="dashboard.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="nav-label">Home</span>
+            </a>
+
+            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-dropdown">
+                <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                        <span class="nav-label">Data Aset</span>
+                    </div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <div class="sidebar-dropdown-menu">
+                    <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
+                    <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
+                </div>
+            </div>
+
+            <div class="sidebar-section-label">OTHERS</div>
+            <a href="approval.html" class="sidebar-nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 12l2 2 4-4"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                <span class="nav-label">Approval Stocktaking</span>
+            </a>
+            <a href="kontak.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span class="nav-label">Kontak</span>
+            </a>
+            <a href="laporan.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span class="nav-label">Laporan Aset</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
+                <div class="sidebar-user-details">
+                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
+                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
+                </div>
+            </div>
+            <button onclick="logout()" class="sidebar-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="top-header-left">
+            <button class="sidebar-toggle-btn" title="Toggle Sidebar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div>
+                <div class="page-title">Approval Stocktaking</div>
+                <div class="page-breadcrumb">Dashboard / <span>Approval Stocktaking</span></div>
+            </div>
+        </div>
+        <div class="top-header-right">
+            <div class="top-user-badge">
+                <div class="top-user-avatar" id="topAvatar">U</div>
+                <div>
+                    <div class="top-user-name" id="topUserName">User</div>
+                    <div class="top-user-role" id="topUserRole">ADMIN</div>
+                </div>
+            </div>
+            <button onclick="logout()" class="top-logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="enterprise-page-header">
+                <div class="enterprise-page-heading">
+                    <button onclick="window.location.href='dashboard.html'" class="btn-back">
+                        &larr; Kembali ke Dashboard
+                    </button>
+                    <h2>Stocktaking Approval</h2>
+                    <p>Review stocktaking submissions and approve completed stocktaking reports.</p>
+                </div>
+            </div>
+
+            <div class="approval-tabs" id="approvalTabs">
+                <button class="approval-tab active" data-status="" onclick="loadSubmissions('')">Semua</button>
+                <button class="approval-tab" data-status="Pending" onclick="loadSubmissions('Pending')">Pending</button>
+                <button class="approval-tab" data-status="Approved" onclick="loadSubmissions('Approved')">Approved</button>
+                <button class="approval-tab" data-status="Rejected" onclick="loadSubmissions('Rejected')">Rejected</button>
+            </div>
+
+            <div class="table-container">
+                <div class="table-responsive">
+                <table class="approval-table">
+                    <colgroup>
+                        <col style="min-width:160px">
+                        <col style="min-width:180px">
+                        <col style="min-width:110px">
+                        <col style="min-width:220px">
+                        <col style="min-width:170px">
+                        <col style="min-width:150px">
+                        <col style="min-width:150px">
+                        <col style="min-width:170px">
+                        <col style="min-width:260px">
+                        <col style="min-width:140px">
+                        <col style="min-width:130px">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Submission Code</th>
+                            <th>Submitted By</th>
+                            <th>Asset Type</th>
+                            <th>Area</th>
+                            <th>Submission Date</th>
+                            <th>Approved By</th>
+                            <th>Rejected By</th>
+                            <th>Approval Date</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelApproval">
+                        <tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px; width: 95%;">
+            <span class="close-btn" onclick="tutupReviewModal()">&times;</span>
+            <h3 id="reviewModalTitle">Review Stocktaking</h3>
+            <div id="reviewBody" class="review-modal-body">
+                <p style="color:#777;">Memuat detail...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Reason Modal -->
+    <div id="rejectModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 480px; width: 95%;">
+            <span class="close-btn" onclick="tutupRejectModal()">&times;</span>
+            <h3 style="margin: 0 0 6px; color: #C62828;">Tolak Pengajuan</h3>
+            <p style="color: #6B7280; font-size: 0.9rem; margin: 0 0 14px;">Alasan penolakan wajib diisi sebelum pengajuan dapat ditolak.</p>
+            <label style="font-size: 0.8rem; font-weight: 800; color: #1F1F1F; text-transform: uppercase; letter-spacing: 0.4px;">Rejection Reason</label>
+            <textarea id="rejectReasonInput" class="reject-reason-input" placeholder="Contoh: Foto aset tidak jelas, data aset belum lengkap..."></textarea>
+            <div class="review-actions">
+                <button class="btn-back" onclick="tutupRejectModal()">Batal</button>
+                <button class="btn-reject" id="confirmRejectBtn" onclick="confirmReject()">Konfirmasi Tolak</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/loader.js"></script>
+    <script>
+        // ========== SIDEBAR & USER ==========
+        function toggleSidebarDropdown() {
+            const dropdown = document.querySelector('.sidebar-dropdown');
+            if (dropdown) dropdown.classList.toggle('open');
+        }
+
+        function loadUserInfo() {
+            const nrp = localStorage.getItem('currentNrp') || 'User';
+            const username = localStorage.getItem('currentUser') || 'User';
+            const role = localStorage.getItem('userRole') || 'admin';
+            const initial = username.charAt(0).toUpperCase();
+
+            document.getElementById('sidebarNrp').textContent = nrp + ' (' + role.toUpperCase() + ')';
+            document.getElementById('sidebarRole').textContent = role.toUpperCase();
+            document.getElementById('sidebarAvatar').textContent = initial;
+            document.getElementById('topAvatar').textContent = initial;
+            document.getElementById('topUserName').textContent = username;
+            document.getElementById('topUserRole').textContent = role.toUpperCase();
+        }
+
+        function logout() {
+            try { fetch('logout.php', { method: 'POST' }); } catch (err) {}
+            sessionStorage.removeItem('isLoggedIn');
+            localStorage.clear();
+            window.location.replace('login.html');
+        }
+
+        loadUserInfo();
+
+        // Admin-only page guard (UI level; the backend enforces it too)
+        const userRole = (localStorage.getItem('userRole') || '').toLowerCase();
+        if (userRole !== 'admin') {
+            window.location.replace('dashboard.html');
+        }
+
+        // ========== SUBMISSION LIST ==========
+        let currentFilter = '';
+
+        // Escape user-controlled values before injecting into innerHTML (XSS-safe).
+        function esc(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function statusBadge(status) {
+            const map = {
+                Pending: 'stk-pending',
+                Approved: 'stk-approved',
+                Rejected: 'stk-rejected'
+            };
+            return `<span class="approval-status-badge ${map[status] || 'stk-pending'}">${status || 'Pending'}</span>`;
+        }
+
+        async function loadSubmissions(status) {
+            currentFilter = status || '';
+            document.querySelectorAll('.approval-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.status === currentFilter);
+            });
+
+            const tbody = document.getElementById('tabelApproval');
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>';
+
+            try {
+                const query = status ? `?status=${encodeURIComponent(status)}` : '';
+                const response = await fetch('get_stocktaking_submissions.php' + query);
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px; color:#c62828;">${result.message || 'Gagal memuat data.'}</td></tr>`;
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Tidak ada pengajuan stocktaking.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = result.data.map((item, index) => {
+                    const assetType = item.asset_type === 'IT' ? '<span class="badge-stocktaked" style="padding:4px 12px;">IT</span>' : '<span class="badge-pending" style="padding:4px 12px;">GA</span>';
+                    return `<tr>
+                        <td><strong>${esc(item.submission_code || 'STK-' + item.id)}</strong></td>
+                        <td>${esc(item.submitted_by_name)}<div style="font-size:11px; color:#6B7280;">${esc(item.submitted_by)}</div></td>
+                        <td>${assetType}</td>
+                        <td>${esc(item.area) || '-'}</td>
+                        <td>${esc(item.submission_date)}</td>
+                        <td>${esc(item.approved_by_name || '-')}</td>
+                        <td>${esc(item.rejected_by_name || '-')}</td>
+                        <td>${esc(item.approval_date || '-')}</td>
+                        <td class="reason-cell"><span style="color:${item.rejection_reason ? '#7F1D1D' : '#6B7280'};">${esc(item.rejection_reason || '-')}</span></td>
+                        <td>${statusBadge(item.status)}</td>
+                        <td><button class="btn-warning" onclick="openReview(${esc(item.id)})">Review</button></td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #c62828;">Gagal memuat data dari server.</td></tr>';
+            }
+        }
+
+        // ========== REVIEW MODAL ==========
+        function tutupReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+            currentReviewId = null;
+        }
+
+        async function openReview(id) {
+            const modal = document.getElementById('reviewModal');
+            const body = document.getElementById('reviewBody');
+            modal.style.display = 'flex';
+            body.innerHTML = '<p style="color:#777;">Memuat detail...</p>';
+
+            try {
+                const response = await fetch('get_stocktaking_submissions.php?id=' + id);
+                const result = await response.json();
+                if (result.status !== 'success' || !result.data) {
+                    body.innerHTML = `<p style="color:#c62828;">${result.message || 'Gagal memuat detail.'}</p>`;
+                    return;
+                }
+                renderReview(result.data);
+            } catch (error) {
+                console.error(error);
+                body.innerHTML = '<p style="color:#c62828;">Gagal memuat detail pengajuan.</p>';
+            }
+        }
+
+        function renderReview(sub) {
+            const body = document.getElementById('reviewBody');
+            document.getElementById('reviewModalTitle').textContent = 'Review Stocktaking - ' + (sub.submission_code || ('STK-' + sub.id));
+            // (title set via textContent — XSS-safe)
+            currentReviewId = sub.id;
+
+            const summaryItems = [
+                { label: 'Total Assets', value: sub.total_assets, bg: '#1F1F1F' },
+                { label: 'Normal', value: sub.normal_count, bg: '#1E5AA8' },
+                { label: 'Broken', value: sub.broken_count, bg: '#0D9488' },
+                { label: 'Lost', value: sub.lost_count, bg: '#DC3545' },
+                { label: 'Pending', value: sub.pending_count, bg: '#FFC20E' }
+            ];
+
+            const metaItems = [
+                ['User Name', sub.submitted_by_name || '-'],
+                ['NRP', sub.submitted_by || '-'],
+                ['Department', sub.department || '-'],
+                ['Area', sub.area || '-'],
+                ['Submission Date', sub.submission_date || '-'],
+                ['Status', sub.status || '-'],
+                ['Approved By', sub.approved_by_name || '-'],
+                ['Approval Date', sub.approval_date || '-'],
+                ['Rejected By', sub.rejected_by_name || '-'],
+                ['Rejection Date', sub.rejection_date || '-']
+            ];
+
+            const assets = sub.assets || [];
+            let rowsHtml = '';
+            if (assets.length === 0) {
+                rowsHtml = '<tr><td colspan="7" style="text-align:center; padding:14px; color:#777;">Tidak ada data aset.</td></tr>';
+            } else {
+                rowsHtml = assets.map((a, i) => {
+                    const cond = a.condition || '-';
+                    let condCls = 'badge-pending';
+                    if (cond === 'Normal') condCls = 'badge-approved';
+                    else if (cond === 'Broken') condCls = 'badge-rejected';
+                    else if (cond === 'Lost') condCls = 'badge-lost';
+                    return `<tr>
+                        <td>${esc(a.asset_number) || '-'}</td>
+                        <td>${esc(a.serial_number) || '-'}</td>
+                        <td>${esc(a.nama_barang) || '-'}</td>
+                        <td>${esc(a.area) || '-'}</td>
+                        <td>${esc(a.location_note) || '-'}</td>
+                        <td><span class="${condCls}" style="padding:4px 12px;">${esc(cond)}</span></td>
+                        <td><span class="badge-stocktaked" style="padding:4px 12px;">${esc(a.stocktaking_status) || 'Stocktaked'}</span></td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Action buttons depend on the current status (bidirectional transitions).
+            // Reject always routes through the required-reason modal.
+            let statusActions = '';
+            if (sub.status === 'Pending') {
+                statusActions = `
+                    <button class="btn-approve" onclick="changeStatus(${esc(sub.id)}, 'Approved')">Approve</button>
+                    <button class="btn-reject" onclick="bukaRejectModal(${esc(sub.id)})">Reject</button>`;
+            } else if (sub.status === 'Approved') {
+                statusActions = `<button class="btn-reject" onclick="bukaRejectModal(${esc(sub.id)})">Change to Rejected</button>`;
+            } else if (sub.status === 'Rejected') {
+                statusActions = `<button class="btn-approve" onclick="changeStatus(${esc(sub.id)}, 'Approved')">Change to Approved</button>`;
+            }
+
+            body.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div>${statusBadge(sub.status)}</div>
+                    <div style="font-size:12px; color:#6B7280;">Asset Type: <strong>${esc(sub.asset_type)}</strong></div>
+                </div>
+
+                <div class="approval-meta-grid">
+                    ${metaItems.map(([label, value]) => `
+                        <div class="approval-meta-item">
+                            <span class="approval-meta-label">${esc(label)}</span>
+                            <span class="approval-meta-value">${esc(value)}</span>
+                        </div>`).join('')}
+                </div>
+
+                <div class="approval-summary-grid">
+                    ${summaryItems.map(item => `
+                        <div class="approval-summary-item" style="background-color:${item.bg}; color:${item.bg === '#FFC20E' ? '#1F1F1F' : '#FFFFFF'};">
+                            <div class="approval-summary-value">${esc(item.value)}</div>
+                            <div class="approval-summary-label">${esc(item.label)}</div>
+                        </div>`).join('')}
+                </div>
+
+                ${sub.status === 'Rejected' && sub.rejection_reason ? `
+                <div style="background-color:#FFEBEE; border:1px solid #F5C6CB; border-radius:10px; padding:14px 16px; margin-bottom:16px;">
+                    <div style="font-size:11px; font-weight:800; color:#C62828; text-transform:uppercase; letter-spacing:0.5px;">Rejection Reason</div>
+                    <div style="font-size:0.95rem; color:#7F1D1D; margin-top:4px; line-height:1.6;">${esc(sub.rejection_reason)}</div>
+                </div>` : ''}
+
+                <div class="table-responsive" style="overflow-x:auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Asset Number</th>
+                                <th>Serial Number</th>
+                                <th>Brand</th>
+                                <th>Area</th>
+                                <th>Department</th>
+                                <th>Condition</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                </div>
+
+                <div class="review-actions">
+                    <button class="btn-back" onclick="tutupReviewModal()">Close</button>
+                    <button class="btn-export" onclick="exportReview('excel')">Export Excel</button>
+                    <button class="btn-export" onclick="exportReview('pdf')">Export PDF</button>
+                    ${statusActions}
+                </div>
+            `;
+        }
+
+        // ========== REVIEW EXPORT ==========
+        let currentReviewId = null;
+
+        function exportReview(format) {
+            if (!currentReviewId) {
+                showToast('Tidak ada pengajuan yang sedang direview.', 'warning');
+                return;
+            }
+            // Trigger the download through a hidden iframe so the current page
+            // (and the open Review modal) is never left on a blank page.
+            let frame = document.getElementById('exportDownloadFrame');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'exportDownloadFrame';
+                frame.setAttribute('aria-hidden', 'true');
+                frame.style.display = 'none';
+                frame.style.width = '0';
+                frame.style.height = '0';
+                frame.style.border = '0';
+                document.body.appendChild(frame);
+            }
+            frame.src = 'export_review.php?id=' + currentReviewId + '&format=' + format;
+        }
+
+        // ========== REJECT REASON MODAL ==========
+        let pendingRejectId = null;
+
+        function bukaRejectModal(id) {
+            pendingRejectId = id;
+            document.getElementById('rejectReasonInput').value = '';
+            document.getElementById('confirmRejectBtn').disabled = true;
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        function tutupRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+            pendingRejectId = null;
+        }
+
+        // Keep the confirm button disabled until a reason is typed.
+        document.addEventListener('input', function (e) {
+            if (e.target && e.target.id === 'rejectReasonInput') {
+                document.getElementById('confirmRejectBtn').disabled = e.target.value.trim() === '';
+            }
+        });
+
+        function confirmReject() {
+            const reason = document.getElementById('rejectReasonInput').value.trim();
+            if (reason === '') {
+                showToast('Alasan penolakan wajib diisi.', 'warning');
+                return;
+            }
+            // Capture the id BEFORE closing the modal: tutupRejectModal() resets
+            // pendingRejectId to null, so reading it afterward would send id=null
+            // to the backend ("Data tidak valid").
+            const id = pendingRejectId;
+            tutupRejectModal();
+            changeStatus(id, 'Rejected', reason);
+        }
+
+        async function changeStatus(id, status, reason) {
+            toggleLoader(true, 'Memperbarui status pengajuan...');
+            try {
+                const response = await fetch('approve_stocktaking.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id, status: status, reason: reason || '' })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                showToast(result.message, result.status === 'success' ? 'success' : 'error');
+                if (result.status === 'success') {
+                    tutupReviewModal();
+                    loadSubmissions(currentFilter);
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal memproses persetujuan.', 'error');
+            }
+        }
+
+        // Open a specific submission when arriving from the e-mail link (?id=)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('id')) {
+            setTimeout(() => openReview(parseInt(urlParams.get('id'), 10)), 300);
+        }
+
+        loadSubmissions('');
+    </script>
+</body>
+</html>

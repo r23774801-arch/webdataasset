@@ -234,7 +234,7 @@
         }
 
         /* Status Kondisi (Normal/Broken/dll) */
-        .badge-pending, .badge-approved, .badge-rejected, .badge-lost, .badge-document-needed, .badge-stocktaked {
+        .badge-pending, .badge-approved, .badge-rejected, .badge-lost, .badge-transfer, .badge-document-needed, .badge-stocktaked {
             padding: 6px 16px;
             border-radius: 20px;
             font-weight: 700;
@@ -249,6 +249,7 @@
         .badge-rejected { background-color: #dc3545; color: #fff; } /* Merah utk "Broken" */
         .badge-document-needed { background-color: #ff9800; color: #fff; } /* Oranye */
         .badge-stocktaked { background-color: #4caf50; color: #fff; } /* Hijau tua */
+        .badge-transfer { background-color: #8B5CF6; color: #fff; } /* Ungu utk "Transfer" */
 
         /* Tombol Action */
         .btn-stocktaking {
@@ -274,6 +275,18 @@
             background-color: #81c784; /* Hijau pudar pastel seperti di gambar */
             color: #fff;
             cursor: not-allowed;
+        }
+
+        /* Status chip & submitted state untuk Finish Stocktaking */
+        .stk-approval-status {
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-finish-stocktaking.submitted {
+            background-color: #9CA3AF !important;
+            color: #fff !important;
+            cursor: not-allowed !important;
+            opacity: 0.9;
         }
     </style>
     <link rel="stylesheet" href="css/table-filters.css">
@@ -312,11 +325,20 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item active">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk.html" class="sidebar-dropdown-item">Barang Masuk</a>
-                    <a href="barang-keluar.html" class="sidebar-dropdown-item">Barang Keluar</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
                 </div>
             </div>
             <div class="sidebar-section-label">OTHERS</div>
+            <a href="approval.html" class="sidebar-nav-item" id="navApproval" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 12l2 2 4-4"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                <span class="nav-label">Approval Stocktaking</span>
+            </a>
             <a href="kontak.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -400,6 +422,7 @@
                 </div>
                 <div class="enterprise-page-actions">
                     <button onclick="bukaModalTambah()" class="btn-warning">+ Tambah Aset IT</button>
+                    <span id="stkStatusIt" class="stk-approval-status" style="display:none;"></span>
                     <button onclick="finishStocktaking()" class="btn-finish-stocktaking" id="btnFinishStocktakingIt">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
                             <polyline points="20 6 9 17 4 12"></polyline>
@@ -432,7 +455,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET MAIN OFFICE</div>
                     <div class="card-value" id="total-Main Office">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
                 
                 <div class="summary-card clickable" data-area="Part BKJ" onclick="filterByArea('Part BKJ')">
@@ -441,7 +464,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET PART BKJ</div>
                     <div class="card-value" id="total-Part BKJ">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
 
                 <div class="summary-card clickable" data-area="Part BIU" onclick="filterByArea('Part BIU')">
@@ -450,7 +473,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET PART BIU</div>
                     <div class="card-value" id="total-Part BIU">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
 
                 <div class="summary-card clickable" data-area="Part BIU 3" onclick="filterByArea('Part BIU 3')">
@@ -459,7 +482,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET PART BIU 3</div>
                     <div class="card-value" id="total-Part BIU 3">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
 
                 <div class="summary-card clickable" data-area="BIU Service" onclick="filterByArea('BIU Service')">
@@ -468,7 +491,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET BIU SERVICE</div>
                     <div class="card-value" id="total-BIU Service">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
 
                 <div class="summary-card clickable" data-area="Kel." onclick="filterByArea('Kel.')">
@@ -477,7 +500,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET KEL.</div>
                     <div class="card-value" id="total-Kel.">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
 
                 <div class="summary-card clickable" data-area="PTK" onclick="filterByArea('PTK')">
@@ -486,7 +509,7 @@
                     </div>
                     <div class="card-title">TOTAL ASSET PTK</div>
                     <div class="card-value" id="total-PTK">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
 
                 <div class="summary-card clickable active-card" data-area="" onclick="filterByArea('')" style="border: 2px dashed #ffc107;">
@@ -495,7 +518,7 @@
                     </div>
                     <div class="card-title">TAMPILKAN SEMUA</div>
                     <div class="card-value" id="total-All">0</div>
-                    <div class="card-subtitle">Unit</div>
+                    <div class="card-subtitle">Total Asset</div>
                 </div>
             </div>
 
@@ -572,27 +595,7 @@
                                         </div>
                                     </div>
                                 </th>
-                                <th>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span>Asset Class</span>
-                                        <svg class="filter-icon" data-col="asset_class" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; cursor: pointer; opacity: 0.6;" onclick="toggleFilterPopup(this, event)">
-                                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                                        </svg>
-                                    </div>
-                                    <div class="filter-popup" id="filter-popup-asset_class">
-                                        <div class="filter-popup-label">Show items with value that:</div>
-                                        <select class="filter-popup-select" id="filter-condition-asset_class">
-                                            <option value="contains">Contains</option>
-                                            <option value="equals">Equals</option>
-                                            <option value="starts_with">Starts with</option>
-                                        </select>
-                                        <input type="text" class="filter-popup-input" id="filter-input-asset_class" placeholder="Search...">
-                                        <div class="filter-popup-buttons">
-                                            <button class="filter-btn-filter" onclick="applyPopupFilter('asset_class')">Filter</button>
-                                            <button class="filter-btn-clear" onclick="clearPopupFilter('asset_class')">Clear</button>
-                                        </div>
-                                    </div>
-                                </th>
+
                                 <th>
                                     <div style="display: flex; align-items: center; gap: 8px;">
                                         <span>PIC</span>
@@ -684,7 +687,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabelAsetIt">
-                            <tr><td colspan="12" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                            <tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -704,8 +707,7 @@
             <div class="input-group"><label>Asset Number</label><input type="text" id="assetNumber" placeholder="Contoh: AST-001"></div>
             <div class="input-group"><label>Serial Number</label><input type="text" id="serialNumber" placeholder="Contoh: SN123456"></div>
             <div class="input-group"><label>Brand</label><input type="text" id="namaBarang" placeholder="Contoh: Lenovo ThinkPad"></div>
-            <input type="hidden" id="assetClass" value="">
-            <input type="hidden" id="pic" value="">
+            <div class="input-group"><label>PIC (Person In Charge)</label><input type="text" id="pic" required placeholder="Contoh: Budi Santoso"></div>
             <div class="input-group"><label>Area</label>
                 <select id="area">
                     <option value="Main Office">Main Office</option>
@@ -746,14 +748,46 @@
             <div class="stocktaking-modal-asset" id="stocktakingModalAsset">Aset: <strong id="stAssetName">-</strong> (SN: <span id="stSerialNumber">-</span>)</div>
             <div class="input-group">
                 <label>Pilih Kondisi</label>
-                <select id="stCondition">
+                <select id="stCondition" onchange="handleConditionChange()">
                     <option value="">-- Pilih Kondisi --</option>
                     <option value="Normal">Normal</option>
                     <option value="Broken">Broken</option>
                     <option value="Lost">Lost</option>
+                    <option value="Transfer">Transfer</option>
                 </select>
             </div>
-            <div class="input-group">
+            <!-- PHASE 4.5 — Transfer Form (shown when Transfer is selected) -->
+            <div id="transferFormGroup" style="display:none;">
+                <div class="input-group">
+                    <label>Destination Area</label>
+                    <select id="transferArea">
+                        <option value="Main Office">Main Office</option>
+                        <option value="Part BKJ">Part BKJ</option>
+                        <option value="Part BIU">Part BIU</option>
+                        <option value="Part BIU 3">Part BIU 3</option>
+                        <option value="BIU Service">BIU Service</option>
+                        <option value="Kel.">Kel.</option>
+                        <option value="PTK">PTK</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Destination Department</label>
+                    <input type="text" id="transferDepartment" placeholder="Contoh: IT Operation">
+                </div>
+                <div class="input-group">
+                    <label>PIC</label>
+                    <input type="text" id="transferPic" placeholder="Contoh: Budi Santoso">
+                </div>
+                <div class="input-group">
+                    <label>Transfer Date</label>
+                    <input type="date" id="transferDate">
+                </div>
+                <div class="input-group">
+                    <label>Remarks</label>
+                    <textarea id="transferRemarks" rows="2" placeholder="Catatan transfer (opsional)"></textarea>
+                </div>
+            </div>
+            <div class="input-group" id="photoGroup">
                 <label>Upload Foto Aset</label>
                 <input type="file" id="stPhoto" accept="image/*" onchange="previewStocktakingPhoto(event)">
                 <img id="stPhotoPreview" class="stocktaking-photo-preview">
@@ -830,17 +864,20 @@
         const userRole = localStorage.getItem('userRole');
 
         loadUserInfo();
+        syncStocktakingSubmissionState();
 
-        // RBAC: GA role hides add button & action column
-        if (userRole.toLowerCase() === 'ga') {
+        // RBAC: Add button visible only to roles that manage IT data (shared rule in js/loader.js)
+        if (typeof window.canManageData === 'function' && !window.canManageData('it')) {
             const btnTambah = document.querySelector('button[onclick="bukaModalTambah()"]');
             if (btnTambah) btnTambah.style.display = 'none';
         }
 
-        // RBAC: Hide Finish Stocktaking button for GA users on IT page
-        if (userRole.toLowerCase() === 'ga') {
+        // RBAC: Hide Finish Stocktaking button for GA and Admin users on IT page
+        if (userRole.toLowerCase() === 'ga' || userRole.toLowerCase() === 'admin') {
             const btnFinish = document.getElementById('btnFinishStocktakingIt');
+            const chipStatus = document.getElementById('stkStatusIt');
             if (btnFinish) btnFinish.style.display = 'none';
+            if (chipStatus) chipStatus.style.display = 'none';
         }
 
         function hideActionColumnForRole() {
@@ -857,17 +894,103 @@
             document.querySelector('#modalTambah h3').textContent = 'Tambah Data Aset IT';
         }
 
-        function finishStocktaking() {
-            const nonStocktaked = filteredDataIt.filter(item => (item.stocktaking_status || 'Pending') !== 'Stocktaked');
+        // ========== STOCKTAKING SUBMISSION & APPROVAL STATE ==========
+        function getFinishButtonIt() {
+            return document.getElementById('btnFinishStocktakingIt');
+        }
+
+        async function syncStocktakingSubmissionState() {
+            try {
+                const resp = await fetch('get_stocktaking_submissions.php?mine=1&asset_type=IT&latest=1');
+                const result = await resp.json();
+                if (result.status === 'success') {
+                    window.stocktakingSubmission = result.data;
+                    renderStocktakingSubmissionState();
+                }
+            } catch (err) {
+                console.error('Gagal memuat status pengajuan stocktaking:', err);
+            }
+        }
+
+        function renderStocktakingSubmissionState() {
+            const btn = getFinishButtonIt();
+            const chip = document.getElementById('stkStatusIt');
+            const sub = window.stocktakingSubmission;
+            if (!sub) return;
+
+            const isRejected = sub.status === 'Rejected';
+
+            if (btn) {
+                if (isRejected) {
+                    // Rejected → re-enable Finish Stocktaking so the user can resubmit.
+                    btn.disabled = false;
+                    btn.classList.remove('submitted');
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"></path></svg> Finish Stocktaking';
+                } else {
+                    btn.disabled = true;
+                    btn.classList.add('submitted');
+                    const icon = sub.status === 'Approved'
+                        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+                    const labels = {
+                        Pending: 'Waiting for Admin Approval',
+                        Approved: 'Approved'
+                    };
+                    btn.innerHTML = icon + ' ' + (labels[sub.status] || sub.status);
+                }
+            }
+
+            if (chip) {
+                chip.style.display = 'inline-flex';
+                if (sub.status === 'Approved') {
+                    chip.className = 'stk-approval-status badge-stocktaked';
+                    chip.textContent = 'Status: Approved';
+                } else if (isRejected) {
+                    chip.className = 'stk-approval-status badge-rejected';
+                    chip.textContent = 'Status: Rejected';
+                } else {
+                    chip.className = 'stk-approval-status badge-pending';
+                    chip.textContent = 'Status: Waiting for Admin Approval';
+                }
+            }
+
+            // Refresh the table so per-asset Action buttons follow the latest state.
+            if (typeof allAsetData !== 'undefined' && allAsetData.length > 0 && typeof renderPageIt === 'function') {
+                renderPageIt();
+            }
+        }
+
+        async function finishStocktaking() {
+            const nonStocktaked = allAsetData.filter(item => (item.stocktaking_status || 'Pending') !== 'Stocktaked');
             if (nonStocktaked.length > 0) {
                 showToast(`Tidak dapat menyelesaikan stocktaking. Masih ada ${nonStocktaked.length} aset yang belum 'Stocktaked'.`, 'warning');
                 return;
             }
-            if (filteredDataIt.length === 0) {
+            if (allAsetData.length === 0) {
                 showToast('Tidak ada data untuk diselesaikan.', 'info');
                 return;
             }
-            showToast('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"><polyline points="20 6 9 17 4 12"></polyline></svg> Semua aset sudah Stocktaked! Stocktaking selesai.', 'success');
+            toggleLoader(true, 'Mengirim pengajuan stocktaking...');
+            try {
+                const response = await fetch('finish_stocktaking.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ table_type: TABLE_TYPE })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                if (result.status === 'success') {
+                    window.stocktakingSubmission = result.data;
+                    renderStocktakingSubmissionState();
+                    showToast(result.message, 'success');
+                } else {
+                    showToast(result.message || 'Gagal mengirim pengajuan stocktaking.', 'error');
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal mengirim pengajuan stocktaking.', 'error');
+            }
         }
 
         // ========== IMAGE PREVIEW ==========
@@ -966,7 +1089,7 @@
             const kondisi = item.stocktaking_condition || item.kondisi || '-';
             if (kondisi === 'Normal' || kondisi === 'Baik') kondisiBadge = 'badge-approved';
             else if (kondisi === 'Rusak' || kondisi === 'Broken') kondisiBadge = 'badge-rejected';
-            else if (kondisi === 'Transfer') kondisiBadge = 'badge-rejected';
+            else if (kondisi === 'Transfer') kondisiBadge = 'badge-transfer';
             else if (kondisi === 'Hilang' || kondisi === 'Lost') kondisiBadge = 'badge-lost';
 
             const stStatus = item.stocktaking_status || 'Pending';
@@ -1022,9 +1145,10 @@
                 ? `<img src="${imgPath}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${imgPath}')">`
                 : '<span class="text-muted" style="font-size:12px;">No Image</span>';
 
-            // Action button - disabled when Stocktaked
+            // Action button - disabled when Stocktaked, unless the latest submission was Rejected (re-edit allowed)
+            const submissionRejected = !!(window.stocktakingSubmission && window.stocktakingSubmission.status === 'Rejected');
             let actionButton = '';
-            if (isStocktaked) {
+            if (isStocktaked && !submissionRejected) {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="Aset sudah Stocktaked">Stocktaked</button>`;
             } else {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-action" onclick="openStocktakingModal(${item.id}, '${item.nama_barang.replace(/'/g, "\\'")}', '${item.serial_number || ''}', '${item.type}')">Action</button>`;
@@ -1034,7 +1158,6 @@
                 <td>${item.asset_number || '-'}</td>
                 <td>${item.nama_barang}</td>
                 <td>${item.serial_number || '-'}</td>
-                <td>${item.asset_class || '-'}</td>
                 <td>${item.pic || '-'}</td>
                 <td>${locationDisplay}</td>
                 <td>${utilisasiToggle}</td>
@@ -1057,7 +1180,7 @@
                 updateSummaryCards(filteredDataIt);
                 hideActionColumnForRole();
             } else {
-                tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No matching asset data found.', 'Adjust or clear the active filter to see more asset records.')}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11">${renderEmptyState('No matching asset data found.', 'Adjust or clear the active filter to see more asset records.')}</td></tr>`;
                 hideActionColumnForRole();
             }
             renderPaginationIt();
@@ -1116,7 +1239,7 @@
                 } else {
                     // Jika data kosong, pastikan kartu juga di-reset ke 0
                     updateSummaryCards([]);
-                    tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="11">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
                     hideActionColumnForRole();
                 }
             } catch (error) {
@@ -1169,8 +1292,68 @@
             }
         }
 
+        // ========== PHASE 4.5 — TRANSFER WORKFLOW ==========
+        function handleConditionChange() {
+            const isTransfer = document.getElementById('stCondition').value === 'Transfer';
+            const transferGroup = document.getElementById('transferFormGroup');
+            const photoGroup = document.getElementById('photoGroup');
+            if (transferGroup) transferGroup.style.display = isTransfer ? 'block' : 'none';
+            if (photoGroup) photoGroup.style.display = isTransfer ? 'none' : 'block';
+        }
+
+        async function submitTransferAction() {
+            const transferArea = document.getElementById('transferArea');
+            const newArea = transferArea ? transferArea.value : '';
+            if (!newArea) {
+                showToast('Area tujuan (Destination Area) wajib diisi!', 'warning');
+                return;
+            }
+
+            const payload = {
+                id: currentStocktakingId,
+                table_type: TABLE_TYPE,
+                action: 'transfer',
+                new_area: newArea,
+                new_department: document.getElementById('transferDepartment')?.value || '',
+                transfer_pic: document.getElementById('transferPic')?.value || '',
+                transfer_date: document.getElementById('transferDate')?.value || '',
+                remarks: document.getElementById('transferRemarks')?.value || ''
+            };
+
+            toggleLoader(true, 'Memproses transfer aset...');
+            try {
+                const response = await fetch('update_stocktaking.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                toggleLoader(false);
+
+                if (result.status === 'success') {
+                    showToast(result.message, 'success');
+                    tutupStocktakingModal();
+                    await muatDataAset();
+                    updateSummaryCards();
+                } else {
+                    showToast(result.message || 'Gagal melakukan transfer.', 'error');
+                }
+            } catch (err) {
+                toggleLoader(false);
+                console.error(err);
+                showToast('Gagal menghubungi server.', 'error');
+            }
+        }
+
         async function submitStocktakingAction() {
             const condition = document.getElementById('stCondition').value;
+
+            // PHASE 4.5 — Transfer condition routes to the transfer workflow.
+            if (condition === 'Transfer') {
+                await submitTransferAction();
+                return;
+            }
+
             const photoInput = document.getElementById('stPhoto');
 
             if (!condition) {
@@ -1342,7 +1525,6 @@
                             document.getElementById('assetNumber').value = item.asset_number || '';
                             document.getElementById('namaBarang').value = item.nama_barang;
                             document.getElementById('serialNumber').value = item.serial_number || '';
-                            document.getElementById('assetClass').value = item.asset_class || '';
                             document.getElementById('pic').value = item.pic || '';
                             document.getElementById('area').value = item.area;
                             document.getElementById('locationNote').value = item.location_note || '';
@@ -1359,7 +1541,6 @@
             const assetNumber = document.getElementById('assetNumber').value.trim();
             const nama = document.getElementById('namaBarang').value.trim();
             const serialNumber = document.getElementById('serialNumber').value.trim();
-            const assetClass = document.getElementById('assetClass').value;
             const pic = document.getElementById('pic').value.trim();
             const area = document.getElementById('area').value;
             const locationNote = document.getElementById('locationNote').value.trim();
@@ -1369,6 +1550,10 @@
 
             if (!nama) {
                 showToast("Brand harus diisi!", "info");
+                return;
+            }
+            if (!pic) {
+                showToast("PIC (Person In Charge) harus diisi!", "info");
                 return;
             }
 
@@ -1384,7 +1569,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
                             id: editId, asset_number: assetNumber, nama_barang: nama, 
-                            serial_number: serialNumber, asset_class: assetClass, pic: pic, 
+                            serial_number: serialNumber, pic: pic, 
                             area: area, location_note: locationNote,
                             date_of_entry: dateOfEntry, attachment: attachmentPath
                         })
@@ -1397,7 +1582,6 @@
                         document.getElementById('assetNumber').value = '';
                         document.getElementById('namaBarang').value = '';
                         document.getElementById('serialNumber').value = '';
-                        document.getElementById('assetClass').value = '';
                         document.getElementById('pic').value = '';
                         document.getElementById('locationNote').value = '';
                         document.getElementById('dateOfEntry').value = '';
@@ -1411,7 +1595,7 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
                             asset_number: assetNumber, nama_barang: nama, 
-                            serial_number: serialNumber, asset_class: assetClass, pic: pic, 
+                            serial_number: serialNumber, pic: pic, 
                             area: area, location_note: locationNote,
                             date_of_entry: dateOfEntry, attachment: attachmentPath,
                             nrp_penginput: currentNrp 
@@ -1425,7 +1609,6 @@
                         document.getElementById('assetNumber').value = '';
                         document.getElementById('namaBarang').value = '';
                         document.getElementById('serialNumber').value = '';
-                        document.getElementById('assetClass').value = '';
                         document.getElementById('pic').value = '';
                         document.getElementById('locationNote').value = '';
                         document.getElementById('dateOfEntry').value = '';
@@ -1487,7 +1670,7 @@
                     applyColumnFilters();
                 } else {
                     updateSummaryCards([]);
-                    tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="11">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
                     hideActionColumnForRole();
                 }
             } catch (error) {

@@ -132,6 +132,24 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 900);
 });
 // ==========================================
+// ADMIN-ONLY NAV - SHOW APPROVAL LINK FOR ADMIN ONLY
+// ==========================================
+function applyRoleNav() {
+    const navApproval = document.getElementById('navApproval');
+    if (navApproval) {
+        const role = (localStorage.getItem('userRole') || '').toLowerCase();
+        navApproval.style.display = role === 'admin' ? 'flex' : 'none';
+    }
+}
+
+// Run on DOM ready to show/hide role-gated nav items
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyRoleNav);
+} else {
+    applyRoleNav();
+}
+
+// ==========================================
 // SIDEBAR ACTIVE STATE - HIGHLIGHT CURRENT PAGE
 // ==========================================
 function setActiveSidebar() {
@@ -181,3 +199,93 @@ if (document.readyState === 'loading') {
 } else {
     setActiveSidebar();
 }
+
+// ==========================================
+// SHARED RBAC — ADD/MANAGE PERMISSION (Phase 4.5.3)
+// One rule used by every asset-management page:
+//   admin → manage everything
+//   it    → manage IT data only
+//   ga    → manage GA data only
+// ==========================================
+function canManageData(type) {
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
+    if (role === 'admin') return true;
+    if (role === 'it') return String(type || '').toLowerCase() === 'it';
+    if (role === 'ga') return String(type || '').toLowerCase() === 'ga';
+    return false;
+}
+window.canManageData = canManageData;
+
+// ==========================================
+// GLOBAL SIDEBAR HAMBURGER CONTROLLER
+// Handles off-canvas drawer on Tablet & Mobile (<=1024px)
+// ==========================================
+function initializeSidebar() {
+    const sidebar = document.getElementById('sidebar') || document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Ensure sidebar overlay element exists
+    let overlay = document.querySelector('.sidebar-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+    }
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        document.body.classList.add('sidebar-open');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+    }
+
+    function toggleSidebar(e) {
+        if (e) e.stopPropagation();
+        if (sidebar.classList.contains('open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    }
+
+    const toggleBtns = document.querySelectorAll('.sidebar-toggle-btn');
+    toggleBtns.forEach(btn => {
+        btn.removeEventListener('click', toggleSidebar);
+        btn.addEventListener('click', toggleSidebar);
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
+
+    const sidebarLinks = sidebar.querySelectorAll('.sidebar-nav-item, .sidebar-dropdown-item');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 1024 && !link.classList.contains('sidebar-dropdown-toggle')) {
+                closeSidebar();
+            }
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024 && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSidebar);
+} else {
+    initializeSidebar();
+}
+

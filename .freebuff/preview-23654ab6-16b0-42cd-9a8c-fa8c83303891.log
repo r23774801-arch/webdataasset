@@ -1,0 +1,106 @@
+[Tue Aug  4 09:09:44 2026] PHP 8.2.12 Development Server (http://127.0.0.1:8090) started
+[Tue Aug  4 09:09:47 2026] 127.0.0.1:64353 Accepted
+[Tue Aug  4 09:09:47 2026] 127.0.0.1:64353 [200]: GET /login.html
+[Tue Aug  4 09:09:47 2026] 127.0.0.1:64353 Closing
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64357 Accepted
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64357 [200]: GET /get_asset_master_data.php?filters%5Basset_class%5D=LEH28
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64357 Closing
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64359 Accepted
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64359 [200]: GET /get_asset_master_data.php?q=FURN
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64359 Closing
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64361 Accepted
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64361 [200]: GET /get_asset_master_data.php?limit=1
+[Tue Aug  4 09:09:56 2026] 127.0.0.1:64361 Closing
+[Tue Aug  4 09:10:07 2026] 127.0.0.1:64364 Accepted
+[Tue Aug  4 09:10:07 2026] 127.0.0.1:64364 [200]: GET /export_asset_master_excel.php
+[Tue Aug  4 09:10:07 2026] 127.0.0.1:64364 Closing
+[Tue Aug  4 09:10:08 2026] 127.0.0.1:64366 Accepted
+[Tue Aug  4 09:10:08 2026] 127.0.0.1:64366 [200]: GET /export_asset_master_pdf.php
+[Tue Aug  4 09:10:08 2026] 127.0.0.1:64366 Closing
+[Tue Aug  4 09:11:31 2026] 127.0.0.1:57166 Accepted
+[Tue Aug  4 09:11:31 2026] 127.0.0.1:57166 [200]: GET /laporan.html
+[Tue Aug  4 09:11:31 2026] 127.0.0.1:57166 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57167 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57167 [200]: GET /laporan.html
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57167 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57168 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57168 [200]: GET /css/style.css
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57168 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57169 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57170 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57171 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57172 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57169 [200]: GET /css/table-filters.css
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57170 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57171 [200]: GET /img/logo.png
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57169 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57170 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57171 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57172 [200]: GET /js/loader.js
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57172 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57173 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57173 [200]: GET /js/table-filters.js
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57173 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57174 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57174 [200]: GET /login.html
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57174 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57175 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57176 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57177 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57175 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57176 [200]: GET /img/logo.png
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57177 [200]: GET /js/loader.js
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57175 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57176 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57177 Closing
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57178 Accepted
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57178 [200]: GET /js/script.js
+[Tue Aug  4 09:11:32 2026] 127.0.0.1:57178 Closing
+[Tue Aug  4 09:12:27 2026] 127.0.0.1:58664 Accepted
+[Tue Aug  4 09:12:27 2026] 127.0.0.1:58664 [200]: GET /laporan.html
+[Tue Aug  4 09:12:27 2026] 127.0.0.1:58664 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58665 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58665 [200]: GET /css/style.css
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58665 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58666 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58666 [200]: GET /css/table-filters.css
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58666 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58667 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58668 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58669 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58667 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58668 [200]: GET /img/logo.png
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58669 [200]: GET /js/loader.js
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58667 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58668 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58669 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58670 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58670 [200]: GET /js/table-filters.js
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58670 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58671 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58672 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58671 [200]: GET /get_laporan_data.php?dashboard=true
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58671 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58673 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58672 [200]: GET /get_laporan_data.php
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58672 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58675 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58673 [200]: GET /get_laporan_data.php?summary=true
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58673 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58677 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58680 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58675 [200]: GET /get_laporan_data.php?barang=true
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58675 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58677 [200]: GET /get_laporan_data.php?transfer=true
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58677 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58680 [200]: GET /get_asset_master_data.php?page=1&limit=10
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58680 Closing
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58684 Accepted
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58684 [200]: GET /get_asset_master_data.php?page=1&limit=10
+[Tue Aug  4 09:12:28 2026] 127.0.0.1:58684 Closing
+[Tue Aug  4 09:12:49 2026] 127.0.0.1:58688 Accepted
+[Tue Aug  4 09:12:49 2026] 127.0.0.1:58688 [200]: GET /get_asset_master_data.php?page=1&limit=10&filters%5Basset_class%5D=LEH28
+[Tue Aug  4 09:12:49 2026] 127.0.0.1:58688 Closing
+[Tue Aug  4 09:12:49 2026] 127.0.0.1:58690 Accepted
+[Tue Aug  4 09:12:49 2026] 127.0.0.1:58690 [200]: GET /get_asset_master_data.php?page=1&limit=10
+[Tue Aug  4 09:12:49 2026] 127.0.0.1:58690 Closing

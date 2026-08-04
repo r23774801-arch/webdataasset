@@ -2,6 +2,7 @@
 session_start();
 header('Content-Type: application/json');
 include 'koneksi.php';
+require_once __DIR__ . '/app/bootstrap.php';
 
 // RBAC: Only GA role can update GA assets
 if (!isset($_SESSION['role']) || strtoupper($_SESSION['role']) !== 'GA') {
@@ -35,6 +36,7 @@ if ($input && isset($input['id'])) {
     }
 
     if ($stmt->execute()) {
+        AuditService::log($conn, 'Updated Asset', 'aset_ga', (int)$id, ['nama_barang' => $nama_barang, 'area' => $area]);
         echo json_encode(["status" => "success", "message" => "Data aset GA berhasil diperbarui!"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Gagal memperbarui data."]);
