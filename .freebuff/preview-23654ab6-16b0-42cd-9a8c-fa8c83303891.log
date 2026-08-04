@@ -275,3 +275,195 @@
 [Tue Aug  4 15:36:29 2026] 127.0.0.1:53268 Closing
 [Tue Aug  4 15:36:29 2026] 127.0.0.1:53269 [200]: GET /js/script.js
 [Tue Aug  4 15:36:29 2026] 127.0.0.1:53269 Closing
+[Tue Aug  4 15:38:15 2026] 127.0.0.1:52455 Accepted
+[Tue Aug  4 15:38:15 2026] 127.0.0.1:52455 [200]: GET /aset-it.html
+[Tue Aug  4 15:38:15 2026] 127.0.0.1:52455 Closing
+[Tue Aug  4 15:38:15 2026] 127.0.0.1:52456 Accepted
+[Tue Aug  4 15:38:15 2026] 127.0.0.1:52456 [200]: GET /aset-ga.html
+[Tue Aug  4 15:38:15 2026] 127.0.0.1:52456 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65078 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65078 [200]: GET /aset-it.html
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65078 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65079 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65080 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65079 [200]: GET /css/style.css
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65079 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65080 [200]: GET /css/table-filters.css
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65080 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65081 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65081 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65081 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65082 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65083 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65082 [200]: GET /img/logo.png
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65083 [200]: GET /js/loader.js
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65082 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65083 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65084 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65084 [200]: GET /js/table-filters.js
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65084 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65085 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65085 [200]: GET /get_stocktaking_submissions.php?mine=1&asset_type=IT&latest=1
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65085 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65086 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65086 [200]: GET /get_aset_it.php
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65086 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65090 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65090 [404]: GET /uploads/6a718c60ce734.png - No such file or directory
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65091 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65090 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65092 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65093 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65094 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65091 [404]: GET /uploads/6a6c5d2e194fb.png - No such file or directory
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65091 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65095 Accepted
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65092 [404]: GET /uploads/6a6c44d881014.png - No such file or directory
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65093 [200]: GET /uploads/6a6aa013ebae9.jpeg
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65094 [200]: GET /uploads/6a69bd6ce8c59.jpg
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65092 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65095 [404]: GET /uploads/6a6c5d176eafb.png - No such file or directory
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65095 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65093 Closing
+[Tue Aug  4 15:38:35 2026] 127.0.0.1:65094 Closing
+[Tue Aug  4 15:41:30 2026] 127.0.0.1:53670 Accepted
+[Tue Aug  4 15:41:31 2026] 127.0.0.1:53670 [200]: POST /login.php
+[Tue Aug  4 15:41:31 2026] 127.0.0.1:53670 Closing
+[Tue Aug  4 15:41:31 2026] 127.0.0.1:53672 Accepted
+[Tue Aug  4 15:41:31 2026] 127.0.0.1:53672 [200]: POST /login.php
+[Tue Aug  4 15:41:31 2026] 127.0.0.1:53672 Closing
+[Tue Aug  4 15:43:26 2026] 127.0.0.1:61074 Accepted
+[Tue Aug  4 15:43:26 2026] 127.0.0.1:61074 [200]: POST /login.php
+[Tue Aug  4 15:43:26 2026] 127.0.0.1:61074 Closing
+[Tue Aug  4 15:43:26 2026] 127.0.0.1:61079 Accepted
+[Tue Aug  4 15:43:26 2026] 127.0.0.1:61079 [200]: POST /finish_stocktaking.php
+[Tue Aug  4 15:43:26 2026] 127.0.0.1:61079 Closing
+[Tue Aug  4 15:43:48 2026] 127.0.0.1:55434 Accepted
+[Tue Aug  4 15:43:48 2026] 127.0.0.1:55434 [200]: GET /aset-it.html
+[Tue Aug  4 15:43:48 2026] 127.0.0.1:55434 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55435 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55436 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55437 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55438 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55435 [200]: GET /css/style.css
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55436 [200]: GET /css/table-filters.css
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55437 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55438 [200]: GET /img/logo.png
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55439 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55435 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55439 [200]: GET /js/loader.js
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55436 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55437 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55438 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55439 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55440 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55440 [200]: GET /js/table-filters.js
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55440 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55441 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55441 [200]: GET /get_stocktaking_submissions.php?mine=1&asset_type=IT&latest=1
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55441 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55442 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55442 [200]: GET /get_aset_it.php
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55442 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55446 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55446 [200]: GET /uploads/6a6aa013ebae9.jpeg
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55447 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55446 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55448 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55449 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55450 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55451 Accepted
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55447 [200]: GET /uploads/6a69bd6ce8c59.jpg
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55448 [404]: GET /uploads/6a718c60ce734.png - No such file or directory
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55449 [404]: GET /uploads/6a6c5d2e194fb.png - No such file or directory
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55450 [404]: GET /uploads/6a6c44d881014.png - No such file or directory
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55451 [404]: GET /uploads/6a6c5d176eafb.png - No such file or directory
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55448 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55449 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55450 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55451 Closing
+[Tue Aug  4 15:43:49 2026] 127.0.0.1:55447 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52244 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52244 [200]: GET /aset-ga.html
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52244 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52245 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52245 [200]: GET /css/style.css
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52245 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52247 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52248 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52247 [200]: GET /css/table-filters.css
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52249 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52247 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52250 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52251 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52248 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52249 [200]: GET /img/logo.png
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52250 [200]: GET /js/loader.js
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52251 [200]: GET /js/table-filters.js
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52248 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52249 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52250 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52251 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52252 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52252 [200]: GET /get_stocktaking_submissions.php?mine=1&asset_type=GA&latest=1
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52252 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52254 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52254 [200]: GET /get_aset_ga.php
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52254 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52258 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52258 [404]: GET /uploads/6a7187e4d9c66.png - No such file or directory
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52259 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52258 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52259 [200]: GET /uploads/6a6aaff7e1a87.jpeg
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52260 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52259 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52261 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52260 [200]: GET /uploads/6a69a3322da18.png
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52261 [200]: GET /uploads/6a69a37fa5fb0.png
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52262 Accepted
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52260 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52261 Closing
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52262 [200]: GET /uploads/6a62d6029792e.jpeg
+[Tue Aug  4 15:44:15 2026] 127.0.0.1:52262 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58388 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58388 [200]: GET /aset-ga.html
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58388 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58389 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58390 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58391 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58389 [200]: GET /css/style.css
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58390 [200]: GET /css/table-filters.css
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58391 [200]: GET /css/enterprise-ui.css
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58389 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58392 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58390 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58391 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58393 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58392 [200]: GET /img/logo.png
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58393 [200]: GET /js/loader.js
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58392 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58393 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58394 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58394 [200]: GET /js/table-filters.js
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58394 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58395 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58395 [200]: GET /get_stocktaking_submissions.php?mine=1&asset_type=GA&latest=1
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58395 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58397 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58397 [200]: GET /get_aset_ga.php
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58397 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58400 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58400 [200]: GET /uploads/6a6aaff7e1a87.jpeg
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58400 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58401 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58402 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58403 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58404 Accepted
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58401 [200]: GET /uploads/6a69a3322da18.png
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58402 [200]: GET /uploads/6a69a37fa5fb0.png
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58403 [200]: GET /uploads/6a62d6029792e.jpeg
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58404 [404]: GET /uploads/6a7187e4d9c66.png - No such file or directory
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58401 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58402 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58404 Closing
+[Tue Aug  4 15:44:38 2026] 127.0.0.1:58403 Closing
