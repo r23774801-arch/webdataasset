@@ -85,19 +85,23 @@ class MailService
     }
 
     /**
-     * Send the "Stocktaking Approval Request" notification to the Administrator.
+     * Send the "Stocktaking Approval Request" notification to one administrator.
      *
-     * @param array $submission  stocktaking submission row
-     * @param array $assets      snapshot of the submitted assets
+     * The recipient MUST be resolved by the caller from the users table
+     * (every row whose role is admin) — never from config or .env.
+     *
+     * @param string $to          recipient e-mail address (must be non-empty)
+     * @param array  $submission  stocktaking submission row
+     * @param array  $assets      snapshot of the submitted assets
      */
-    public function sendStocktakingApproval(array $submission, array $assets = []): bool
+    public function sendStocktakingApproval(string $to, array $submission, array $assets = []): bool
     {
-        $config = mail_config();
-        if ($config['admin_email'] === '') {
-            error_log('[MailService] MAIL_ADMIN_ADDRESS is not configured. Skipping notification.');
+        if (trim($to) === '') {
+            error_log('[MailService] sendStocktakingApproval skipped: recipient e-mail is empty.');
             return false;
         }
 
+        $config   = mail_config();
         $baseUrl  = $config['app_url'];
         $reviewId = urlencode((string)($submission['id'] ?? ''));
 
@@ -112,7 +116,7 @@ class MailService
                 : 'approval.html?id=' . $reviewId,
         ]);
 
-        return $this->send($config['admin_email'], 'Stocktaking Approval Request', $html);
+        return $this->send($to, 'Stocktaking Approval Request', $html);
     }
 
     /**
@@ -125,6 +129,11 @@ class MailService
      */
     public function sendStocktakingResult(string $to, array $submission, array $assets = []): bool
     {
+        if (trim($to) === '') {
+            error_log('[MailService] sendStocktakingResult skipped: recipient e-mail is empty.');
+            return false;
+        }
+
         $status = $submission['status'] ?? '';
 
         if ($status === 'Approved') {

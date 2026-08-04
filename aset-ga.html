@@ -867,7 +867,7 @@
 
         const currentUser = localStorage.getItem('currentUser');
         const currentNrp = localStorage.getItem('currentNrp');
-        const userRole = localStorage.getItem('userRole');
+        const userRole = (localStorage.getItem('userRole') || '').toLowerCase();
 
         async function logout() {
             try { await fetch('logout.php', { method: 'POST' }); } catch (err) {}
@@ -885,8 +885,8 @@
             if (btnTambahGa) btnTambahGa.style.display = 'none';
         }
 
-        // RBAC: Finish Stocktaking is owned by the GA role — hidden for IT and Admin
-        if (userRole.toLowerCase() === 'it' || userRole.toLowerCase() === 'admin') {
+        // RBAC: Finish Stocktaking belongs to the GA role only — hidden for Admin and IT (shared rule in js/loader.js)
+        if (typeof window.canFinishStocktaking === 'function' && !window.canFinishStocktaking('ga')) {
             const btnFinishGa = document.getElementById('btnFinishStocktakingGa');
             const chipStatusGa = document.getElementById('stkStatusGa');
             if (btnFinishGa) btnFinishGa.style.display = 'none';

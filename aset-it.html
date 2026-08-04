@@ -861,7 +861,7 @@
 
         const currentUser = localStorage.getItem('currentUser');
         const currentNrp = localStorage.getItem('currentNrp');
-        const userRole = localStorage.getItem('userRole');
+        const userRole = (localStorage.getItem('userRole') || '').toLowerCase();
 
         loadUserInfo();
         syncStocktakingSubmissionState();
@@ -872,8 +872,8 @@
             if (btnTambah) btnTambah.style.display = 'none';
         }
 
-        // RBAC: Hide Finish Stocktaking button for GA and Admin users on IT page
-        if (userRole.toLowerCase() === 'ga' || userRole.toLowerCase() === 'admin') {
+        // RBAC: Finish Stocktaking belongs to the IT role only — hidden for Admin and GA (shared rule in js/loader.js)
+        if (typeof window.canFinishStocktaking === 'function' && !window.canFinishStocktaking('it')) {
             const btnFinish = document.getElementById('btnFinishStocktakingIt');
             const chipStatus = document.getElementById('stkStatusIt');
             if (btnFinish) btnFinish.style.display = 'none';

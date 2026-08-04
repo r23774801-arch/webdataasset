@@ -217,75 +217,17 @@ function canManageData(type) {
 window.canManageData = canManageData;
 
 // ==========================================
-// GLOBAL SIDEBAR HAMBURGER CONTROLLER
-// Handles off-canvas drawer on Tablet & Mobile (<=1024px)
+// SHARED RBAC — FINISH STOCKTAKING PERMISSION
+// Fail-closed: only the owning role may finish a stocktaking session.
+//   admin → false (monitoring/approval/reporting only)
+//   it    → true for 'it' assets only
+//   ga    → true for 'ga' assets only
+//   unknown/missing role → false (button hidden, never shown)
 // ==========================================
-function initializeSidebar() {
-    const sidebar = document.getElementById('sidebar') || document.querySelector('.sidebar');
-    if (!sidebar) return;
-
-    // Ensure sidebar overlay element exists
-    let overlay = document.querySelector('.sidebar-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'sidebar-overlay';
-        document.body.appendChild(overlay);
-    }
-
-    function openSidebar() {
-        sidebar.classList.add('open');
-        overlay.classList.add('active');
-        document.body.classList.add('sidebar-open');
-    }
-
-    function closeSidebar() {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.classList.remove('sidebar-open');
-    }
-
-    function toggleSidebar(e) {
-        if (e) e.stopPropagation();
-        if (sidebar.classList.contains('open')) {
-            closeSidebar();
-        } else {
-            openSidebar();
-        }
-    }
-
-    const toggleBtns = document.querySelectorAll('.sidebar-toggle-btn');
-    toggleBtns.forEach(btn => {
-        btn.removeEventListener('click', toggleSidebar);
-        btn.addEventListener('click', toggleSidebar);
-    });
-
-    overlay.addEventListener('click', closeSidebar);
-
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            closeSidebar();
-        }
-    });
-
-    const sidebarLinks = sidebar.querySelectorAll('.sidebar-nav-item, .sidebar-dropdown-item');
-    sidebarLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth <= 1024 && !link.classList.contains('sidebar-dropdown-toggle')) {
-                closeSidebar();
-            }
-        });
-    });
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 1024 && sidebar.classList.contains('open')) {
-            closeSidebar();
-        }
-    });
+function canFinishStocktaking(type) {
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
+    if (role === 'it') return String(type || '').toLowerCase() === 'it';
+    if (role === 'ga') return String(type || '').toLowerCase() === 'ga';
+    return false;
 }
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeSidebar);
-} else {
-    initializeSidebar();
-}
-
+window.canFinishStocktaking = canFinishStocktaking;

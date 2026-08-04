@@ -99,12 +99,22 @@ if ($statusChanged && in_array($status, [ApprovalService::STATUS_APPROVED, Appro
             $stmt->close();
         }
 
-        if ($userEmail === '') {
-            error_log('[approve_stocktaking] No e-mail on record for user ' . $submission['submitted_by'] . '; result notification skipped.');
+        if ($userEmail === '' || !filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+            error_log('[approve_stocktaking] No valid e-mail on record for user ' . $submission['submitted_by'] . '; result notification skipped.');
+            AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', $id, [
+                'submission_code' => $submission['submission_code'] ?? null,
+                'status'          => $status,
+                'reason'          => 'No valid e-mail on record for user ' . ($submission['submitted_by'] ?? ''),
+            ]);
         } else {
             $emailSent = MailService::instance()->sendStocktakingResult($userEmail, $updated, $updated['assets'] ?? []);
             if (!$emailSent) {
                 error_log('[approve_stocktaking] Failed to send result notification to ' . $userEmail . ' for submission #' . $id);
+                AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', $id, [
+                    'submission_code' => $submission['submission_code'] ?? null,
+                    'status'          => $status,
+                    'reason'          => 'Failed to send result notification to ' . $userEmail,
+                ]);
             }
         }
     } catch (\Throwable $t) {

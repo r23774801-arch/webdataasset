@@ -160,6 +160,15 @@
           <label>Status Akun</label>
           <p>Aktif (Site Batu Kajang)</p>
         </div>
+        <div class="profile-field">
+          <label>Email (Notifikasi)</label>
+          <input type="email" id="profilEmail" placeholder="nama@email.com" autocomplete="email" style="width:100%; padding:10px 14px; font-size:1rem; color:#222222; background:#ffffff; border:1px solid #dddddd; border-radius:6px; outline:none; box-sizing:border-box; transition:border-color 0.2s;">
+          <div style="font-size:0.78rem; color:#999999; margin-top:6px;">Email digunakan untuk menerima notifikasi hasil stocktaking (disetujui / ditolak). Admin juga menerima notifikasi pengajuan baru.</div>
+          <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
+            <button id="saveEmailBtn" style="background:#FFCC00; color:#111111; font-weight:700; border:none; padding:10px 22px; border-radius:8px; cursor:pointer; font-size:0.9rem; transition:transform 0.15s, box-shadow 0.15s;">Simpan Email</button>
+            <span id="emailSaveMsg" style="font-size:0.85rem;"></span>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -175,6 +184,62 @@
       document.getElementById('profilNrp').textContent = nrp;
       document.getElementById('profilUsername').textContent = username;
       document.getElementById('profilRole').textContent = role.toUpperCase();
+
+      // ==========================================
+      // E-MAIL (NOTIFIKASI) — prefill + save
+      // ==========================================
+      const emailInput = document.getElementById('profilEmail');
+      const saveBtn    = document.getElementById('saveEmailBtn');
+      const msg        = document.getElementById('emailSaveMsg');
+
+      const saveBtnHover = () => { saveBtn.style.boxShadow = '0 3px 8px rgba(179,143,0,0.35)'; };
+      const saveBtnLeave = () => { saveBtn.style.boxShadow = 'none'; };
+      saveBtn.addEventListener('mouseenter', saveBtnHover);
+      saveBtn.addEventListener('mouseleave', saveBtnLeave);
+
+      // Pre-fill the e-mail from the server session record.
+      fetch('get_session_info.php')
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res.status === 'success' && res.data && res.data.email) {
+            emailInput.value = res.data.email;
+          }
+        })
+        .catch(function() { /* session load is best-effort */ });
+
+      function setMsg(text, color) {
+        msg.textContent = text;
+        msg.style.color = color;
+      }
+
+      function saveEmail() {
+        const email = emailInput.value.trim();
+        if (!email) { setMsg('Email wajib diisi.', '#d9534f'); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Format email tidak valid.', '#d9534f'); return; }
+
+        saveBtn.disabled = true;
+        setMsg('Menyimpan...', '#777777');
+        fetch('update_profil.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.status === 'success') {
+              setMsg('\u2713 Email tersimpan.', '#2E7D32');
+            } else {
+              setMsg('\u2717 ' + (data.message || 'Gagal menyimpan email.'), '#d9534f');
+            }
+          })
+          .catch(function() { setMsg('\u2717 Gagal terhubung ke server.', '#d9534f'); })
+          .finally(function() { saveBtn.disabled = false; });
+      }
+
+      saveBtn.addEventListener('click', saveEmail);
+      emailInput.addEventListener('keydown', function(ev) {
+        if (ev.key === 'Enter') saveEmail();
+      });
     })();
 
     function logout() {

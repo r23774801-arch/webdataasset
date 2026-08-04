@@ -84,8 +84,41 @@ SpreadsheetService::sync(SpreadsheetService::SHEET_APPROVAL, [
     'rejection_reason'=> $submission['rejection_reason'] ?? null,
 ]);
 
-// Send the notification e-mail (best-effort; the submission stays valid if mail fails).
-$emailSent = MailService::instance()->sendStocktakingApproval($submission, $submission['assets'] ?? []);
+// Notify every administrator (best-effort; the submission stays valid if mail fails).
+// Recipients are resolved ONLY from the users table (role = admin) — never from
+// config or .env. Admins without a valid e-mail are skipped silently; if no admin
+// has an e-mail at all, a warning is logged and the submission still completes.
+$emailSent   = null;
+$adminEmails = [];
+$adminRows   = $conn->query("SELECT nrp, email FROM users WHERE LOWER(TRIM(role)) = 'admin'");
+if ($adminRows) {
+    while ($admin = $adminRows->fetch_assoc()) {
+        $adminEmail = trim((string)($admin['email'] ?? ''));
+        if ($adminEmail !== '' && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            $adminEmails[] = $adminEmail;
+        }
+    }
+}
+
+if (empty($adminEmails)) {
+    error_log('[finish_stocktaking] No admin e-mail address found in users table; admin notification skipped.');
+    AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', (int)($submission['id'] ?? 0), [
+        'submission_code' => $submission['submission_code'] ?? null,
+        'reason'          => 'No admin e-mail address in users table; admin notification not sent.',
+    ]);
+} else {
+    $mailer    = MailService::instance();
+    $sentCount = 0;
+    foreach (array_unique($adminEmails) as $adminEmail) {
+        if ($mailer->sendStocktakingApproval($adminEmail, $submission, $submission['assets'] ?? [])) {
+            $sentCount++;
+        }
+    }
+    $emailSent = ($sentCount > 0);
+    if ($sentCount < count($adminEmails)) {
+        error_log('[finish_stocktaking] Approval notification sent to ' . $sentCount . '/' . count($adminEmails) . ' admins for submission #' . ($submission['id'] ?? 0));
+    }
+}
 
 $message = $isResubmit
     ? ($emailSent
