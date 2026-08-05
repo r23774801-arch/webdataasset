@@ -90,6 +90,7 @@ class BarangService
         $area        = trim((string)($data['area'] ?? 'Main Office'));
         $supplier    = trim((string)($data['supplier'] ?? ''));
         $nomorTiket  = trim((string)($data['nomor_tiket'] ?? ''));
+        $unit        = trim((string)($data['unit'] ?? ''));
         $attachment  = trim((string)($data['attachment'] ?? ''));
         // Ensure path includes uploads/ prefix if a file was uploaded
         if (!empty($attachment) && strpos($attachment, 'uploads/') !== 0 && strpos($attachment, 'img/') !== 0) {
@@ -101,21 +102,21 @@ class BarangService
         }
 
         if ($module === 'masuk') {
-            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, supplier, tanggal, pic, area, nomor_tiket, attachment, created_at)
+            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, unit, supplier, tanggal, pic, area, nomor_tiket, attachment, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                return null;
+            }
+            $stmt->bind_param('ssisssssss', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $attachment);
+        } else {
+            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, unit, tanggal, pic, area, nomor_tiket, attachment, created_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 return null;
             }
-            $stmt->bind_param('ssissssss', $assetNumber, $assetName, $jumlah, $supplier, $tanggal, $pic, $area, $nomorTiket, $attachment);
-        } else {
-            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, tanggal, pic, area, nomor_tiket, attachment, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                return null;
-            }
-            $stmt->bind_param('ssisssss', $assetNumber, $assetName, $jumlah, $tanggal, $pic, $area, $nomorTiket, $attachment);
+            $stmt->bind_param('ssissssss', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $attachment);
         }
 
         if (!$stmt->execute()) {
@@ -142,6 +143,7 @@ class BarangService
         $area        = trim((string)($data['area'] ?? 'Main Office'));
         $supplier    = trim((string)($data['supplier'] ?? ''));
         $nomorTiket  = trim((string)($data['nomor_tiket'] ?? ''));
+        $unit        = trim((string)($data['unit'] ?? ''));
 
         if ($assetName === '' || $jumlah <= 0 || $tanggal === '') {
             return false;
@@ -149,22 +151,22 @@ class BarangService
 
         if ($module === 'masuk') {
             $sql = "UPDATE $table
-                    SET asset_number = ?, asset_name = ?, jumlah = ?, supplier = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?
+                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, supplier = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?
                     WHERE id = ?";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 return false;
             }
-            $stmt->bind_param('ssisssssi', $assetNumber, $assetName, $jumlah, $supplier, $tanggal, $pic, $area, $nomorTiket, $id);
+            $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $id);
         } else {
             $sql = "UPDATE $table
-                    SET asset_number = ?, asset_name = ?, jumlah = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?
+                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?
                     WHERE id = ?";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 return false;
             }
-            $stmt->bind_param('ssissssi', $assetNumber, $assetName, $jumlah, $tanggal, $pic, $area, $nomorTiket, $id);
+            $stmt->bind_param('ssisssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $id);
         }
 
         return $stmt->execute();

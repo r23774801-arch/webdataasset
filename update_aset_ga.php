@@ -10,6 +10,13 @@ if (!isset($_SESSION['role']) || strtoupper($_SESSION['role']) !== 'GA') {
     exit;
 }
 
+// PHASE 4.15 — session lock: no asset edits while a GA stocktaking cycle is
+// Pending or Approved. Rejecting the submission unlocks editing again.
+if (ApprovalService::isStocktakingLocked($conn, 'GA')) {
+    echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking aset GA sedang berlangsung atau telah disetujui. Perubahan aset tidak diizinkan."]);
+    exit;
+}
+
 $input = json_decode(file_get_contents('php://input'), true);
 
 if ($input && isset($input['id'])) {

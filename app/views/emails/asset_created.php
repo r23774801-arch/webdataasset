@@ -7,15 +7,21 @@
  *   Secondary : Dark Charcoal #1F1F1F
  *   Background: White / Light Gray #F5F6F8
  *
- * Expected variables (set by MailService::sendBarangTransaction):
- *   $tx, $config, $logo_url
+ * Expected variables (set by MailService::sendAssetCreated):
+ *   $asset, $config, $logo_url
  */
-$tx = $tx ?? [];
+$asset = $asset ?? [];
 
-$module     = strtolower((string)($tx['module'] ?? 'masuk'));
-$department = strtoupper((string)($tx['department'] ?? ''));
-$typeLabel  = $module === 'keluar' ? 'Barang Keluar' : 'Barang Masuk';
-$hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
+$assetType = strtoupper((string)($asset['asset_type'] ?? ''));
+
+// Photo (optional) — stored as a relative path (e.g. uploads/xxx.jpg); build an
+// absolute URL from app_url when available, otherwise fall back to the path.
+$photo     = trim((string)($asset['attachment'] ?? ''));
+$photoUrl  = '';
+if ($photo !== '') {
+    $baseUrl  = trim((string)($config['app_url'] ?? ''));
+    $photoUrl = ($baseUrl !== '' ? rtrim($baseUrl, '/') . '/' : '') . ltrim($photo, '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -23,7 +29,7 @@ $hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>New <?php echo e($typeLabel); ?> Transaction</title>
+    <title>New Asset <?php echo e($assetType); ?> Created</title>
 </head>
 <body style="margin:0; padding:0; background-color:#F5F6F8; font-family:'Segoe UI', Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F6F8;">
@@ -58,25 +64,25 @@ $hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="padding:32px 36px 8px 36px;">
-                                        <div style="font-size:22px; font-weight:800; color:#1F1F1F; line-height:1.3;">New <?php echo e($typeLabel); ?> Transaction</div>
+                                        <div style="font-size:22px; font-weight:800; color:#1F1F1F; line-height:1.3;">New Asset <?php echo e($assetType !== '' ? $assetType : '-'); ?> Created</div>
                                         <div style="margin-top:12px;">
-                                            <span style="display:inline-block; background-color:#FFF4CC; color:#9A7300; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;">Department: <?php echo e($department !== '' ? $department : '-'); ?></span>
+                                            <span style="display:inline-block; background-color:#FFF4CC; color:#9A7300; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;">Asset Type: <?php echo e($assetType !== '' ? $assetType : '-'); ?></span>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="padding:18px 36px 0 36px;">
                                         <div style="color:#4B5563; font-size:14px; line-height:1.7;">Dear Administrator,</div>
-                                        <div style="color:#4B5563; font-size:14px; line-height:1.7; margin-top:6px;">A new <?php echo e($typeLabel); ?> (<?php echo e($department !== '' ? $department : '-'); ?>) transaction has been recorded in the system. Details are below.</div>
+                                        <div style="color:#4B5563; font-size:14px; line-height:1.7; margin-top:6px;">A new asset has been recorded in the system. Details are below.</div>
                                     </td>
                                 </tr>
                             </table>
 
-                            <!-- ============ TRANSACTION INFORMATION ============ -->
+                            <!-- ============ ASSET INFORMATION ============ -->
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="padding:24px 36px 0 36px;">
-                                        <div style="font-size:13px; font-weight:800; color:#1F1F1F; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:10px; border-bottom:3px solid #FFC20E;">Transaction Information</div>
+                                        <div style="font-size:13px; font-weight:800; color:#1F1F1F; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:10px; border-bottom:3px solid #FFC20E;">Asset Information</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -84,104 +90,89 @@ $hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
                                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                             <tr>
                                                 <td style="width:50%; padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Transaction Type</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($typeLabel); ?></div>
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Asset Type</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($assetType !== '' ? $assetType : '-'); ?></div>
                                                 </td>
                                                 <td style="width:50%; padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Department</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($department !== '' ? $department : '-'); ?></div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Asset Number</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['asset_number'] ?? '-'); ?></div>
-                                                </td>
-                                                <td style="padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Nomor Tiket / Resi</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['nomor_tiket'] ?? '-'); ?></div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['asset_number'] ?? '-'); ?></div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Asset Name</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['asset_name'] ?? '-'); ?></div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['nama_barang'] ?? '-'); ?></div>
                                                 </td>
                                                 <td style="padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Quantity</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo (int)($tx['jumlah'] ?? 0); ?></div>
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Serial Number</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['serial_number'] ?? '-'); ?></div>
                                                 </td>
                                             </tr>
+                                            <?php if (trim((string)($asset['asset_class'] ?? '')) !== ''): ?>
                                             <tr>
                                                 <td style="padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Unit</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['unit'] ?? '-'); ?></div>
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Asset Class</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['asset_class'] ?? '-'); ?></div>
                                                 </td>
-                                                <td style="padding:6px 0;" valign="top"></td>
+                                                <td style="padding:6px 0;" valign="top">
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Utilisasi</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['utilisasi'] ?? 'No'); ?></div>
+                                                </td>
                                             </tr>
+                                            <?php endif; ?>
                                             <tr>
                                                 <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">PIC</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['pic'] ?? '-'); ?></div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['pic'] ?? '-'); ?></div>
                                                 </td>
                                                 <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Area</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['area'] ?? '-'); ?></div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['area'] ?? '-'); ?></div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td style="padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Date</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['tanggal'] ?? '-'); ?></div>
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Department</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['location_note'] ?? '-'); ?></div>
                                                 </td>
+                                                <td style="padding:6px 0;" valign="top">
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Date of Entry</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['date_of_entry'] ?? '-'); ?></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
                                                 <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">User Name</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['user_name'] ?? '-'); ?></div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['user_name'] ?? '-'); ?></div>
                                                 </td>
-                                            </tr>
-                                            <tr>
                                                 <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">User NRP</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['user_nrp'] ?? '-'); ?></div>
-                                                </td>
-                                                <td style="padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Submission Timestamp</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['timestamp'] ?? '-'); ?></div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['user_nrp'] ?? '-'); ?></div>
                                                 </td>
                                             </tr>
-                                            <?php if ($hasSupplier): ?>
                                             <tr>
                                                 <td style="padding:6px 0;" valign="top">
-                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Supplier</div>
-                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($tx['supplier'] ?? '-'); ?></div>
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Submission Timestamp</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($asset['timestamp'] ?? '-'); ?></div>
                                                 </td>
                                                 <td style="padding:6px 0;" valign="top"></td>
                                             </tr>
-                                            <?php endif; ?>
                                         </table>
                                     </td>
                                 </tr>
                             </table>
 
                             <!-- ============ PHOTO ============ -->
-                            <?php
-                            $txPhoto    = trim((string)($tx['attachment'] ?? ''));
-                            $txBase     = trim((string)($config['app_url'] ?? ''));
-                            $txPhotoUrl = '';
-                            if ($txPhoto !== '') {
-                                $txPhotoUrl = ($txBase !== '' ? rtrim($txBase, '/') . '/' : '') . ltrim($txPhoto, '/');
-                            }
-                            ?>
-                            <?php if ($txPhotoUrl !== ''): ?>
+                            <?php if ($photoUrl !== ''): ?>
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="padding:24px 36px 0 36px;">
-                                        <div style="font-size:13px; font-weight:800; color:#1F1F1F; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:10px; border-bottom:3px solid #FFC20E;">Transaction Photo</div>
+                                        <div style="font-size:13px; font-weight:800; color:#1F1F1F; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:10px; border-bottom:3px solid #FFC20E;">Asset Photo</div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td align="center" style="padding:20px 36px 0 36px;">
-                                        <img src="<?php echo e($txPhotoUrl); ?>" alt="Transaction Photo" style="display:block; max-width:100%; height:auto; border-radius:8px; border:1px solid #E5E7EB;" onerror="this.style.display='none'">
+                                        <img src="<?php echo e($photoUrl); ?>" alt="Asset Photo" style="display:block; max-width:100%; height:auto; border-radius:8px; border:1px solid #E5E7EB;" onerror="this.style.display='none'">
                                     </td>
                                 </tr>
                             </table>

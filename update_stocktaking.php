@@ -44,16 +44,15 @@ if ($userRole === 'GA' && $table !== 'aset_ga') {
     exit;
 }
 
-// RBAC: Users cannot edit stocktaking data while a submission is awaiting approval (Pending).
+// PHASE 4.15 — session lock: the entire stocktaking session (all actions:
+// submit_action, create_document, transfer, update_utilisasi) is locked while
+// the latest submission for this asset type is Pending or Approved. Only a
+// Rejection unlocks it again so users can add missing data and resubmit.
 require_once __DIR__ . '/app/bootstrap.php';
-$nrpForGuard = $_SESSION['nrp'] ?? '';
 $assetTypeForGuard = strtoupper($table_type);
-if ($nrpForGuard !== '' && in_array($assetTypeForGuard, ['IT', 'GA'], true)) {
-    $pendingSubmission = ApprovalService::getLatestForUser($conn, $nrpForGuard, $assetTypeForGuard);
-    if ($pendingSubmission && $pendingSubmission['status'] === ApprovalService::STATUS_PENDING) {
-        echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking masih menunggu persetujuan admin (status Pending). Anda tidak dapat mengubah data stocktaking sekarang."]);
-        exit;
-    }
+if (in_array($assetTypeForGuard, ['IT', 'GA'], true) && ApprovalService::isStocktakingLocked($conn, $assetTypeForGuard)) {
+    echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking sedang terkunci (menunggu persetujuan admin atau telah disetujui). Data stocktaking tidak dapat diubah sekarang."]);
+    exit;
 }
 
 try {
@@ -76,7 +75,41 @@ try {
                 exit;
             }
 
-            // First step: save only the stocktaking condition and keep status pending.
+            // PHASE 4.15 — reuse an existing photo so the user is never asked to
+            // upload again when one already exists. Preference order:
+            //   1) stocktaking_photo (already uploaded during a previous cycle)
+            //   2) attachment (photo uploaded during asset creation)
+            // The condition is always provided by the caller (validated above).
+            $existingPhoto = '';
+            $photoStmt = $conn->prepare("SELECT attachment, stocktaking_photo FROM $table WHERE id = ?");
+            if ($photoStmt) {
+                $photoStmt->bind_param('i', $id);
+                $photoStmt->execute();
+                $photoRow = $photoStmt->get_result()->fetch_assoc();
+                if ($photoRow) {
+                    $existingPhoto = trim((string)($photoRow['stocktaking_photo'] ?? ''));
+                    if ($existingPhoto === '') {
+                        $existingPhoto = trim((string)($photoRow['attachment'] ?? ''));
+                    }
+                }
+            }
+
+            if ($existingPhoto !== '') {
+                // Complete stocktaking using the existing photo.
+                $query = "UPDATE $table SET stocktaking_status = 'Stocktaked', stocktaking_condition = ?, stocktaking_photo = ?, kondisi = ? WHERE id = ?";
+                $stmt = $conn->prepare($query);
+                $kondisiVal = $kondisiMap[$condition] ?? $condition;
+                $stmt->bind_param("sssi", $condition, $existingPhoto, $kondisiVal, $id);
+
+                if ($stmt->execute()) {
+                    echo json_encode(["status" => "success", "message" => "Kondisi aset berhasil dilaporkan. Status: Stocktaked."]);
+                } else {
+                    echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+                }
+                exit;
+            }
+
+            // No existing photo: first step, save only the stocktaking condition and keep status pending.
             $query = "UPDATE $table SET stocktaking_condition = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("si", $condition, $id);

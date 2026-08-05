@@ -118,7 +118,7 @@
     }
 
     // ---------- Table rendering + pagination ----------
-    function colSpan() { return HAS_SUPPLIER ? 9 : 8; }
+    function colSpan() { return HAS_SUPPLIER ? 10 : 9; }
 
     function renderPage() {
         const tbody = $(cfg.tbodyId);
@@ -136,6 +136,7 @@
                     <td class="td-wrap">${esc(item.nomor_tiket) || '-'}</td>
                     <td class="td-wrap">${esc(item.asset_name) || '-'}</td>
                     <td>${esc(item.jumlah)}</td>
+                    <td>${esc(item.unit) || '-'}</td>
                     ${HAS_SUPPLIER ? `<td class="td-wrap">${esc(item.supplier) || '-'}</td>` : ''}
                     <td>${esc(item.tanggal) || '-'}</td>
                     <td>${esc(item.pic) || '-'}</td>
@@ -256,6 +257,7 @@
             nomor_tiket: g('nomorTiket').trim(),
             asset_name: g('assetName').trim(),
             jumlah: g('jumlah').trim(),
+            unit: g('unit').trim(),
             supplier: g('supplier').trim(),
             tanggal: g('tanggal'),
             pic: g('pic').trim(),
@@ -264,7 +266,7 @@
     }
 
     function clearForm() {
-        ['assetNumber', 'nomorTiket', 'assetName', 'jumlah', 'supplier', 'tanggal', 'pic', 'photo'].forEach(id => {
+        ['assetNumber', 'nomorTiket', 'assetName', 'jumlah', 'unit', 'supplier', 'tanggal', 'pic', 'photo'].forEach(id => {
             const el = $(id);
             if (el) el.value = '';
         });

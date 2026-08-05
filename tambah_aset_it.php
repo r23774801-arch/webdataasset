@@ -71,6 +71,24 @@ if ($input) {
             'created_at'     => date('Y-m-d H:i:s'),
         ]);
 
+        // PHASE 4.15 — notify every administrator (best-effort; the asset insert
+        // stays valid if mail fails). Recipients come only from the users table.
+        MailService::notifyAdminsAssetCreated($conn, [
+            'asset_type'    => 'IT',
+            'asset_number'  => $asset_number,
+            'nama_barang'   => $nama_barang,
+            'serial_number' => $serial_number,
+            'pic'           => $pic,
+            'area'          => $area,
+            'location_note' => $location_note,
+            'utilisasi'     => ($utilisasi !== '' ? $utilisasi : 'No'),
+            'date_of_entry' => $date_of_entry,
+            'attachment'    => $attachment,
+            'user_name'     => $_SESSION['username'] ?? '',
+            'user_nrp'      => $_SESSION['nrp'] ?? '',
+            'timestamp'     => date('Y-m-d H:i:s'),
+        ]);
+
         echo json_encode(["status" => "success", "message" => "Aset IT berhasil ditambahkan!"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);

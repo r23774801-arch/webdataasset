@@ -282,14 +282,14 @@ class ApprovalService
     }
 
     /**
-     * Whether asset creation is locked for an entire asset type (IT or GA).
+     * Whether the whole stocktaking session is locked for an asset type (IT or GA).
      *
-     * Phase 4.11 — single source of truth is stocktaking_submissions.status:
+     * Phase 4.15 — single source of truth is stocktaking_submissions.status:
      * locked while the LATEST submission for the type (across all users) is
      * Pending or Approved; a Rejected submission or no submission at all
-     * leaves creation open.
+     * leaves the session open (users can add/edit assets and resubmit).
      */
-    public static function isAssetCreationLocked(mysqli $conn, string $assetType): bool
+    public static function isStocktakingLocked(mysqli $conn, string $assetType): bool
     {
         $assetType = strtoupper($assetType);
         if (!in_array($assetType, ['IT', 'GA'], true)) {
@@ -303,8 +303,8 @@ class ApprovalService
         );
         if (!$stmt) {
             // Fail closed: if the approval table cannot be queried the guard
-            // must not silently allow creation. Visible in the error log.
-            error_log('[ApprovalService] isAssetCreationLocked: cannot query stocktaking_submissions: ' . $conn->error);
+            // must not silently allow writes. Visible in the error log.
+            error_log('[ApprovalService] isStocktakingLocked: cannot query stocktaking_submissions: ' . $conn->error);
             return true;
         }
         $stmt->bind_param('s', $assetType);
@@ -313,6 +313,18 @@ class ApprovalService
         $row = $result->fetch_assoc();
         $status = (string)($row['status'] ?? '');
         return in_array($status, [self::STATUS_PENDING, self::STATUS_APPROVED], true);
+    }
+
+    /**
+     * Whether asset creation is locked for an entire asset type (IT or GA).
+     *
+     * Phase 4.11 — alias of isStocktakingLocked(). Locked while the LATEST
+     * submission for the type (across all users) is Pending or Approved; a
+     * Rejected submission or no submission at all leaves creation open.
+     */
+    public static function isAssetCreationLocked(mysqli $conn, string $assetType): bool
+    {
+        return self::isStocktakingLocked($conn, $assetType);
     }
 
     /**

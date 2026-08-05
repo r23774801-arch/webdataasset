@@ -19,6 +19,15 @@ if ($userRole === 'ADMIN') {
     exit;
 }
 
+// PHASE 4.15 — session lock: no asset edits while a stocktaking cycle is
+// Pending or Approved (lock follows the role's own asset type).
+require_once __DIR__ . '/app/bootstrap.php';
+$lockAssetType = ($userRole === 'GA') ? 'GA' : 'IT';
+if (ApprovalService::isStocktakingLocked($conn, $lockAssetType)) {
+    echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking sedang berlangsung atau telah disetujui. Perubahan aset tidak diizinkan."]);
+    exit;
+}
+
 $input = json_decode(file_get_contents('php://input'), true);
 
 if ($input && isset($input['id']) && isset($input['kondisi'])) {

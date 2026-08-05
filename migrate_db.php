@@ -166,6 +166,15 @@ $queries = [
     "ALTER TABLE barang_masuk_ga ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
     "ALTER TABLE barang_keluar_it ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
     "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
+
+    // ==========================================
+    // PHASE 4.16 — Unit (satuan) column on
+    // the separated Barang tables
+    // ==========================================
+    "ALTER TABLE barang_masuk_it ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
+    "ALTER TABLE barang_masuk_ga ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_it ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
 ];
 
 $allSuccess = true;

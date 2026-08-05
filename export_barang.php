@@ -63,6 +63,7 @@ if ($format === 'pdf') {
                 <th>Nomor Tiket / Resi</th>
                 <th>Asset Name</th>
                 <th class="text-center">Jumlah</th>
+                <th>Unit</th>
                 <?php if (!$isKeluar) { ?><th>Supplier</th><?php } ?>
                 <th>Tanggal</th>
                 <th>PIC</th>
@@ -77,6 +78,7 @@ if ($format === 'pdf') {
                 <td><?php echo htmlspecialchars($row['nomor_tiket'] ?: '-'); ?></td>
                 <td><?php echo htmlspecialchars($row['asset_name']); ?></td>
                 <td class="text-center"><?php echo (int)$row['jumlah']; ?></td>
+                <td><?php echo htmlspecialchars($row['unit'] ?: '-'); ?></td>
                 <?php if (!$isKeluar) { ?><td><?php echo htmlspecialchars($row['supplier'] ?: '-'); ?></td><?php } ?>
                 <td><?php echo htmlspecialchars($row['tanggal'] ?: '-'); ?></td>
                 <td><?php echo htmlspecialchars($row['pic'] ?: '-'); ?></td>
@@ -108,6 +110,7 @@ echo '<th>Asset Number</th>';
 echo '<th>Nomor Tiket / Resi</th>';
 echo '<th>Asset Name</th>';
 echo '<th>Jumlah</th>';
+echo '<th>Unit</th>';
 if (!$isKeluar) {
     echo '<th>Supplier</th>';
 }
@@ -126,6 +129,7 @@ foreach ($rows as $row) {
     echo '<td>' . htmlspecialchars($row['nomor_tiket'] ?: '-') . '</td>';
     echo '<td>' . htmlspecialchars($row['asset_name']) . '</td>';
     echo '<td>' . (int)$row['jumlah'] . '</td>';
+    echo '<td>' . htmlspecialchars($row['unit'] ?: '-') . '</td>';
     if (!$isKeluar) {
         echo '<td>' . htmlspecialchars($row['supplier'] ?: '-') . '</td>';
     }

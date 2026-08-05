@@ -941,11 +941,16 @@
                 const resp = await fetch('get_stocktaking_submissions.php?lock=1&asset_type=GA');
                 const result = await resp.json();
                 const locked = result.status === 'success' && result.data && result.data.locked;
+                // PHASE 4.15 — the whole stocktaking session is locked (Pending/Approved).
+                window.assetLocked = locked;
                 const btnTambah = document.querySelector('button[onclick="bukaModalTambahGa()"]');
                 if (btnTambah) {
                     const can = typeof window.canManageData === 'function' ? window.canManageData('ga') : true;
                     btnTambah.style.display = (can && !locked) ? 'inline-flex' : 'none';
                 }
+                // Re-render the submission state (which re-renders the table) so the
+                // Finish button and per-row Action/Utilisasi buttons follow the lock.
+                if (typeof renderStocktakingSubmissionState === 'function') renderStocktakingSubmissionState();
             } catch (err) {
                 console.error('Gagal memuat status lock aset:', err);
             }
@@ -968,9 +973,10 @@
             const btn = getFinishButtonGa();
             const chip = document.getElementById('stkStatusGa');
             const sub = window.stocktakingSubmission;
-            if (!sub) return;
+            const locked = !!window.assetLocked;
+            if (!sub && !locked) return;
 
-            const isRejected = sub.status === 'Rejected';
+            const isRejected = !!(sub && sub.status === 'Rejected');
 
             if (btn) {
                 if (isRejected) {
@@ -989,10 +995,16 @@
                         Approved: 'Approved'
                     };
                     btn.innerHTML = icon + ' ' + (labels[sub.status] || sub.status);
+                } else if (locked) {
+                    // PHASE 4.15 — session locked for this asset type (a Pending or
+                    // Approved submission exists, possibly submitted by another user).
+                    btn.disabled = true;
+                    btn.classList.add('submitted');
+                    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Stocktaking Locked';
                 }
             }
 
-            if (chip) {
+            if (chip && sub) {
                 chip.style.display = 'inline-flex';
                 if (sub.status === 'Approved') {
                     chip.className = 'stk-approval-status badge-stocktaked';
@@ -1117,6 +1129,13 @@
 
         // ========== CRUD OPERATIONS ==========
         async function simpanAsetGa() {
+            // PHASE 4.15 — session lock: block add/edit from the form too (the
+            // backend enforces this; this is only for a better user experience).
+            if (window.assetLocked) {
+                if (typeof showToast === 'function') showToast('Stocktaking sedang terkunci. Anda tidak dapat menambah atau mengubah aset sekarang.', 'warning');
+                return;
+            }
+
             const assetNumber = document.getElementById('assetNumberGa').value.trim();
             const nama = document.getElementById('namaBarangGa').value.trim();
             const serialNumber = document.getElementById('serialNumberGa').value.trim();
@@ -1249,10 +1268,12 @@
 
             const utilisasi = item.utilisasi || '';
             const isStocktaked = stStatus === 'Stocktaked';
+            // PHASE 4.15 — while the stocktaking session is locked no row edits are allowed.
+            const sessionLocked = !!window.assetLocked;
             
-            // Utilisasi toggle button - LOCKED when Stocktaked
+            // Utilisasi toggle button - LOCKED when Stocktaked or when the session is locked
             let utilisasiToggle = '';
-            if (isStocktaked) {
+            if (isStocktaked || sessionLocked) {
                 utilisasiToggle = `<button id="badge-utilisasi-${item.id}" class="btn-utilisasi-toggle utilisasi-locked" style="cursor: not-allowed; opacity: 0.6;" disabled title="Utilisasi locked for stocktaked assets">
                 <span>${utilisasi || 'Set'}</span>
             </button>`;
@@ -1287,11 +1308,12 @@
                 ? `<img src="${imgPath}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${imgPath}')">`
                 : '<span class="text-muted" style="font-size:12px;">No Image</span>';
 
-            // Action button - disabled when Stocktaked, unless the latest submission was Rejected (re-edit allowed)
+            // Action button - disabled when Stocktaked or when the session is locked,
+            // unless the latest submission was Rejected (re-edit allowed)
             const submissionRejected = !!(window.stocktakingSubmission && window.stocktakingSubmission.status === 'Rejected');
             let actionButton = '';
-            if (isStocktaked && !submissionRejected) {
-                actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="Aset sudah Stocktaked">Stocktaked</button>`;
+            if ((isStocktaked || sessionLocked) && !submissionRejected) {
+                actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="${sessionLocked ? 'Stocktaking sedang terkunci' : 'Aset sudah Stocktaked'}">${sessionLocked ? 'Locked' : 'Stocktaked'}</button>`;
             } else {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-action" onclick="openStocktakingModal(${item.id}, '${item.nama_barang.replace(/'/g, "\\'")}', '${item.serial_number || ''}', '${item.type}')">Action</button>`;
             }
@@ -1368,6 +1390,13 @@
 
         // ========== STOCKTAKING STATE MACHINE ==========
         function openStocktakingModal(id, assetName, serialNumber, tableType) {
+            // PHASE 4.15 — the whole stocktaking session is locked while a
+            // submission is Pending or Approved; block opening the modal.
+            if (window.assetLocked) {
+                if (typeof showToast === 'function') showToast('Stocktaking sedang terkunci. Menunggu persetujuan admin.', 'warning');
+                return;
+            }
+
             currentStocktakingId = id;
             currentStocktakingTableType = tableType;
             stocktakingPhotoPath = '';
@@ -1386,8 +1415,24 @@
                 conditionGroup.style.display = savedStocktakingCondition ? 'none' : 'block';
             }
             
-            document.getElementById('stPhoto').value = '';
-            document.getElementById('stPhotoPreview').style.display = 'none';
+            // PHASE 4.15 — reuse the existing asset photo (creation photo or a
+            // previous stocktaking photo) instead of asking for another upload.
+            const photoInput = document.getElementById('stPhoto');
+            const photoPreview = document.getElementById('stPhotoPreview');
+            const photoGroup = document.getElementById('photoGroup');
+            const photoLabel = photoGroup ? photoGroup.querySelector('label') : null;
+            const existingPhoto = asset ? (asset.stocktaking_photo || asset.attachment || '') : '';
+            if (photoInput) photoInput.value = '';
+            if (existingPhoto && photoPreview) {
+                photoPreview.src = existingPhoto;
+                photoPreview.style.display = 'block';
+                if (photoInput) photoInput.style.display = 'none';
+                if (photoLabel) photoLabel.textContent = 'Foto Aset (diunggah saat input aset)';
+            } else {
+                if (photoPreview) photoPreview.style.display = 'none';
+                if (photoInput) photoInput.style.display = 'block';
+                if (photoLabel) photoLabel.textContent = 'Upload Foto Aset';
+            }
             document.getElementById('stocktakingModal').style.display = 'flex';
         }
 

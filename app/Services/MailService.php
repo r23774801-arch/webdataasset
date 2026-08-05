@@ -238,4 +238,60 @@ class MailService
         }
         return $sentCount;
     }
+
+    /**
+     * Send the "New Asset Created" notification to one administrator.
+     *
+     * The recipient MUST be resolved by the caller (e.g. via adminEmails())
+     * from the users table — never from config or .env.
+     *
+     * @param string $to    recipient e-mail address (must be non-empty)
+     * @param array  $asset asset data; keys: asset_type (IT/GA), asset_number,
+     *                      nama_barang, serial_number, asset_class (GA),
+     *                      pic, area, location_note, utilisasi, date_of_entry,
+     *                      attachment (photo path), user_name, user_nrp,
+     *                      timestamp
+     */
+    public function sendAssetCreated(string $to, array $asset): bool
+    {
+        if (trim($to) === '') {
+            error_log('[MailService] sendAssetCreated skipped: recipient e-mail is empty.');
+            return false;
+        }
+
+        $assetType = strtoupper((string)($asset['asset_type'] ?? ''));
+        $subject   = trim('New Asset ' . $assetType . ' Created');
+
+        $config  = mail_config();
+        $baseUrl = $config['app_url'];
+
+        $html = $this->renderTemplate('asset_created.php', [
+            'asset'    => $asset,
+            'config'   => $config,
+            'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+        ]);
+
+        return $this->send($to, $subject, $html);
+    }
+
+    /**
+     * Notify every administrator about a newly created asset (IT or GA).
+     *
+     * Shared helper for the asset create endpoints. Best-effort: a mail
+     * failure is logged by send() and never throws, so the asset insert is
+     * never affected. Returns the number of successfully delivered
+     * notifications.
+     */
+    public static function notifyAdminsAssetCreated(mysqli $conn, array $asset): int
+    {
+        $mailer      = self::instance();
+        $adminEmails = self::adminEmails($conn);
+        $sentCount   = 0;
+        foreach ($adminEmails as $adminEmail) {
+            if ($mailer->sendAssetCreated($adminEmail, $asset)) {
+                $sentCount++;
+            }
+        }
+        return $sentCount;
+    }
 }
