@@ -231,3 +231,53 @@ function canFinishStocktaking(type) {
     return false;
 }
 window.canFinishStocktaking = canFinishStocktaking;
+
+// ==========================================
+// USER MENU DROPDOWN (top-right avatar -> Profile / Logout)
+// ==========================================
+function closeUserMenu(menu) {
+    if (!menu) return;
+    menu.classList.remove('open');
+    const badge = menu.querySelector('.top-user-badge');
+    if (badge) badge.setAttribute('aria-expanded', 'false');
+}
+
+function toggleUserMenu(event) {
+    if (event) event.stopPropagation();
+    const menu = document.querySelector('.top-user-menu');
+    if (!menu) return;
+    const isOpen = menu.classList.toggle('open');
+    const badge = menu.querySelector('.top-user-badge');
+    if (badge) badge.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function initUserMenu() {
+    const menu = document.querySelector('.top-user-menu');
+    if (!menu) return;
+
+    // Close when clicking outside the menu
+    document.addEventListener('click', (event) => {
+        if (menu.classList.contains('open') && !menu.contains(event.target)) {
+            closeUserMenu(menu);
+        }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeUserMenu(menu);
+    });
+
+    // Close after selecting a menu item (Profile / Logout)
+    const dropdown = menu.querySelector('.user-menu-dropdown');
+    if (dropdown) {
+        dropdown.addEventListener('click', (event) => {
+            if (event.target.closest('.user-menu-item')) closeUserMenu(menu);
+        });
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUserMenu);
+} else {
+    initUserMenu();
+}
