@@ -175,6 +175,17 @@
     <div class="main-wrapper">
         <section id="home" class="dashboard-section">
             <div class="container">
+                <!-- Admin Notification: Stocktaking Pending Approval (top of dashboard content) -->
+                <div id="admin-notification" class="admin-notification" style="display: none;">
+                    <div class="notification-icon">&#9888;</div>
+                    <div class="notification-content">
+                        <strong>Perhatian Admin!</strong>
+                        <p id="notification-message">Ada pengajuan stocktaking yang menunggu persetujuan Anda!</p>
+                    </div>
+                    <div class="notification-badge" id="notification-badge">0</div>
+                    <button type="button" class="btn-warning notification-action" onclick="window.location.href='approval.html'">View Approval</button>
+                </div>
+
                 <div class="welcome-card dashboard-welcome-card">
                     <div class="welcome-content">
                         <span class="welcome-kicker">United Tractors Asset Management System</span>
@@ -316,16 +327,6 @@
                         <div class="card-subtitle">Ditolak</div>
                     </div>
                 </div>
-
-                <!-- Admin Notification: Unverified Data Alert -->
-                <div id="admin-notification" class="admin-notification" style="display: none;">
-                    <div class="notification-icon">&#9888;</div>
-                    <div class="notification-content">
-                        <strong>Perhatian Admin!</strong>
-                        <p id="notification-message">Ada data aset yang belum diverifikasi!</p>
-                    </div>
-                    <div class="notification-badge" id="notification-badge">0</div>
-                </div>
             </div>
         </section>
 
@@ -431,13 +432,16 @@
             try {
                 const response = await fetch('get_stocktaking_submissions.php?status=Pending');
                 const result = await response.json();
+                const notification = document.getElementById('admin-notification');
+                const badge = document.getElementById('notification-badge');
+                const message = document.getElementById('notification-message');
                 if (result.status === 'success' && result.data && result.data.length > 0) {
-                    const notification = document.getElementById('admin-notification');
-                    const badge = document.getElementById('notification-badge');
-                    const message = document.getElementById('notification-message');
                     if (notification) notification.style.display = 'flex';
                     if (badge) badge.textContent = result.data.length;
                     if (message) message.textContent = 'Ada pengajuan stocktaking yang menunggu persetujuan Anda!';
+                } else if (notification) {
+                    // Phase 4.18 — hide completely when there are no pending stocktaking submissions.
+                    notification.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Failed to load approval notification:', error);
