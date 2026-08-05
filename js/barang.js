@@ -24,6 +24,9 @@
     let allData = [];
     let sourceData = [];
 
+    // Active Area-card filter (clickable summary cards). '' = show all.
+    let activeAreaFilter = '';
+
     // ---------- RBAC ----------
     function userRole() {
         return (localStorage.getItem('userRole') || '').toLowerCase();
@@ -94,10 +97,13 @@
     // ---------- Summary cards (by area) ----------
     const AREAS = ['Main Office', 'Part BKJ', 'Part BIU', 'Part BIU 3', 'BIU Service', 'Kel.', 'PTK'];
 
-    function updateSummaryCards(data) {
+    // Option A — card totals always reflect the FULL source dataset (same as the
+    // Asset pages), never the filtered set. The grand total feeds the All card.
+    function updateSummaryCards() {
         const totals = {};
+        let grandTotal = 0;
         AREAS.forEach(a => { totals[a] = 0; });
-        data.forEach(item => {
+        (sourceData || []).forEach(item => {
             if (item.area && Object.prototype.hasOwnProperty.call(totals, item.area)) {
                 totals[item.area] += parseInt(item.jumlah, 10) || 1;
             }
@@ -105,7 +111,10 @@
         AREAS.forEach(area => {
             const el = $(`total-${area}`);
             if (el) el.textContent = totals[area];
+            grandTotal += totals[area];
         });
+        const allEl = $('total-All');
+        if (allEl) allEl.textContent = grandTotal;
     }
 
     // ---------- Table rendering + pagination ----------
@@ -136,7 +145,7 @@
         } else {
             tbody.innerHTML = `<tr><td colspan="${colSpan()}">${renderEmptyState('Tidak ada data barang.', 'Gunakan tombol Tambah untuk menambahkan data.')}</td></tr>`;
         }
-        updateSummaryCards(allData);
+        updateSummaryCards();
         renderPagination();
     }
 
@@ -184,6 +193,8 @@
         };
         sourceData = sourceData || [];
         allData = sourceData.filter(item => {
+            // Area-card filter composes (AND) with the shared column filters.
+            if (activeAreaFilter && item.area !== activeAreaFilter) return false;
             if (typeof window.matchesSharedPopupFilters === 'function') {
                 return window.matchesSharedPopupFilters(item, formatters);
             }
@@ -192,6 +203,26 @@
         currentPage = 1;
         renderPage();
     }
+
+    // ---------- Area filter (clickable summary cards) ----------
+    window.filterByArea = function (area) {
+        activeAreaFilter = area;
+
+        // Highlight the clicked card (matches the Asset pages' behavior).
+        document.querySelectorAll('.summary-card').forEach(card => {
+            card.classList.toggle('active-card', card.dataset.area === area);
+        });
+
+        // Status text under the cards.
+        const statusEl = document.getElementById('filterStatusText');
+        if (statusEl) {
+            statusEl.innerHTML = area
+                ? `Menampilkan data untuk area: <strong>${area}</strong>`
+                : 'Menampilkan semua data';
+        }
+
+        applyColumnFilters();
+    };
 
     // ---------- Data loading ----------
     async function loadData() {
@@ -324,6 +355,11 @@
 
     window.toggleSidebarDropdown = toggleSidebarDropdown;
     window.logout = logout;
+
+    // Expose the filter pipeline so the shared table-filters.js popups can
+    // re-render after Filter/Clear (same contract the Asset pages rely on).
+    window.applyColumnFilters = applyColumnFilters;
+
     window.goToPage = function (page) {
         const totalPages = Math.ceil(allData.length / itemsPerPage);
         if (page < 1 || page > totalPages) return;
