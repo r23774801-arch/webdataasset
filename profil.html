@@ -162,6 +162,9 @@
         </div>
         <div class="profile-field">
           <label>Email (Notifikasi)</label>
+          <div id="emailReminder" style="display:none; background:#FFF4CC; border:1px solid #E6C75E; color:#7A5B00; font-size:0.85rem; padding:10px 14px; border-radius:8px; margin-bottom:12px; line-height:1.5;">
+            <strong>Email belum dilengkapi.</strong> Lengkapi email Anda agar dapat menerima notifikasi hasil stocktaking.
+          </div>
           <input type="email" id="profilEmail" placeholder="nama@email.com" autocomplete="email" style="width:100%; padding:10px 14px; font-size:1rem; color:#222222; background:#ffffff; border:1px solid #dddddd; border-radius:6px; outline:none; box-sizing:border-box; transition:border-color 0.2s;">
           <div style="font-size:0.78rem; color:#999999; margin-top:6px;">Email digunakan untuk menerima notifikasi hasil stocktaking (disetujui / ditolak). Admin juga menerima notifikasi pengajuan baru.</div>
           <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
@@ -197,12 +200,18 @@
       saveBtn.addEventListener('mouseenter', saveBtnHover);
       saveBtn.addEventListener('mouseleave', saveBtnLeave);
 
+      const emailReminder = document.getElementById('emailReminder');
+
       // Pre-fill the e-mail from the server session record.
+      // Users without an e-mail still work everywhere; the Profile page
+      // reminds them to complete it so notifications can be delivered.
       fetch('get_session_info.php')
         .then(function(r) { return r.json(); })
         .then(function(res) {
           if (res.status === 'success' && res.data && res.data.email) {
             emailInput.value = res.data.email;
+          } else if (emailReminder) {
+            emailReminder.style.display = 'block';
           }
         })
         .catch(function() { /* session load is best-effort */ });
@@ -228,6 +237,7 @@
           .then(function(data) {
             if (data.status === 'success') {
               setMsg('\u2713 Email tersimpan.', '#2E7D32');
+              if (emailReminder) emailReminder.style.display = 'none';
             } else {
               setMsg('\u2717 ' + (data.message || 'Gagal menyimpan email.'), '#d9534f');
             }

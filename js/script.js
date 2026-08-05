@@ -419,11 +419,18 @@ async function handleReset() {
 async function handleRegister() {
     const nrp = getRegisterNrpValue();
     const username = document.getElementById('regUsername').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value.trim();
     const role = document.getElementById('regRole').value;
     
-    if (!nrp || !username || !password) {
-        showToast("Semua field (NRP, Nama, Password) wajib diisi!", "info");
+    if (!nrp || !username || !email || !password) {
+        showToast("Semua field (NRP, Nama, Email, Password) wajib diisi!", "info");
+        return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        showToast("Format email tidak valid.", "error");
         return;
     }
 
@@ -441,6 +448,7 @@ async function handleRegister() {
             body: JSON.stringify({ 
                 nrp: nrp, 
                 username: username, 
+                email: email, 
                 password: password, 
                 role: role 
             })
@@ -455,6 +463,7 @@ async function handleRegister() {
             // Reset Form & pindah ke tampilan login setelah 1.5 detik
             clearRegisterNrpValue();
             document.getElementById('regUsername').value = '';
+            document.getElementById('regEmail').value = '';
             document.getElementById('regPassword').value = '';
             updatePasswordValidation();
             setTimeout(() => { showLogin(); }, 1500);
