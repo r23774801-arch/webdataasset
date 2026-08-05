@@ -12,6 +12,14 @@ if (!isset($_SESSION['role']) || !in_array(strtoupper($_SESSION['role']), ['IT',
     exit;
 }
 
+// Phase 4.11 — asset-type-wide lock: no new IT assets while an IT stocktaking
+// cycle is Pending or Approved (single source of truth: stocktaking_submissions.status).
+// Rejecting the submission automatically unlocks creation again.
+if (ApprovalService::isAssetCreationLocked($conn, 'IT')) {
+    echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking aset IT sedang berlangsung atau telah disetujui. Penambahan aset IT baru tidak diizinkan."]);
+    exit;
+}
+
 // Ambil data JSON yang dikirimkan oleh JavaScript
 $input = json_decode(file_get_contents('php://input'), true);
 

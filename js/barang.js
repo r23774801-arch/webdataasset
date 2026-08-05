@@ -109,7 +109,7 @@
     }
 
     // ---------- Table rendering + pagination ----------
-    function colSpan() { return HAS_SUPPLIER ? 8 : 7; }
+    function colSpan() { return HAS_SUPPLIER ? 9 : 8; }
 
     function renderPage() {
         const tbody = $(cfg.tbodyId);
@@ -124,6 +124,7 @@
                 tbody.innerHTML += `<tr>
                     <td>${rowNum}</td>
                     <td>${esc(item.asset_number) || '-'}</td>
+                    <td class="td-wrap">${esc(item.nomor_tiket) || '-'}</td>
                     <td class="td-wrap">${esc(item.asset_name) || '-'}</td>
                     <td>${esc(item.jumlah)}</td>
                     ${HAS_SUPPLIER ? `<td class="td-wrap">${esc(item.supplier) || '-'}</td>` : ''}
@@ -221,6 +222,7 @@
         return {
             module: MODULE,
             asset_number: g('assetNumber').trim(),
+            nomor_tiket: g('nomorTiket').trim(),
             asset_name: g('assetName').trim(),
             jumlah: g('jumlah').trim(),
             supplier: g('supplier').trim(),
@@ -231,7 +233,7 @@
     }
 
     function clearForm() {
-        ['assetNumber', 'assetName', 'jumlah', 'supplier', 'tanggal', 'pic'].forEach(id => {
+        ['assetNumber', 'nomorTiket', 'assetName', 'jumlah', 'supplier', 'tanggal', 'pic', 'photo'].forEach(id => {
             const el = $(id);
             if (el) el.value = '';
         });
@@ -254,6 +256,22 @@
 
     window.tutupModal = function () { closeModal(cfg.modalId); };
 
+    // ---------- Photo upload (optional, only during data entry) ----------
+    async function uploadPhotoIfAny() {
+        const input = $('photo');
+        if (!input || !input.files || !input.files[0]) return '';
+        const formData = new FormData();
+        formData.append('attachment', input.files[0]);
+        const uploadResponse = await fetch('upload_photo.php', { method: 'POST', body: formData });
+        const uploadResult = await uploadResponse.json();
+        if (uploadResult.status !== 'success') {
+            const err = new Error(uploadResult.message || 'Gagal upload foto.');
+            err.uploadFailed = true;
+            throw err;
+        }
+        return uploadResult.path;
+    }
+
     window.simpanBarang = async function () {
         if (!canManage()) {
             if (typeof showToast === 'function') showToast('Anda tidak memiliki izin untuk mengelola data ini.', 'error');
@@ -266,6 +284,8 @@
         }
         if (typeof toggleLoader === 'function') toggleLoader(true, 'Menyimpan data...');
         try {
+            // Optional photo upload — happens only during data entry.
+            data.attachment = await uploadPhotoIfAny();
             const res = await fetch(`tambah_${API}.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -281,7 +301,11 @@
             }
         } catch (err) {
             if (typeof toggleLoader === 'function') toggleLoader(false);
-            if (typeof showToast === 'function') showToast('Terjadi kesalahan saat menghubungi server.', 'error');
+            if (err && err.uploadFailed) {
+                if (typeof showToast === 'function') showToast(err.message, 'error');
+            } else if (typeof showToast === 'function') {
+                showToast('Terjadi kesalahan saat menghubungi server.', 'error');
+            }
         }
     };
 

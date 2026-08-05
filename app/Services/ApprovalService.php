@@ -282,6 +282,40 @@ class ApprovalService
     }
 
     /**
+     * Whether asset creation is locked for an entire asset type (IT or GA).
+     *
+     * Phase 4.11 — single source of truth is stocktaking_submissions.status:
+     * locked while the LATEST submission for the type (across all users) is
+     * Pending or Approved; a Rejected submission or no submission at all
+     * leaves creation open.
+     */
+    public static function isAssetCreationLocked(mysqli $conn, string $assetType): bool
+    {
+        $assetType = strtoupper($assetType);
+        if (!in_array($assetType, ['IT', 'GA'], true)) {
+            return false;
+        }
+        $stmt = $conn->prepare(
+            "SELECT status FROM stocktaking_submissions
+             WHERE asset_type = ?
+             ORDER BY id DESC
+             LIMIT 1"
+        );
+        if (!$stmt) {
+            // Fail closed: if the approval table cannot be queried the guard
+            // must not silently allow creation. Visible in the error log.
+            error_log('[ApprovalService] isAssetCreationLocked: cannot query stocktaking_submissions: ' . $conn->error);
+            return true;
+        }
+        $stmt->bind_param('s', $assetType);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $status = (string)($row['status'] ?? '');
+        return in_array($status, [self::STATUS_PENDING, self::STATUS_APPROVED], true);
+    }
+
+    /**
      * Update the approval status of an existing submission (never duplicates).
      * Allowed transitions: Pending -> Approved, Pending -> Rejected,
      * Approved -> Rejected, Rejected -> Approved (back to Pending is accepted

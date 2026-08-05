@@ -148,6 +148,24 @@ $queries = [
     // ==========================================
     "ALTER TABLE aset_it MODIFY COLUMN kondisi ENUM('Normal','Broken','Lost','Transfer','-') NULL DEFAULT '-'",
     "ALTER TABLE aset_ga MODIFY COLUMN kondisi ENUM('Normal','Broken','Lost','Transfer','-') NULL DEFAULT '-'",
+
+    // ==========================================
+    // PHASE 4.9 — photo (attachment) column on
+    // the separated Barang tables (entry forms)
+    // ==========================================
+    "ALTER TABLE barang_masuk_it ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT NULL",
+    "ALTER TABLE barang_masuk_ga ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_it ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS attachment VARCHAR(255) DEFAULT NULL",
+
+    // ==========================================
+    // PHASE 4.10 — Nomor Tiket/Resi column on
+    // the separated Barang tables
+    // ==========================================
+    "ALTER TABLE barang_masuk_it ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
+    "ALTER TABLE barang_masuk_ga ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_it ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
 ];
 
 $allSuccess = true;

@@ -84,13 +84,17 @@ $statusLabel = ($approvalStatus === 'Approved') ? 'Approved' : (($approvalStatus
                                     <td style="padding:16px 36px 0 36px;">
                                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                             <tr>
-                                                <td style="width:50%; padding:6px 0;" valign="top">
+                                                <td style="width:33.3%; padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">User Name</div>
                                                     <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($sub['submitted_by_name'] ?? '-'); ?></div>
                                                 </td>
-                                                <td style="width:50%; padding:6px 0;" valign="top">
+                                                <td style="width:33.3%; padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">NRP</div>
                                                     <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($sub['submitted_by'] ?? '-'); ?></div>
+                                                </td>
+                                                <td style="width:33.3%; padding:6px 0;" valign="top">
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Asset Type</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($sub['asset_type'] ?? '-'); ?></div>
                                                 </td>
                                             </tr>
                                             <tr>

@@ -396,6 +396,7 @@
                         <tr>
                             <th>No</th>
                             <th data-filter-col="asset_number">Asset Number</th>
+                            <th data-filter-col="nomor_tiket">Nomor Tiket / Resi</th>
                             <th data-filter-col="asset_name">Asset Name</th>
                             <th data-filter-col="jumlah">Jumlah</th>
                             <th data-filter-col="tanggal" data-filter-placeholder="DD/MM/YYYY">Tanggal</th>
@@ -404,7 +405,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelBarang">
-                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        <tr><td colspan="8" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -420,6 +421,7 @@
                 <span class="close-btn" onclick="tutupModal()">&times;</span>
                 <h3 id="modalTitle" style="margin-bottom: 20px; color: #333;">Tambah Barang Keluar</h3>
                 <div class="input-group"><label>Asset Number</label><input type="text" id="assetNumber" placeholder="Contoh: AST-001"></div>
+                <div class="input-group"><label>Nomor Tiket / Resi</label><input type="text" id="nomorTiket" placeholder="Contoh: TKT-2024-001"></div>
                 <div class="input-group"><label>Asset Name</label><input type="text" id="assetName" placeholder="Contoh: Laptop Lenovo ThinkPad"></div>
                 <div class="input-group"><label>Jumlah</label><input type="number" id="jumlah" placeholder="Contoh: 5"></div>
                 <div class="input-group"><label>Tanggal Keluar</label><input type="date" id="tanggal"></div>
@@ -435,6 +437,7 @@
                         <option value="PTK">PTK</option>
                     </select>
                 </div>
+                <div class="input-group"><label>Photo (Opsional)</label><input type="file" id="photo" accept="image/*"></div>
                 <button id="modalSave" class="btn-warning" onclick="simpanBarang()">Simpan Data</button>
             </div>
         </div>

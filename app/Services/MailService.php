@@ -31,6 +31,29 @@ class MailService
     }
 
     /**
+     * Resolve the e-mail addresses of every administrator from the users table
+     * (role = admin), validated with FILTER_VALIDATE_EMAIL and deduplicated.
+     *
+     * This is the shared administrator lookup used by the notification
+     * endpoints (e.g. Barang transaction notifications). Recipients are
+     * resolved ONLY from the users table — never from config or .env.
+     */
+    public static function adminEmails(mysqli $conn): array
+    {
+        $emails = [];
+        $result = $conn->query("SELECT nrp, email FROM users WHERE LOWER(TRIM(role)) = 'admin'");
+        if ($result) {
+            while ($admin = $result->fetch_assoc()) {
+                $email = trim((string)($admin['email'] ?? ''));
+                if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $emails[] = $email;
+                }
+            }
+        }
+        return array_values(array_unique($emails));
+    }
+
+    /**
      * Build a configured PHPMailer instance. Supports TLS and SSL.
      */
     private function createMailer(): PHPMailer
@@ -157,5 +180,62 @@ class MailService
         ]);
 
         return $this->send($to, $subject, $html);
+    }
+
+    /**
+     * Send the "New Barang Transaction" notification to one administrator.
+     *
+     * The recipient MUST be resolved by the caller (e.g. via adminEmails())
+     * from the users table — never from config or .env.
+     *
+     * @param string $to recipient e-mail address (must be non-empty)
+     * @param array  $tx  transaction data; keys: module (masuk/keluar),
+     *                    department (IT/GA), asset_number, nomor_tiket,
+     *                    asset_name, jumlah, supplier, pic, area, tanggal,
+     *                    user_name, user_nrp, timestamp
+     */
+    public function sendBarangTransaction(string $to, array $tx): bool
+    {
+        if (trim($to) === '') {
+            error_log('[MailService] sendBarangTransaction skipped: recipient e-mail is empty.');
+            return false;
+        }
+
+        $module     = strtolower((string)($tx['module'] ?? 'masuk'));
+        $department = strtoupper((string)($tx['department'] ?? ''));
+        $typeLabel  = $module === 'keluar' ? 'Keluar' : 'Masuk';
+        $subject    = trim('New Barang ' . $typeLabel . ' ' . $department . ' Transaction');
+
+        $config  = mail_config();
+        $baseUrl = $config['app_url'];
+
+        $html = $this->renderTemplate('barang_transaction.php', [
+            'tx'       => $tx,
+            'config'   => $config,
+            'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+        ]);
+
+        return $this->send($to, $subject, $html);
+    }
+
+    /**
+     * Notify every administrator about a new Barang transaction.
+     *
+     * Shared helper for the Barang create endpoints (Masuk/Keluar x IT/GA).
+     * Best-effort: a mail failure is logged by send() and never throws, so
+     * the transaction is never affected. Returns the number of successfully
+     * delivered notifications.
+     */
+    public static function notifyAdminsBarangTransaction(mysqli $conn, array $tx): int
+    {
+        $mailer      = self::instance();
+        $adminEmails = self::adminEmails($conn);
+        $sentCount   = 0;
+        foreach ($adminEmails as $adminEmail) {
+            if ($mailer->sendBarangTransaction($adminEmail, $tx)) {
+                $sentCount++;
+            }
+        }
+        return $sentCount;
     }
 }

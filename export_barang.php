@@ -60,6 +60,7 @@ if ($format === 'pdf') {
             <tr>
                 <th class="text-center" width="50px">No</th>
                 <th>Asset Number</th>
+                <th>Nomor Tiket / Resi</th>
                 <th>Asset Name</th>
                 <th class="text-center">Jumlah</th>
                 <?php if (!$isKeluar) { ?><th>Supplier</th><?php } ?>
@@ -73,6 +74,7 @@ if ($format === 'pdf') {
             <tr>
                 <td class="text-center"><?php echo $no++; ?></td>
                 <td><?php echo htmlspecialchars($row['asset_number'] ?: '-'); ?></td>
+                <td><?php echo htmlspecialchars($row['nomor_tiket'] ?: '-'); ?></td>
                 <td><?php echo htmlspecialchars($row['asset_name']); ?></td>
                 <td class="text-center"><?php echo (int)$row['jumlah']; ?></td>
                 <?php if (!$isKeluar) { ?><td><?php echo htmlspecialchars($row['supplier'] ?: '-'); ?></td><?php } ?>
@@ -81,7 +83,7 @@ if ($format === 'pdf') {
                 <td><?php echo htmlspecialchars($row['area'] ?: '-'); ?></td>
             </tr>
             <?php } } else { ?>
-            <tr><td colspan="<?php echo $isKeluar ? 7 : 8; ?>" class="text-center">Belum ada data</td></tr>
+            <tr><td colspan="<?php echo $isKeluar ? 8 : 9; ?>" class="text-center">Belum ada data</td></tr>
             <?php } ?>
         </tbody>
     </table>
@@ -103,6 +105,7 @@ echo '<thead>';
 echo '<tr style="background-color: #1E5AA8; color: #FFCC00; font-weight: bold;">';
 echo '<th>No</th>';
 echo '<th>Asset Number</th>';
+echo '<th>Nomor Tiket / Resi</th>';
 echo '<th>Asset Name</th>';
 echo '<th>Jumlah</th>';
 if (!$isKeluar) {
@@ -120,6 +123,7 @@ foreach ($rows as $row) {
     echo '<tr>';
     echo '<td>' . $no++ . '</td>';
     echo '<td>' . htmlspecialchars($row['asset_number'] ?: '-') . '</td>';
+    echo '<td>' . htmlspecialchars($row['nomor_tiket'] ?: '-') . '</td>';
     echo '<td>' . htmlspecialchars($row['asset_name']) . '</td>';
     echo '<td>' . (int)$row['jumlah'] . '</td>';
     if (!$isKeluar) {

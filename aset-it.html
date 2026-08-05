@@ -733,6 +733,7 @@
             </div>
             <div class="input-group"><label>Department</label><input type="text" id="locationNote" placeholder="Contoh: IT Operation"></div>
             <div class="input-group"><label>Date</label><input type="date" id="dateOfEntry"></div>
+            <div class="input-group"><label>Photo (Opsional)</label><input type="file" id="photo" accept="image/*"></div>
             <button class="btn-warning" onclick="simpanAsetIt()">Simpan Data Aset</button>
         </div>
     </div>
@@ -877,6 +878,7 @@
 
         loadUserInfo();
         syncStocktakingSubmissionState();
+        syncAssetCreationLock();
 
         // RBAC: Add button visible only to roles that manage IT data (shared rule in js/loader.js)
         if (typeof window.canManageData === 'function' && !window.canManageData('it')) {
@@ -904,11 +906,30 @@
             document.getElementById('modalTambah').style.display = 'none';
             document.getElementById('modalTambah').dataset.editId = '';
             document.querySelector('#modalTambah h3').textContent = 'Tambah Data Aset IT';
+            const photoInput = document.getElementById('photo');
+            if (photoInput) photoInput.value = '';
         }
 
         // ========== STOCKTAKING SUBMISSION & APPROVAL STATE ==========
         function getFinishButtonIt() {
             return document.getElementById('btnFinishStocktakingIt');
+        }
+
+        // Phase 4.11 — hide the Add button while an IT stocktaking cycle is Pending or
+        // Approved (asset-type-wide lock). UX only — the backend enforces the lock.
+        async function syncAssetCreationLock() {
+            try {
+                const resp = await fetch('get_stocktaking_submissions.php?lock=1&asset_type=IT');
+                const result = await resp.json();
+                const locked = result.status === 'success' && result.data && result.data.locked;
+                const btnTambah = document.querySelector('button[onclick="bukaModalTambah()"]');
+                if (btnTambah) {
+                    const can = typeof window.canManageData === 'function' ? window.canManageData('it') : true;
+                    btnTambah.style.display = (can && !locked) ? 'inline-flex' : 'none';
+                }
+            } catch (err) {
+                console.error('Gagal memuat status lock aset:', err);
+            }
         }
 
         async function syncStocktakingSubmissionState() {
@@ -994,6 +1015,7 @@
                 if (result.status === 'success') {
                     window.stocktakingSubmission = result.data;
                     renderStocktakingSubmissionState();
+                    syncAssetCreationLock();
                     showToast(result.message, 'success');
                 } else {
                     showToast(result.message || 'Gagal mengirim pengajuan stocktaking.', 'error');
@@ -1572,8 +1594,23 @@
             toggleLoader(true, editId ? "Memperbarui data..." : "Menyimpan data aset IT...");
 
             try {
-                // No file upload for new assets - photo is only added during stocktaking
-                const attachmentPath = '';
+                // Optional photo upload — only during data entry (new asset)
+                let attachmentPath = '';
+                if (!editId) {
+                    const photoInput = document.getElementById('photo');
+                    if (photoInput && photoInput.files && photoInput.files[0]) {
+                        const formData = new FormData();
+                        formData.append('attachment', photoInput.files[0]);
+                        const uploadResponse = await fetch('upload_photo.php', { method: 'POST', body: formData });
+                        const uploadResult = await uploadResponse.json();
+                        if (uploadResult.status !== 'success') {
+                            toggleLoader(false);
+                            showToast('Gagal upload foto: ' + uploadResult.message, 'error');
+                            return;
+                        }
+                        attachmentPath = uploadResult.path;
+                    }
+                }
 
                 if (editId) {
                     const response = await fetch(UPDATE_ENDPOINT, {
