@@ -18,12 +18,335 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
     <style>
-        /* Content-only rules (enterprise-ui.css already styles .content-card and .profile-field p) */
-        .content-card { max-width: 600px; }
-        .content-card h2 { font-size: 1.15rem; font-weight: 700; color: #111111; margin-bottom: 20px; border-bottom: 3px solid #FFCC00; display: inline-block; padding-bottom: 5px; }
-        .profile-field { margin-bottom: 15px; }
-        .profile-field label { font-size: 0.8rem; font-weight: 600; color: #777777; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .profile-field p { font-size: 1rem; font-weight: 600; color: #222222; background: #f9f9fb; padding: 10px 14px; border-radius: 6px; border: 1px solid #eeeeee; }
+        /* =============================================
+           PROFIL AKUN — ENTERPRISE PROFILE CARD
+           Built on the existing enterprise theme tokens
+           (--ut-yellow, --ut-charcoal, --ut-border ...).
+           ============================================= */
+        .profil-shell {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Card container */
+        .profil-card {
+            background: #ffffff;
+            border: 1px solid var(--ut-border, #E6E9EF);
+            border-radius: 16px;
+            box-shadow: 0 16px 42px rgba(31, 31, 31, 0.08);
+            padding: clamp(22px, 3.2vw, 38px);
+            animation: profilCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes profilCardIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Profile header */
+        .profil-header {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            padding-bottom: 24px;
+            margin-bottom: 26px;
+            border-bottom: 1px solid var(--ut-border, #E6E9EF);
+        }
+
+        .profil-avatar {
+            width: 92px;
+            height: 92px;
+            flex: 0 0 92px;
+            display: grid;
+            place-items: center;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #FFC20E 0%, #e5ad00 100%);
+            color: var(--ut-charcoal, #1F1F1F);
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 0;
+            box-shadow: 0 14px 30px rgba(255, 194, 14, 0.32);
+        }
+
+        .profil-header-info { min-width: 0; flex: 1 1 260px; }
+
+        .profil-name {
+            margin: 0 0 10px;
+            color: var(--ut-charcoal, #1F1F1F);
+            font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .profil-badges {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .profil-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .profil-badge-role {
+            background: var(--ut-charcoal, #1F1F1F);
+            color: var(--ut-yellow, #FFC20E);
+        }
+
+        .profil-badge-status {
+            background: #E7F6EC;
+            color: #167A3A;
+        }
+
+        .profil-badge-status::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ut-green, #16A34A);
+        }
+
+        .profil-sub {
+            margin-top: 12px;
+            color: var(--ut-muted, #6B7280);
+            font-size: 0.92rem;
+        }
+
+        /* Sections */
+        .profil-section {
+            margin-bottom: 28px;
+            animation: profilSectionIn 0.5s ease both;
+        }
+        /* Children of .profil-card: 1 = .profil-header, 2/3 = sections */
+        .profil-card > .profil-section:nth-child(2) { animation-delay: 0.08s; }
+        .profil-card > .profil-section:nth-child(3) { animation-delay: 0.16s; }
+
+        @keyframes profilSectionIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Respect users who disable motion — content must never stay hidden */
+        @media (prefers-reduced-motion: reduce) {
+            .profil-card,
+            .profil-section {
+                animation: none;
+            }
+        }
+
+        .profil-section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            color: var(--ut-charcoal, #1F1F1F);
+            font-size: 0.98rem;
+            font-weight: 800;
+        }
+
+        .profil-section-title svg {
+            width: 20px;
+            height: 20px;
+            stroke: #9A7300;
+        }
+
+        /* Readonly info fields */
+        .profil-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .profil-field {
+            margin: 0;
+        }
+
+        .profil-field > label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--ut-muted, #6B7280);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .profil-readonly {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 50px;
+            padding: 12px 16px;
+            background: #F8FAFC;
+            border: 1px solid var(--ut-border, #E6E9EF);
+            border-radius: 12px;
+            color: #343841;
+            font-size: 1rem;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .profil-readonly svg {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            stroke: #9A7300;
+        }
+
+        /* Email (contact) section */
+        .profil-email-reminder {
+            display: none;
+            background: #FFF4CC;
+            border: 1px solid #E6C75E;
+            color: #7A5B00;
+            font-size: 0.85rem;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            line-height: 1.55;
+        }
+
+        .profil-email-field {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border: 1px solid #D8DEE8;
+            border-radius: 12px;
+            padding: 0 16px;
+            min-height: 50px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .profil-email-field:focus-within {
+            border-color: var(--ut-yellow, #FFC20E);
+            box-shadow: 0 0 0 4px rgba(255, 194, 14, 0.16);
+        }
+
+        .profil-email-field svg {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            stroke: #9A7300;
+        }
+
+        .profil-email-field input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 1rem;
+            color: #222222;
+            font-family: inherit;
+            padding: 14px 0;
+        }
+
+        .profil-email-hint {
+            font-size: 0.78rem;
+            color: #999999;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .profil-email-actions {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* Save button */
+        .profil-save-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: var(--ut-yellow, #FFC20E);
+            color: var(--ut-charcoal, #1F1F1F);
+            font-weight: 800;
+            border: 1px solid var(--ut-yellow, #FFC20E);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.92rem;
+            font-family: inherit;
+            box-shadow: 0 8px 20px rgba(255, 194, 14, 0.24);
+            transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .profil-save-btn:hover {
+            background: #e5ad00;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(255, 194, 14, 0.34);
+        }
+
+        .profil-save-btn:active {
+            transform: translateY(0);
+        }
+
+        .profil-save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .profil-save-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+        }
+
+        #emailSaveMsg {
+            font-size: 0.88rem;
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profil-header {
+                gap: 16px;
+            }
+            .profil-avatar {
+                width: 76px;
+                height: 76px;
+                flex-basis: 76px;
+                font-size: 1.8rem;
+                border-radius: 20px;
+            }
+            .profil-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .profil-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .profil-card {
+                padding: 20px 18px;
+            }
+            .profil-email-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .profil-save-btn {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -161,37 +484,79 @@
     <!-- Main Content -->
     <div class="main-wrapper">
         <section class="dashboard-section">
-            <div class="container">
-                <div class="content-card">
-                    <h2>Informasi Akun</h2>
-                    <div class="profile-field">
-                        <label>ID Pengguna (NRP)</label>
-                        <p id="profilNrp">-</p>
+            <div class="container profil-shell">
+                <div class="profil-card">
+
+                    <!-- Profile header -->
+                    <div class="profil-header">
+                        <div class="profil-avatar" id="profilAvatar">U</div>
+                        <div class="profil-header-info">
+                            <h1 class="profil-name" id="profilDisplayName">Pengguna</h1>
+                            <div class="profil-badges">
+                                <span class="profil-badge profil-badge-role" id="profilRoleBadge">USER</span>
+                                <span class="profil-badge profil-badge-status">Aktif</span>
+                            </div>
+                            <div class="profil-sub">Akun terdaftar di UT Asset Dashboard &middot; Site Batu Kajang</div>
+                        </div>
                     </div>
-                    <div class="profile-field">
-                        <label>Nama Pengguna</label>
-                        <p id="profilUsername">-</p>
+
+                    <!-- Informasi Identitas -->
+                    <div class="profil-section">
+                        <div class="profil-section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Informasi Identitas
+                        </div>
+                        <div class="profil-grid">
+                            <div class="profil-field">
+                                <label>ID Pengguna (NRP)</label>
+                                <div class="profil-readonly">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"></path></svg>
+                                    <span id="profilNrp">-</span>
+                                </div>
+                            </div>
+                            <div class="profil-field">
+                                <label>Nama Pengguna</label>
+                                <div class="profil-readonly">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <span id="profilUsername">-</span>
+                                </div>
+                            </div>
+                            <div class="profil-field">
+                                <label>Hak Akses (Role)</label>
+                                <div class="profil-readonly">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                    <span id="profilRole">-</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="profile-field">
-                        <label>Hak Akses (Role)</label>
-                        <p id="profilRole">-</p>
-                    </div>
-                    <div class="profile-field">
-                        <label>Status Akun</label>
-                        <p>Aktif (Site Batu Kajang)</p>
-                    </div>
-                    <div class="profile-field">
-                        <label>Email (Notifikasi)</label>
-                        <div id="emailReminder" style="display:none; background:#FFF4CC; border:1px solid #E6C75E; color:#7A5B00; font-size:0.85rem; padding:10px 14px; border-radius:8px; margin-bottom:12px; line-height:1.5;">
+
+                    <!-- Informasi Kontak -->
+                    <div class="profil-section">
+                        <div class="profil-section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path></svg>
+                            Informasi Kontak
+                        </div>
+                        <div id="emailReminder" class="profil-email-reminder">
                             <strong>Email belum dilengkapi.</strong> Lengkapi email Anda agar dapat menerima notifikasi hasil stocktaking.
                         </div>
-                        <input type="email" id="profilEmail" placeholder="nama@email.com" autocomplete="email" style="width:100%; padding:10px 14px; font-size:1rem; color:#222222; background:#ffffff; border:1px solid #dddddd; border-radius:6px; outline:none; box-sizing:border-box; transition:border-color 0.2s;">
-                        <div style="font-size:0.78rem; color:#999999; margin-top:6px;">Email digunakan untuk menerima notifikasi hasil stocktaking (disetujui / ditolak). Admin juga menerima notifikasi pengajuan baru.</div>
-                        <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
-                            <button id="saveEmailBtn" style="background:#FFCC00; color:#111111; font-weight:700; border:none; padding:10px 22px; border-radius:8px; cursor:pointer; font-size:0.9rem; transition:transform 0.15s, box-shadow 0.15s;">Simpan Email</button>
-                            <span id="emailSaveMsg" style="font-size:0.85rem;"></span>
+                        <div class="profil-field">
+                            <label>Email (Notifikasi)</label>
+                            <div class="profil-email-field">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path></svg>
+                                <input type="email" id="profilEmail" placeholder="nama@email.com" autocomplete="email">
+                            </div>
+                            <div class="profil-email-hint">Email digunakan untuk menerima notifikasi hasil stocktaking (disetujui / ditolak). Admin juga menerima notifikasi pengajuan baru.</div>
+                            <div class="profil-email-actions">
+                                <button id="saveEmailBtn" class="profil-save-btn" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                                    Simpan Email
+                                </button>
+                                <span id="emailSaveMsg"></span>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -242,6 +607,14 @@
             document.getElementById('profilUsername').textContent = username;
             document.getElementById('profilRole').textContent = role.toUpperCase();
 
+            // UI-only: populate the profile header (avatar initial, name, role badge).
+            const avatarEl = document.getElementById('profilAvatar');
+            if (avatarEl) avatarEl.textContent = (username.trim().charAt(0) || 'U').toUpperCase();
+            const displayNameEl = document.getElementById('profilDisplayName');
+            if (displayNameEl) displayNameEl.textContent = username;
+            const roleBadgeEl = document.getElementById('profilRoleBadge');
+            if (roleBadgeEl) roleBadgeEl.textContent = role.toUpperCase();
+
             // ==========================================
             // E-MAIL (NOTIFIKASI) — prefill + save
             // ==========================================
@@ -249,10 +622,6 @@
             const saveBtn    = document.getElementById('saveEmailBtn');
             const msg        = document.getElementById('emailSaveMsg');
 
-            const saveBtnHover = () => { saveBtn.style.boxShadow = '0 3px 8px rgba(179,143,0,0.35)'; };
-            const saveBtnLeave = () => { saveBtn.style.boxShadow = 'none'; };
-            saveBtn.addEventListener('mouseenter', saveBtnHover);
-            saveBtn.addEventListener('mouseleave', saveBtnLeave);
 
             const emailReminder = document.getElementById('emailReminder');
 
