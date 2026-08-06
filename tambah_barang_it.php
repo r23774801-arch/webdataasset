@@ -50,7 +50,8 @@ SpreadsheetService::sync(
         'area'         => $input['area'] ?? '',
         'attachment'   => $input['attachment'] ?? '',
         'created_at'   => date('Y-m-d H:i:s'),
-    ]
+    ],
+    ($input['nomor_tiket'] ?? '') !== '' ? 'nomor_tiket' : 'id'
 );
 
 // Phase 4.12B — notify every administrator about the new transaction

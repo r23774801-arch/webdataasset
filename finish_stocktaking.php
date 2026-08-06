@@ -82,7 +82,7 @@ SpreadsheetService::sync(SpreadsheetService::SHEET_APPROVAL, [
     'approved_by'     => $submission['approved_by'] ?? null,
     'rejected_by'     => $submission['rejected_by'] ?? null,
     'rejection_reason'=> $submission['rejection_reason'] ?? null,
-]);
+], 'submission_code');
 
 // Notify every administrator (best-effort; the submission stays valid if mail fails).
 // Recipients are resolved ONLY from the users table (role = admin) — never from

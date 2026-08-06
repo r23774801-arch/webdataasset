@@ -38,4 +38,7 @@ AuditService::log(
     ['asset_name' => $input['asset_name'] ?? '', 'area' => $input['area'] ?? '']
 );
 
+// Phase 4.20 — mirror the updated transaction to the sheet (upsert by nomor_tiket).
+SpreadsheetService::syncBarang($conn, $module, 'it', $id);
+
 json_response(['status' => 'success', 'message' => 'Data barang ' . $module . ' IT berhasil diperbarui!']);

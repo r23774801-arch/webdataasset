@@ -37,6 +37,7 @@ if ($input && isset($input['id']) && isset($input['kondisi'])) {
     // Determine which table to update based on user role
     // IT role can only update aset_it, GA role can only update aset_ga, Admin can update both
     $updated = false;
+    $updatedTable = '';
     
     if ($userRole === 'IT' || $userRole === 'ADMIN') {
         $query_it = "UPDATE aset_it SET kondisi = ? WHERE id = ?";
@@ -44,6 +45,7 @@ if ($input && isset($input['id']) && isset($input['kondisi'])) {
         $stmt_it->bind_param("si", $kondisi, $id);
         if ($stmt_it->execute() && $stmt_it->affected_rows > 0) {
             $updated = true;
+            $updatedTable = 'aset_it';
         }
     }
     
@@ -53,10 +55,18 @@ if ($input && isset($input['id']) && isset($input['kondisi'])) {
         $stmt_ga->bind_param("si", $kondisi, $id);
         if ($stmt_ga->execute() && $stmt_ga->affected_rows > 0) {
             $updated = true;
+            $updatedTable = 'aset_ga';
         }
     }
 
     if ($updated) {
+        // Phase 4.20 — mirror the condition change to the matching sheet (upsert by asset_number).
+        SpreadsheetService::syncAsset(
+            $conn,
+            $updatedTable,
+            $updatedTable === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA,
+            (int)$id
+        );
         echo json_encode(["status" => "success", "message" => "Status aset berhasil diubah menjadi $kondisi"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Gagal memperbarui status atau data tidak ditemukan"]);

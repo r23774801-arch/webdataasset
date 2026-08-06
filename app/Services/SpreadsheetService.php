@@ -47,10 +47,17 @@ class SpreadsheetService
      * Push one row to a worksheet. Best-effort: returns true only when the
      * remote Web App acknowledged the row. Failures are logged, never thrown.
      *
-     * @param string $worksheet one of the SHEET_* constants
-     * @param array  $row       associative array of column => value
+     * Phase 4.20 — when $uniqueKey is provided the Web App performs an UPSERT:
+     * it searches the worksheet for a row whose key column equals the row's
+     * value and updates that row in place. When no key is given (or the value
+     * is empty) the behavior stays exactly as before: a new row is appended.
+     *
+     * @param string      $worksheet one of the SHEET_* constants
+     * @param array       $row       associative array of column => value
+     * @param string|null $uniqueKey column name used as the unique key, or null
+     *                               to keep append-only behavior (backward compatible)
      */
-    public static function sync(string $worksheet, array $row): bool
+    public static function sync(string $worksheet, array $row, ?string $uniqueKey = null): bool
     {
         try {
             $cfg = self::config();
@@ -63,6 +70,9 @@ class SpreadsheetService
                 'row'       => $row,
                 'token'     => $cfg['token'],
             ];
+            if ($uniqueKey !== null && $uniqueKey !== '') {
+                $payload['key'] = $uniqueKey;
+            }
 
             $ok = self::httpPost($cfg['web_app_url'], $payload, (int)$cfg['timeout']);
             if (!$ok) {
@@ -72,6 +82,114 @@ class SpreadsheetService
         } catch (\Throwable $e) {
             // A synchronization failure must never break the application.
             error_log('[SpreadsheetService] Sync error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Re-fetch one Asset row (aset_it / aset_ga) from MySQL and upsert it to
+     * its worksheet keyed by asset_number (falls back to id when the asset
+     * number is empty). Best-effort — never throws, never blocks the caller.
+     * Used by every endpoint that mutates an asset record.
+     */
+    public static function syncAsset(mysqli $conn, string $table, string $worksheet, int $id): bool
+    {
+        try {
+            if (!self::enabled()) {
+                return false;
+            }
+            $stmt = $conn->prepare("SELECT * FROM `$table` WHERE id = ?");
+            if (!$stmt) {
+                return false;
+            }
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+            if (!$row) {
+                return false;
+            }
+
+            $assetNumber = trim((string)($row['asset_number'] ?? ''));
+            $payload = [
+                'id'            => (int)($row['id'] ?? 0),
+                'asset_number'  => $assetNumber,
+                'nama_barang'   => (string)($row['nama_barang'] ?? ''),
+                'serial_number' => (string)($row['serial_number'] ?? ''),
+            ];
+            if ($table === 'aset_ga' && array_key_exists('asset_class', $row)) {
+                $payload['asset_class'] = (string)($row['asset_class'] ?? '');
+            }
+            $payload['pic']           = (string)($row['pic'] ?? '');
+            $payload['area']          = (string)($row['area'] ?? '');
+            $payload['location_note'] = (string)($row['location_note'] ?? '');
+            $payload['utilisasi']     = (string)($row['utilisasi'] ?? '');
+            $payload['date_of_entry'] = $row['date_of_entry'] ?? null;
+            $payload['attachment']    = (string)($row['attachment'] ?? '');
+            $payload['kondisi']       = (string)($row['kondisi'] ?? '-');
+            if (array_key_exists('created_at', $row) && $row['created_at'] !== null) {
+                $payload['created_at'] = (string)$row['created_at'];
+            }
+
+            return self::sync($worksheet, $payload, $assetNumber !== '' ? 'asset_number' : 'id');
+        } catch (\Throwable $e) {
+            error_log('[SpreadsheetService] syncAsset error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Re-fetch one Barang row (barang_{module}_{type}) from MySQL and upsert it
+     * to its worksheet keyed by nomor_tiket (falls back to id when the ticket
+     * number is empty). Best-effort — never throws, never blocks the caller.
+     */
+    public static function syncBarang(mysqli $conn, string $module, string $type, int $id): bool
+    {
+        try {
+            $module = strtolower($module);
+            $type   = strtolower($type);
+            if (!in_array($module, ['masuk', 'keluar'], true) || !in_array($type, ['it', 'ga'], true)) {
+                return false;
+            }
+            $table = "barang_{$module}_{$type}";
+            $worksheet = ($module === 'masuk')
+                ? ($type === 'it' ? self::SHEET_BARANG_MASUK_IT : self::SHEET_BARANG_MASUK_GA)
+                : ($type === 'it' ? self::SHEET_BARANG_KELUAR_IT : self::SHEET_BARANG_KELUAR_GA);
+
+            if (!self::enabled()) {
+                return false;
+            }
+            $stmt = $conn->prepare("SELECT * FROM `$table` WHERE id = ?");
+            if (!$stmt) {
+                return false;
+            }
+            $stmt->bind_param('i', $id);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+            if (!$row) {
+                return false;
+            }
+
+            $nomorTiket = trim((string)($row['nomor_tiket'] ?? ''));
+            $payload = [
+                'id'           => (int)($row['id'] ?? 0),
+                'asset_number' => (string)($row['asset_number'] ?? ''),
+                'nomor_tiket'  => $nomorTiket,
+                'asset_name'   => (string)($row['asset_name'] ?? ''),
+                'jumlah'       => (int)($row['jumlah'] ?? 0),
+                'unit'         => (string)($row['unit'] ?? ''),
+                'supplier'     => array_key_exists('supplier', $row) ? (string)($row['supplier'] ?? '') : '',
+                'tanggal'      => (string)($row['tanggal'] ?? ''),
+                'pic'          => (string)($row['pic'] ?? ''),
+                'area'         => (string)($row['area'] ?? ''),
+                'attachment'   => (string)($row['attachment'] ?? ''),
+            ];
+            if (array_key_exists('created_at', $row) && $row['created_at'] !== null) {
+                $payload['created_at'] = (string)$row['created_at'];
+            }
+
+            return self::sync($worksheet, $payload, $nomorTiket !== '' ? 'nomor_tiket' : 'id');
+        } catch (\Throwable $e) {
+            error_log('[SpreadsheetService] syncBarang error: ' . $e->getMessage());
             return false;
         }
     }

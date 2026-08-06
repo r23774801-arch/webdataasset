@@ -70,7 +70,7 @@ if ($input) {
             'attachment'     => $attachment,
             'kondisi'        => $kondisi,
             'created_at'     => date('Y-m-d H:i:s'),
-        ]);
+        ], $asset_number !== '' ? 'asset_number' : 'id');
 
         // PHASE 4.15 — notify every administrator (best-effort; the asset insert
         // stays valid if mail fails). Recipients come only from the users table.

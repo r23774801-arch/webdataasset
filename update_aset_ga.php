@@ -44,6 +44,12 @@ if ($input && isset($input['id'])) {
 
     if ($stmt->execute()) {
         AuditService::log($conn, 'Updated Asset', 'aset_ga', (int)$id, ['nama_barang' => $nama_barang, 'area' => $area]);
+
+        // Phase 4.20 — mirror the latest asset state to the sheet (upsert by asset_number).
+        if ($stmt->affected_rows > 0) {
+            SpreadsheetService::syncAsset($conn, 'aset_ga', SpreadsheetService::SHEET_ASSET_GA, (int)$id);
+        }
+
         echo json_encode(["status" => "success", "message" => "Data aset GA berhasil diperbarui!"]);
     } else {
         echo json_encode(["status" => "error", "message" => "Gagal memperbarui data."]);

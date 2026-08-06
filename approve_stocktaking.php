@@ -78,7 +78,7 @@ SpreadsheetService::sync(SpreadsheetService::SHEET_APPROVAL, [
     'approved_by'      => $updated['approved_by'] ?? $submission['approved_by'] ?? null,
     'rejected_by'      => $updated['rejected_by'] ?? $submission['rejected_by'] ?? null,
     'rejection_reason' => $reason,
-]);
+], 'submission_code');
 
 // Notify the submitting user when the status actually changed.
 // Best-effort: a missing/invalid e-mail or a send failure is only logged —
