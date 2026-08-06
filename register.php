@@ -53,14 +53,37 @@ $email = $conn->real_escape_string($email);
 // ENKRIPSI PASSWORD DI SINI
 $password = password_hash($data['password'], PASSWORD_DEFAULT); 
 
-
-
 // 1. Cek apakah NRP sudah terdaftar di database
 $cek_nrp = $conn->query("SELECT id FROM users WHERE nrp = '$nrp'");
 
 if ($cek_nrp->num_rows > 0) {
     echo json_encode(["status" => "error", "message" => "NRP sudah terdaftar di sistem!"]);
 } else {
+    // ==========================================
+    // PHASE 4.22 — Master employee validation:
+    // the NRP must belong to a known employee
+    // from the master_employee directory.
+    // Backward compatible: skipped when the
+    // table has not been migrated yet.
+    // ==========================================
+    $checkMasterTable = $conn->query("SHOW TABLES LIKE 'master_employee'");
+    $hasMasterTable = $checkMasterTable && $checkMasterTable->num_rows > 0;
+
+    if ($hasMasterTable) {
+        $rawNrp = trim((string)$data['nrp']);
+        $cekMaster = $conn->prepare("SELECT id FROM master_employee WHERE nrp = ? LIMIT 1");
+        if ($cekMaster) {
+            $cekMaster->bind_param('s', $rawNrp);
+            $cekMaster->execute();
+            $cekMaster->store_result();
+            if ($cekMaster->num_rows === 0) {
+                echo json_encode(["status" => "error", "message" => "NRP tidak terdaftar sebagai karyawan. Silakan pilih karyawan dari direktori."]);
+                exit;
+            }
+            $cekMaster->close();
+        }
+    }
+
     // 1b. Cek apakah email sudah dipakai akun lain (LOWER() = case-insensitive)
     $cek_email = $conn->query("SELECT id FROM users WHERE LOWER(email) = LOWER('$email')");
     if ($cek_email && $cek_email->num_rows > 0) {

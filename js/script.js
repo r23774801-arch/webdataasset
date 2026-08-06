@@ -100,52 +100,6 @@ function updatePasswordValidation() {
     return validation;
 }
 
-function normalizeNrpOptions(options) {
-    if (!Array.isArray(options)) return [];
-
-    return options
-        .map(option => {
-            if (typeof option === 'string' || typeof option === 'number') {
-                const value = String(option).trim();
-                return value ? { value, text: value } : null;
-            }
-
-            if (!option || typeof option !== 'object') return null;
-
-            const value = String(option.value || option.nrp || option.id || '').trim();
-            const label = String(option.text || option.label || option.nama || option.name || value).trim();
-            if (!value) return null;
-
-            const item = {
-                value,
-                text: label && label !== value ? `${value} - ${label}` : value
-            };
-
-            // Extra display fields used only by the dropdown UI.
-            // Search, sort, and the stored value keep using `value`/`text` exactly as before.
-            const name = option.nama || option.name || option.label || option.text || '';
-            if (name) item.nama = String(name).trim();
-            const department = option.department || option.dept || option.departemen || '';
-            if (department) item.department = String(department).trim();
-
-            return item;
-        })
-        .filter(Boolean);
-}
-
-function loadNrpOptions(selectElement) {
-    const nrpOptions = normalizeNrpOptions(window.UT_NRP_OPTIONS || []);
-    const existingValues = new Set(
-        Array.from(selectElement.options).map(option => option.value)
-    );
-
-    nrpOptions.forEach(option => {
-        if (existingValues.has(option.value)) return;
-        selectElement.add(new Option(option.text, option.value));
-        existingValues.add(option.value);
-    });
-}
-
 function replaceNrpSelectWithInput(selectElement) {
     const input = document.createElement('input');
     input.type = 'text';
@@ -184,37 +138,11 @@ function renderNrpItem(data, escape) {
     return `<span class="nrp-selected">${name ? `${value} — ${name}` : value}</span>`;
 }
 
-function createNrpSkeletonRow() {
-    const row = document.createElement('div');
-    row.className = 'nrp-skeleton-row';
-    row.setAttribute('aria-hidden', 'true');
-    return row;
-}
-
-function setNrpLoading(wrapper, isLoading) {
-    if (!wrapper) return;
-    wrapper.classList.toggle('nrp-loading', isLoading);
-
-    let skeletons = wrapper.querySelector('.nrp-skeletons');
-    if (isLoading) {
-        if (!skeletons) {
-            skeletons = document.createElement('div');
-            skeletons.className = 'nrp-skeletons';
-            for (let i = 0; i < 4; i += 1) skeletons.appendChild(createNrpSkeletonRow());
-            const dropdown = wrapper.querySelector('.ts-dropdown');
-            if (dropdown) dropdown.appendChild(skeletons);
-        }
-    } else if (skeletons) {
-        skeletons.remove();
-    }
-}
-
 function initializeNrpDropdown() {
     const nrpSelect = document.getElementById('regNrp');
     if (!nrpSelect || nrpSelect.dataset.enhanced === 'true') return;
 
     nrpSelect.dataset.enhanced = 'true';
-    loadNrpOptions(nrpSelect);
 
     if (typeof TomSelect === 'undefined') {
         replaceNrpSelectWithInput(nrpSelect);
@@ -222,49 +150,71 @@ function initializeNrpDropdown() {
     }
 
     try {
-        const source = window.UT_NRP_OPTIONS || [];
-        const isAsync = source instanceof Promise;
-
         let tomSelect = null;
         let nrpCloseTimer = null;
         let nrpReopened = false;
         tomSelect = new TomSelect(nrpSelect, {
             maxItems: 1,
-            create: input => {
-                const value = input.trim();
-                return value ? { value, text: value } : false;
-            },
+            // Phase 4.22 — NRP must be picked from the master employee directory.
+            create: false,
             persist: false,
             allowEmptyOption: true,
-            placeholder: 'Cari NRP atau Nama Pegawai...',
+            placeholder: 'Search Employee NRP or Name...',
             searchField: ['text', 'value'],
             sortField: { field: 'text', direction: 'asc' },
+            // Only query the server once the user typed at least 2 characters.
+            shouldLoad: query => query.trim().length >= 2,
+            load: function (query, callback) {
+                const q = query.trim();
+                if (q.length < 2) {
+                    callback();
+                    return;
+                }
+                fetch(`search_employee.php?q=${encodeURIComponent(q)}`)
+                    .then(r => r.json())
+                    .then(res => {
+                        const list = (res && res.data) || [];
+                        callback(list.map(emp => ({
+                            value: emp.nrp,
+                            text: `${emp.nrp} - ${emp.employee_name}`,
+                            nama: emp.employee_name,
+                            email: emp.email || ''
+                        })));
+                    })
+                    .catch(() => callback());
+            },
             render: {
                 option: renderNrpOption,
                 item: renderNrpItem,
-                no_results: () => '<div class="nrp-empty">No employee found</div>'
+                loading: () => '<div class="nrp-empty">Searching employees...</div>',
+                no_results: function () {
+                    const typed = tomSelect.control_input ? tomSelect.control_input.value.trim() : '';
+                    return typed.length < 2
+                        ? '<div class="nrp-empty">Type at least 2 characters...</div>'
+                        : '<div class="nrp-empty">No employee found.</div>';
+                }
+            },
+            onChange: function (value) {
+                if (!value) return;
+                const option = tomSelect.options[value];
+                if (!option) return;
+                // Auto-populate: Username = NRP, Email = employee email (if any),
+                // and keep the employee name in a hidden field.
+                const usernameInput = document.getElementById('regUsername');
+                const emailInput = document.getElementById('regEmail');
+                const nameInput = document.getElementById('regEmployeeName');
+                if (usernameInput) usernameInput.value = value;
+                if (emailInput && option.email) emailInput.value = option.email;
+                if (nameInput) nameInput.value = option.nama || '';
             },
             onDropdownOpen: () => {
                 if (nrpCloseTimer) nrpReopened = true; // re-opened during the fade-out
                 if (tomSelect.dropdown) tomSelect.dropdown.classList.remove('nrp-closing');
-                setNrpLoading(tomSelect.wrapper, tomSelect.wrapper.classList.contains('nrp-loading'));
             },
-            onDropdownClose: () => {
-                setNrpLoading(tomSelect.wrapper, false);
-            }
+            onDropdownClose: () => {}
         });
 
         tomSelect.wrapper.classList.add('auth-nrp-select');
-
-        // Enrich existing options with display fields only — value, text, search and sort unchanged.
-        normalizeNrpOptions(isAsync ? [] : source).forEach(option => {
-            tomSelect.addOption({
-                value: option.value,
-                text: option.text,
-                nama: option.nama || '',
-                department: option.department || ''
-            });
-        });
 
         // Gentle fade-out when the dropdown closes (Tom Select hides it instantly by default).
         // A pending-close timer plus a reopen flag keeps the fade safe against fast re-opens
@@ -293,28 +243,6 @@ function initializeNrpDropdown() {
                 originalClose();
             }, 150);
         };
-
-        // Future async employee source: show skeleton rows while it resolves.
-        // The current array-based source keeps its exact synchronous behaviour.
-        if (isAsync) {
-            const wrapper = tomSelect.wrapper;
-            wrapper.classList.add('nrp-loading');
-            setNrpLoading(wrapper, true);
-            source
-                .then(list => {
-                    normalizeNrpOptions(list).forEach(option => {
-                        tomSelect.addOption({
-                            value: option.value,
-                            text: option.text,
-                            nama: option.nama || '',
-                            department: option.department || ''
-                        });
-                    });
-                    tomSelect.refreshOptions(false);
-                })
-                .catch(() => {})
-                .finally(() => setNrpLoading(wrapper, false));
-        }
     } catch (error) {
         console.warn('Tom Select initialization failed:', error);
         replaceNrpSelectWithInput(nrpSelect);
@@ -325,16 +253,10 @@ function getRegisterNrpValue() {
     const nrpField = document.getElementById('regNrp');
     if (!nrpField) return '';
 
+    // Phase 4.22 — the NRP is only valid when picked from the employee directory.
+    // Free-typed text can never be submitted (backend validates against master_employee too).
     if (nrpField.tomselect) {
-        const selectedValue = nrpField.tomselect.getValue().trim();
-        const typedValue = nrpField.tomselect.control_input?.value.trim() || '';
-
-        if (selectedValue) return selectedValue;
-        if (typedValue) {
-            nrpField.tomselect.addOption({ value: typedValue, text: typedValue });
-            nrpField.tomselect.addItem(typedValue, true);
-            return typedValue;
-        }
+        return (nrpField.tomselect.getValue() || '').trim();
     }
 
     return nrpField.value.trim();
@@ -346,10 +268,12 @@ function clearRegisterNrpValue() {
 
     if (nrpField.tomselect) {
         nrpField.tomselect.clear(true);
-        return;
+    } else {
+        nrpField.value = '';
     }
 
-    nrpField.value = '';
+    const nameInput = document.getElementById('regEmployeeName');
+    if (nameInput) nameInput.value = '';
 }
 
 function initializeRegisterValidation() {

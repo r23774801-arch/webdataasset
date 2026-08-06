@@ -175,6 +175,22 @@ $queries = [
     "ALTER TABLE barang_masuk_ga ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
     "ALTER TABLE barang_keluar_it ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
     "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT NULL",
+
+    // ==========================================
+    // PHASE 4.22 — master employee directory
+    // (source of truth for registration lookup)
+    // ==========================================
+    "CREATE TABLE IF NOT EXISTS master_employee (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nrp VARCHAR(50) NOT NULL,
+        employee_name VARCHAR(255) NOT NULL,
+        email VARCHAR(100) DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_master_employee_nrp (nrp),
+        KEY idx_master_employee_nrp (nrp),
+        KEY idx_master_employee_name (employee_name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 ];
 
 $allSuccess = true;

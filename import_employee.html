@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Master Karyawan - UT Asset Dashboard</title>
+    <link rel="icon" href="img/ikon.png" type="image/png">
+    <link rel="stylesheet" href="css/enterprise-ui.css">
+    <style>
+        /* Standalone admin import page — minimal, scoped styles only */
+        .emp-body { background: #f4f6f9; display: flex; justify-content: center; padding: 48px 20px; min-height: 100vh; }
+        .emp-shell { width: 100%; max-width: 720px; }
+        .emp-head { margin-bottom: 20px; }
+        .emp-head h1 { font-size: 1.35rem; font-weight: 700; color: #111111; margin: 0 0 4px; }
+        .emp-head p { font-size: 0.85rem; color: #777777; margin: 0; }
+        .emp-card { background: #ffffff; border: 1px solid #eeeeee; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); padding: 26px; }
+        .emp-section { margin-bottom: 22px; }
+        .emp-section:last-child { margin-bottom: 0; }
+        .emp-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #999999; margin-bottom: 8px; }
+        .emp-file { border: 1.5px dashed #dddddd; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: #fafbfc; }
+        .emp-file:hover { border-color: #FFCC00; background: #fffdf5; }
+        .emp-file strong { color: #B38F00; }
+        .emp-file input[type="file"] { display: none; }
+        .emp-file-name { font-size: 0.85rem; color: #333333; margin-top: 6px; word-break: break-all; }
+        .emp-or { text-align: center; font-size: 0.75rem; color: #aaaaaa; text-transform: uppercase; letter-spacing: 1px; margin: 12px 0; }
+        .emp-paste { width: 100%; min-height: 110px; border: 1px solid #dddddd; border-radius: 10px; padding: 12px; font-family: 'Consolas', 'Menlo', monospace; font-size: 0.82rem; resize: vertical; color: #333333; }
+        .emp-paste:focus { outline: none; border-color: #FFCC00; box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.15); }
+        .emp-actions { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+        .emp-result { margin-top: 18px; border-radius: 10px; padding: 14px 16px; display: none; font-size: 0.88rem; }
+        .emp-result.ok { display: block; background: #f0faf3; border: 1px solid #cdeeda; color: #1c7a3d; }
+        .emp-result.err { display: block; background: #fff5f5; border: 1px solid #f3cccc; color: #b02a2a; }
+        .emp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+        .emp-stat { background: #f8f9fb; border: 1px solid #eeeeee; border-radius: 10px; padding: 12px; text-align: center; }
+        .emp-stat b { display: block; font-size: 1.25rem; color: #111111; }
+        .emp-stat span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #999999; font-weight: 700; }
+        .btn-ut-primary { margin-top: 0; }
+        .emp-note { font-size: 0.75rem; color: #999999; margin-top: 14px; line-height: 1.5; }
+    </style>
+</head>
+<body class="emp-body">
+    <div class="emp-shell">
+        <div class="emp-head">
+            <h1>Import Master Karyawan</h1>
+            <p>Unggah file Excel/CSV direktori karyawan — menjadi sumber data untuk pencarian saat registrasi.</p>
+        </div>
+
+        <div class="emp-card">
+            <div class="emp-section">
+                <div class="emp-label">Pilih File</div>
+                <label class="emp-file" id="empFileDrop">
+                    <strong>Klik untuk memilih file</strong>
+                    <div style="font-size:0.78rem; color:#999999; margin-top:4px;">Format: .csv, .tsv, .txt, .xlsx (kolom: NRP, Nama, Email opsional)</div>
+                    <input type="file" id="empFile" accept=".csv,.tsv,.txt,.xlsx">
+                    <div class="emp-file-name" id="empFileName"></div>
+                </label>
+            </div>
+
+            <div class="emp-or">— atau tempel data —</div>
+
+            <div class="emp-section">
+                <div class="emp-label">Tempel Data (NRP&#9;Nama&#9;Email)</div>
+                <textarea class="emp-paste" id="empPaste" placeholder="Contoh:&#10;23774801&#9;ICANG PRATAMA&#9;icang@example.com&#10;23774855&#9;BUDI SANTOSO"></textarea>
+            </div>
+
+            <div class="emp-actions">
+                <button class="btn-ut-primary" type="button" onclick="runImport()">Import Karyawan</button>
+                <a href="dashboard.html" class="btn-outline-link" style="font-size:0.85rem; color:#B38F00; text-decoration:none; font-weight:600;">Kembali ke Dashboard</a>
+            </div>
+
+            <div class="emp-result" id="empResult"></div>
+
+            <div class="emp-note">
+                Catatan: baris dengan NRP yang sudah ada akan diperbarui (bukan duplikat). Data hanya dibaca saat import — registrasi selalu membaca tabel master_employee.
+            </div>
+        </div>
+    </div>
+
+    <script src="js/loader.js"></script>
+    <script>
+        // Admin-only guard (localStorage mirror of server-side require_admin)
+        (function () {
+            const role = (localStorage.getItem('userRole') || '').toLowerCase();
+            if (role !== 'admin') {
+                window.location.replace('login.html');
+            }
+        })();
+
+        const fileInput = document.getElementById('empFile');
+        const fileName = document.getElementById('empFileName');
+        const pasteInput = document.getElementById('empPaste');
+        const resultBox = document.getElementById('empResult');
+
+        fileInput.addEventListener('change', () => {
+            fileName.textContent = fileInput.files && fileInput.files[0]
+                ? 'Dipilih: ' + fileInput.files[0].name
+                : '';
+        });
+
+        async function runImport() {
+            resultBox.className = 'emp-result';
+            resultBox.textContent = '';
+            resultBox.style.display = 'none';
+
+            const file = fileInput.files && fileInput.files[0];
+            const pasted = pasteInput.value.trim();
+
+            if (!file && !pasted) {
+                showToast('Pilih file atau tempel data terlebih dahulu.', 'error');
+                return;
+            }
+
+            toggleLoader(true, 'Mengimpor data karyawan...');
+            try {
+                let response;
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    response = await fetch('import_employee.php', { method: 'POST', body: formData });
+                } else {
+                    response = await fetch('import_employee.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ data: pasted })
+                    });
+                }
+
+                const result = await response.json();
+                toggleLoader(false);
+
+                if (result.status === 'success' && result.data) {
+                    const d = result.data;
+                    resultBox.className = 'emp-result ok';
+                    resultBox.innerHTML =
+                        '<strong>Import berhasil!</strong> ' + d.total + ' karyawan diproses.' +
+                        '<div class="emp-stats">' +
+                            '<div class="emp-stat"><b>' + d.inserted + '</b><span>Baru</span></div>' +
+                            '<div class="emp-stat"><b>' + d.updated + '</b><span>Diperbarui</span></div>' +
+                            '<div class="emp-stat"><b>' + d.skipped + '</b><span>Dilewati</span></div>' +
+                        '</div>';
+                    showToast('Import berhasil: ' + d.total + ' karyawan.', 'success');
+                } else {
+                    resultBox.className = 'emp-result err';
+                    resultBox.textContent = result.message || 'Terjadi kesalahan saat import.';
+                    showToast(result.message || 'Import gagal.', 'error');
+                }
+            } catch (error) {
+                toggleLoader(false);
+                resultBox.className = 'emp-result err';
+                resultBox.textContent = 'Terjadi kesalahan saat menghubungi server.';
+                showToast('Terjadi kesalahan saat menghubungi server.', 'error');
+            }
+        }
+
+        window.runImport = runImport;
+    </script>
+</body>
+</html>
