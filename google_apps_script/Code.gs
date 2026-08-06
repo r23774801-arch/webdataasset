@@ -47,6 +47,11 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(worksheet) || ss.insertSheet(worksheet);
 
+    // Phase 4.23 — the database primary key is no longer exported. If an older
+    // worksheet still carries an "id" column, remove it so it is neither kept
+    // in the header nor overwritten on future upserts.
+    removeLegacyIdColumn(sheet);
+
     // Only upsert when a key column is requested AND the payload actually has a
     // usable (non-empty) value for it — otherwise append (backward compatible).
     var keyValue = row[key] === undefined || row[key] === null ? '' : String(row[key]).trim();
@@ -67,9 +72,9 @@ function doPost(e) {
  * Upsert one object as a row: search the key column for a matching value and
  * update that row in place; otherwise append a new row (header-aligned).
  *
- * Phase 4.20 — fallback: when the key search misses, also try the always-
- * present "id" column. This keeps edits of the unique key itself (e.g. a
- * changed nomor_tiket) updating the SAME row instead of appending a duplicate.
+ * Phase 4.23 — no id column exists in the sheets anymore, so there is no
+ * secondary-key fallback: if the unique key itself was changed, the row is
+ * appended (key-based upsert only).
  */
 function upsertRow(sheet, row, key, keyValue) {
   var headers = getHeaders(sheet, row);
@@ -94,23 +99,25 @@ function upsertRow(sheet, row, key, keyValue) {
       }
     }
 
-    // Key not found — fall back to the id column (id is always present).
-    var idIndex = headers.indexOf('id');
-    var idValue = row['id'] === undefined || row['id'] === null ? '' : String(row['id']).trim();
-    if (idIndex >= 0 && idValue !== '') {
-      var idRange = sheet.getRange(2, idIndex + 1, numData, 1);
-      var idValues = idRange.getValues();
-      for (var j = 0; j < idValues.length; j++) {
-        var idCell = idValues[j][0];
-        if (idCell !== null && idCell !== undefined && String(idCell).trim() === idValue) {
-          writeRow(sheet, j + 2, headers, row);
-          return;
-        }
-      }
-    }
   }
   // Not found — append a new row.
   appendRow(sheet, row);
+}
+
+/**
+ * Phase 4.23 — the spreadsheet no longer stores the database primary key.
+ * Sheets created before this change may still have an "id" column in the
+ * header; delete that column once so it stops being created/updated/blanked.
+ * Idempotent: after the first deletion the column no longer exists.
+ */
+function removeLegacyIdColumn(sheet) {
+  var lastCol = sheet.getLastColumn();
+  if (lastCol < 1) return;
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(String);
+  var idIndex = headers.indexOf('id');
+  if (idIndex >= 0) {
+    sheet.deleteColumn(idIndex + 1);
+  }
 }
 
 /**

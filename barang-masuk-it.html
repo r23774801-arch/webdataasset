@@ -387,6 +387,14 @@
                     <div class="card-value" id="total-PTK">0</div>
                     <div class="card-subtitle">Unit</div>
                 </div>
+                <div class="summary-card clickable" data-area="Gudang" onclick="filterByArea('Gudang')">
+                    <div class="card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path><path d="M2 8h20"></path></svg>
+                    </div>
+                    <div class="card-title">Total Asset Gudang</div>
+                    <div class="card-value" id="total-Gudang">0</div>
+                    <div class="card-subtitle">Unit</div>
+                </div>
                 <div class="summary-card clickable active-card" data-area="" onclick="filterByArea('')" style="border: 2px dashed #ffc107;">
                     <div class="card-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
@@ -451,6 +459,7 @@
                         <option value="BIU Service">BIU Service</option>
                         <option value="Kel.">Kel.</option>
                         <option value="PTK">PTK</option>
+                        <option value="Gudang">Gudang</option>
                     </select>
                 </div>
                 <div class="input-group"><label>Photo (Opsional)</label><input type="file" id="photo" accept="image/*"></div>

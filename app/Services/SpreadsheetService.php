@@ -88,9 +88,10 @@ class SpreadsheetService
 
     /**
      * Re-fetch one Asset row (aset_it / aset_ga) from MySQL and upsert it to
-     * its worksheet keyed by asset_number (falls back to id when the asset
-     * number is empty). Best-effort — never throws, never blocks the caller.
-     * Used by every endpoint that mutates an asset record.
+     * its worksheet keyed by asset_number (falls back to serial_number when the
+     * asset number is empty). Phase 4.23 — the database primary key ('id') is
+     * no longer exported to the spreadsheet. Best-effort — never throws, never
+     * blocks the caller. Used by every endpoint that mutates an asset record.
      */
     public static function syncAsset(mysqli $conn, string $table, string $worksheet, int $id): bool
     {
@@ -109,12 +110,14 @@ class SpreadsheetService
                 return false;
             }
 
-            $assetNumber = trim((string)($row['asset_number'] ?? ''));
+            $assetNumber  = trim((string)($row['asset_number'] ?? ''));
+            $serialNumber = trim((string)($row['serial_number'] ?? ''));
+            // Phase 4.23 — the database primary key ('id') is intentionally NOT
+            // exported to the spreadsheet.
             $payload = [
-                'id'            => (int)($row['id'] ?? 0),
                 'asset_number'  => $assetNumber,
                 'nama_barang'   => (string)($row['nama_barang'] ?? ''),
-                'serial_number' => (string)($row['serial_number'] ?? ''),
+                'serial_number' => $serialNumber,
             ];
             if ($table === 'aset_ga' && array_key_exists('asset_class', $row)) {
                 $payload['asset_class'] = (string)($row['asset_class'] ?? '');
@@ -130,7 +133,10 @@ class SpreadsheetService
                 $payload['created_at'] = (string)$row['created_at'];
             }
 
-            return self::sync($worksheet, $payload, $assetNumber !== '' ? 'asset_number' : 'id');
+            // Phase 4.23 — upsert key: asset_number, else serial_number (assets
+            // require at least one of them), else append (backward compatible).
+            $key = $assetNumber !== '' ? 'asset_number' : ($serialNumber !== '' ? 'serial_number' : null);
+            return self::sync($worksheet, $payload, $key);
         } catch (\Throwable $e) {
             error_log('[SpreadsheetService] syncAsset error: ' . $e->getMessage());
             return false;
@@ -139,8 +145,9 @@ class SpreadsheetService
 
     /**
      * Re-fetch one Barang row (barang_{module}_{type}) from MySQL and upsert it
-     * to its worksheet keyed by nomor_tiket (falls back to id when the ticket
-     * number is empty). Best-effort — never throws, never blocks the caller.
+     * to its worksheet keyed by nomor_tiket. Phase 4.23 — the database primary
+     * key ('id') is no longer exported to the spreadsheet. Best-effort — never
+     * throws, never blocks the caller.
      */
     public static function syncBarang(mysqli $conn, string $module, string $type, int $id): bool
     {
@@ -170,8 +177,9 @@ class SpreadsheetService
             }
 
             $nomorTiket = trim((string)($row['nomor_tiket'] ?? ''));
+            // Phase 4.23 — the database primary key ('id') is intentionally NOT
+            // exported to the spreadsheet.
             $payload = [
-                'id'           => (int)($row['id'] ?? 0),
                 'asset_number' => (string)($row['asset_number'] ?? ''),
                 'nomor_tiket'  => $nomorTiket,
                 'asset_name'   => (string)($row['asset_name'] ?? ''),
@@ -187,7 +195,7 @@ class SpreadsheetService
                 $payload['created_at'] = (string)$row['created_at'];
             }
 
-            return self::sync($worksheet, $payload, $nomorTiket !== '' ? 'nomor_tiket' : 'id');
+            return self::sync($worksheet, $payload, $nomorTiket !== '' ? 'nomor_tiket' : null);
         } catch (\Throwable $e) {
             error_log('[SpreadsheetService] syncBarang error: ' . $e->getMessage());
             return false;

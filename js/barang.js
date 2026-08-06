@@ -95,7 +95,7 @@
     }
 
     // ---------- Summary cards (by area) ----------
-    const AREAS = ['Main Office', 'Part BKJ', 'Part BIU', 'Part BIU 3', 'BIU Service', 'Kel.', 'PTK'];
+    const AREAS = ['Main Office', 'Part BKJ', 'Part BIU', 'Part BIU 3', 'BIU Service', 'Kel.', 'PTK', 'Gudang'];
 
     // Option A — card totals always reflect the FULL source dataset (same as the
     // Asset pages), never the filtered set. The grand total feeds the All card.
