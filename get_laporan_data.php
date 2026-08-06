@@ -123,19 +123,20 @@ $query = "
 $result = $conn->query($query);
 
 $areaData = [];
-// Build the area list dynamically from the database — never hardcoded.
-$areaLabels = [];
-$areasResult = $conn->query("SELECT DISTINCT area FROM aset_it UNION SELECT DISTINCT area FROM aset_ga");
-if ($areasResult) {
-    while ($areaRow = $areasResult->fetch_assoc()) {
-        $areaVal = trim((string)($areaRow['area'] ?? ''));
-        if ($areaVal !== '') {
-            $areaLabels[] = $areaVal;
+// Phase 4.24 — master_area is the source of truth: every active Area is shown
+// in the chart, including Areas with zero assets. Pre-migration fallback
+// derives the list from the data itself — never hardcoded.
+$areaLabels = AreaService::names($conn);
+if (empty($areaLabels)) {
+    $areasResult = $conn->query("SELECT DISTINCT area FROM aset_it UNION SELECT DISTINCT area FROM aset_ga");
+    if ($areasResult) {
+        while ($areaRow = $areasResult->fetch_assoc()) {
+            $areaVal = trim((string)($areaRow['area'] ?? ''));
+            if ($areaVal !== '' && !in_array($areaVal, $areaLabels, true)) {
+                $areaLabels[] = $areaVal;
+            }
         }
     }
-}
-if (empty($areaLabels)) {
-    $areaLabels = ['Main Office'];
 }
 
 // Map database kondisi values to chart labels

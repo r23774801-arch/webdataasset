@@ -191,6 +191,22 @@ $queries = [
         KEY idx_master_employee_nrp (nrp),
         KEY idx_master_employee_name (employee_name)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // ==========================================
+    // PHASE 4.24 — Master Area (single source of truth for every Area
+    // dropdown, summary card, report and chart).
+    // ==========================================
+    "CREATE TABLE IF NOT EXISTS master_area (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        area_name VARCHAR(100) NOT NULL,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_master_area_name (area_name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // Seed the default Areas (INSERT IGNORE never duplicates existing rows).
+    "INSERT IGNORE INTO master_area (area_name) VALUES ('Main Office'), ('Part BKJ'), ('Kel.'), ('BIU Service'), ('Part BIU'), ('Part BIU 3'), ('PTK'), ('Gudang')",
 ];
 
 $allSuccess = true;

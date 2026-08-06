@@ -281,3 +281,79 @@ if (document.readyState === 'loading') {
 } else {
     initUserMenu();
 }
+
+// ==========================================
+// MASTER AREA — single source of truth for Area lists (Phase 4.24)
+// Area dropdowns, summary cards and charts read from master_area via
+// get_areas.php, so a new Area appears everywhere without code changes.
+// ==========================================
+window.UTAreas = { list: [], loaded: false };
+
+window.loadMasterAreas = async function () {
+    if (window.UTAreas.loaded) return window.UTAreas.list;
+    try {
+        const res = await fetch('get_areas.php');
+        const result = await res.json();
+        if (result.status === 'success' && Array.isArray(result.data)) {
+            window.UTAreas.list = result.data
+                .filter(a => String(a.is_active) !== '0' && a.area_name)
+                .map(a => String(a.area_name));
+            window.UTAreas.loaded = true;
+        }
+    } catch (err) {
+        console.error('Gagal memuat master area:', err);
+    }
+    return window.UTAreas.list;
+};
+
+function _utAreaEsc(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Fill a <select> with every active master Area. Keeps the current value when
+// it is still valid, otherwise selects the first Area.
+window.populateAreaSelect = function (selectEl) {
+    if (!selectEl) return;
+    const current = selectEl.value;
+    selectEl.innerHTML = window.UTAreas.list
+        .map(a => `<option value="${_utAreaEsc(a)}">${_utAreaEsc(a)}</option>`)
+        .join('');
+    if (current && window.UTAreas.list.includes(current)) {
+        selectEl.value = current;
+    } else if (selectEl.options.length) {
+        selectEl.value = selectEl.options[0].value;
+    }
+};
+
+// Build the clickable per-Area summary cards plus the "All" card into a
+// container. Cards are fully driven by master_area (no hardcoded Areas).
+// opts: { container, title(area), subtitle, iconSvg }
+window.buildAreaCards = function (opts) {
+    const container = opts && opts.container;
+    if (!container) return;
+    const icon = String(opts.iconSvg || '');
+    const subtitle = String(opts.subtitle || 'Total Asset');
+    const titleFn = typeof opts.title === 'function' ? opts.title : (a => 'TOTAL ASSET ' + String(a).toUpperCase());
+
+    const cards = window.UTAreas.list.map(area => {
+        const safe = _utAreaEsc(area);
+        return `<div class="summary-card clickable" data-area="${safe}" onclick="filterByArea('${safe}')">
+            <div class="card-icon">${icon}</div>
+            <div class="card-title">${_utAreaEsc(titleFn(area))}</div>
+            <div class="card-value" id="total-${safe}">0</div>
+            <div class="card-subtitle">${subtitle}</div>
+        </div>`;
+    });
+    cards.push(`<div class="summary-card clickable active-card" data-area="" onclick="filterByArea('')" style="border: 2px dashed #ffc107;">
+        <div class="card-icon">${icon}</div>
+        <div class="card-title">TAMPILKAN SEMUA</div>
+        <div class="card-value" id="total-All">0</div>
+        <div class="card-subtitle">${subtitle}</div>
+    </div>`);
+    container.innerHTML = cards.join('');
+};

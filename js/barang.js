@@ -94,21 +94,20 @@
         window.location.replace('login.html');
     }
 
-    // ---------- Summary cards (by area) ----------
-    const AREAS = ['Main Office', 'Part BKJ', 'Part BIU', 'Part BIU 3', 'BIU Service', 'Kel.', 'PTK', 'Gudang'];
-
+    // ---------- Summary cards (by area — master_area driven, Phase 4.24) ----------
     // Option A — card totals always reflect the FULL source dataset (same as the
     // Asset pages), never the filtered set. The grand total feeds the All card.
     function updateSummaryCards() {
+        const areas = (window.UTAreas && Array.isArray(window.UTAreas.list)) ? window.UTAreas.list : [];
         const totals = {};
         let grandTotal = 0;
-        AREAS.forEach(a => { totals[a] = 0; });
+        areas.forEach(a => { totals[a] = 0; });
         (sourceData || []).forEach(item => {
             if (item.area && Object.prototype.hasOwnProperty.call(totals, item.area)) {
                 totals[item.area] += parseInt(item.jumlah, 10) || 1;
             }
         });
-        AREAS.forEach(area => {
+        areas.forEach(area => {
             const el = $(`total-${area}`);
             if (el) el.textContent = totals[area];
             grandTotal += totals[area];
@@ -271,7 +270,7 @@
             if (el) el.value = '';
         });
         const area = $('area');
-        if (area) area.value = 'Main Office';
+        if (area && area.options.length) area.value = area.options[0].value;
     }
 
     function setModalTitle(text) {
@@ -369,9 +368,27 @@
         renderPage();
     };
 
+    // ---------- Master Area UI (Phase 4.24) ----------
+    // Summary cards + Area dropdown are driven by master_area via get_areas.php
+    // (shared helpers in js/loader.js) — no hardcoded Areas.
+    const AREA_CARD_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path><path d="M2 8h20"></path></svg>';
+
+    async function initMasterAreaUI() {
+        await loadMasterAreas();
+        buildAreaCards({
+            container: $('areaCardsGrid'),
+            title: area => 'Total Asset ' + area,
+            subtitle: 'Unit',
+            iconSvg: AREA_CARD_ICON
+        });
+        populateAreaSelect($('area'));
+        updateSummaryCards();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         loadUserInfo();
         applyRbacUi();
+        initMasterAreaUI();
         loadData();
     });
 })();

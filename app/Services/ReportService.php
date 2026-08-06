@@ -60,19 +60,26 @@ class ReportService
 
     /**
      * Per-area summary across both asset tables (IT + GA combined).
-     * Areas are read from the database — never hardcoded.
+     *
+     * Phase 4.24 — master_area is the source of truth: every active Area is
+     * listed, including Areas that currently have zero assets (they appear
+     * with zero counts). Before master_area exists (pre-migration) the list
+     * is derived from the data itself — never hardcoded.
      */
     public static function areaSummary(mysqli $conn): array
     {
-        $areas = [];
-        $result = $conn->query(
-            "SELECT DISTINCT area FROM aset_it UNION SELECT DISTINCT area FROM aset_ga"
-        );
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                $area = trim((string)($row['area'] ?? ''));
-                if ($area !== '' && !in_array($area, $areas, true)) {
-                    $areas[] = $area;
+        $areas = AreaService::names($conn);
+
+        if (empty($areas)) {
+            $result = $conn->query(
+                "SELECT DISTINCT area FROM aset_it UNION SELECT DISTINCT area FROM aset_ga"
+            );
+            if ($result) {
+                while ($row = $result->fetch_assoc()) {
+                    $area = trim((string)($row['area'] ?? ''));
+                    if ($area !== '' && !in_array($area, $areas, true)) {
+                        $areas[] = $area;
+                    }
                 }
             }
         }

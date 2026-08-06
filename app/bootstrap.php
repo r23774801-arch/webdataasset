@@ -11,4 +11,5 @@ require_once __DIR__ . '/Services/SpreadsheetService.php';
 require_once __DIR__ . '/Services/AnalyticsService.php';
 require_once __DIR__ . '/Services/AuditService.php';
 require_once __DIR__ . '/Services/ReportService.php';
+require_once __DIR__ . '/Services/AreaService.php';
 require_once __DIR__ . '/Services/PdfService.php';
