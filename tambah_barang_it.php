@@ -40,6 +40,7 @@ SpreadsheetService::sync(
     [
         'id'           => $id,
         'asset_number' => $input['asset_number'] ?? '',
+        'nomor_tiket'  => $input['nomor_tiket'] ?? '',
         'asset_name'   => $input['asset_name'] ?? '',
         'jumlah'       => (int)($input['jumlah'] ?? 0),
         'unit'         => $input['unit'] ?? '',
@@ -47,6 +48,7 @@ SpreadsheetService::sync(
         'tanggal'      => $input['tanggal'] ?? '',
         'pic'          => $input['pic'] ?? '',
         'area'         => $input['area'] ?? '',
+        'attachment'   => $input['attachment'] ?? '',
         'created_at'   => date('Y-m-d H:i:s'),
     ]
 );
