@@ -54,6 +54,56 @@ class MailService
     }
 
     /**
+     * Resolve a single user's e-mail address by NRP from the users table.
+     *
+     * This is the shared lookup used to notify the user who performed an
+     * action (asset/barang creation, stocktaking submission). Recipients are
+     * resolved ONLY from the users table — never from config or .env.
+     *
+     * Returns '' when the user has no valid e-mail on record.
+     */
+    public static function userEmail(mysqli $conn, string $nrp): string
+    {
+        $nrp = trim((string)$nrp);
+        if ($nrp === '') {
+            return '';
+        }
+        try {
+            $stmt = $conn->prepare('SELECT email FROM users WHERE nrp = ? LIMIT 1');
+            if (!$stmt) {
+                return '';
+            }
+            $stmt->bind_param('s', $nrp);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+        } catch (\Throwable $t) {
+            error_log('[MailService] userEmail lookup failed for nrp ' . $nrp . ': ' . $t->getMessage());
+            return '';
+        }
+        $email = trim((string)($row['email'] ?? ''));
+        return ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : '';
+    }
+
+    /**
+     * Resolve the recipient list for a user-triggered notification.
+     *
+     * The acting user's own e-mail (resolved from the users table) is the
+     * intended recipient — the SMTP account is ONLY ever the sender. If the
+     * acting user has no valid e-mail on record, fall back to the
+     * administrators so the notification is still delivered somewhere.
+     */
+    private static function recipientForActor(mysqli $conn, string $actorNrp): array
+    {
+        $actorEmail = self::userEmail($conn, $actorNrp);
+        if ($actorEmail !== '') {
+            return [$actorEmail];
+        }
+        error_log('[MailService] recipientForActor: acting user (nrp=' . $actorNrp . ') has no e-mail on record; falling back to administrators.');
+        return self::adminEmails($conn);
+    }
+
+    /**
      * Build a configured PHPMailer instance. Supports TLS and SSL.
      */
     private function createMailer(): PHPMailer
@@ -231,20 +281,26 @@ class MailService
     }
 
     /**
-     * Notify every administrator about a new Barang transaction.
+     * Notify about a new Barang transaction.
      *
      * Shared helper for the Barang create endpoints (Masuk/Keluar x IT/GA).
+     * The recipient is the acting user (resolved from the users table by
+     * their NRP); administrators are only used as a fallback when the acting
+     * user has no e-mail on record.
+     *
      * Best-effort: a mail failure is logged by send() and never throws, so
      * the transaction is never affected. Returns the number of successfully
      * delivered notifications.
+     *
+     * @param string $actorNrp NRP of the logged-in user who created the transaction
      */
-    public static function notifyAdminsBarangTransaction(mysqli $conn, array $tx): int
+    public static function notifyBarangTransaction(mysqli $conn, array $tx, string $actorNrp = ''): int
     {
-        $mailer      = self::instance();
-        $adminEmails = self::adminEmails($conn);
-        $sentCount   = 0;
-        foreach ($adminEmails as $adminEmail) {
-            if ($mailer->sendBarangTransaction($adminEmail, $tx)) {
+        $mailer     = self::instance();
+        $recipients = self::recipientForActor($conn, $actorNrp);
+        $sentCount  = 0;
+        foreach ($recipients as $recipient) {
+            if ($mailer->sendBarangTransaction($recipient, $tx)) {
                 $sentCount++;
             }
         }
@@ -287,20 +343,26 @@ class MailService
     }
 
     /**
-     * Notify every administrator about a newly created asset (IT or GA).
+     * Notify about a newly created asset (IT or GA).
      *
-     * Shared helper for the asset create endpoints. Best-effort: a mail
-     * failure is logged by send() and never throws, so the asset insert is
-     * never affected. Returns the number of successfully delivered
-     * notifications.
+     * Shared helper for the asset create endpoints. The recipient is the
+     * acting user (resolved from the users table by their NRP);
+     * administrators are only used as a fallback when the acting user has no
+     * e-mail on record.
+     *
+     * Best-effort: a mail failure is logged by send() and never throws, so
+     * the asset insert is never affected. Returns the number of successfully
+     * delivered notifications.
+     *
+     * @param string $actorNrp NRP of the logged-in user who created the asset
      */
-    public static function notifyAdminsAssetCreated(mysqli $conn, array $asset): int
+    public static function notifyAssetCreated(mysqli $conn, array $asset, string $actorNrp = ''): int
     {
-        $mailer      = self::instance();
-        $adminEmails = self::adminEmails($conn);
-        $sentCount   = 0;
-        foreach ($adminEmails as $adminEmail) {
-            if ($mailer->sendAssetCreated($adminEmail, $asset)) {
+        $mailer     = self::instance();
+        $recipients = self::recipientForActor($conn, $actorNrp);
+        $sentCount  = 0;
+        foreach ($recipients as $recipient) {
+            if ($mailer->sendAssetCreated($recipient, $asset)) {
                 $sentCount++;
             }
         }
