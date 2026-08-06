@@ -71,8 +71,20 @@ class MailService
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
 
-        if ($this->config['sender_email'] !== '') {
-            $mail->setFrom($this->config['sender_email'], $this->config['sender_name']);
+        // The authenticated SMTP account is always the sender. Gmail (and most
+        // SMTP relays) rewrite the From header to the authenticated account, so
+        // a MAIL_FROM_ADDRESS that differs from SMTP_USERNAME silently delivers
+        // a bare address without the intended display name. Prefer
+        // sender_email only when it matches the SMTP account (or when no SMTP
+        // account is configured); otherwise fall back to the account itself.
+        $smtpUser  = $this->config['smtp_username'];
+        $fromEmail = $this->config['sender_email'];
+        $fromName  = $this->config['sender_name'];
+        if ($fromEmail === '' || ($smtpUser !== '' && strcasecmp($fromEmail, $smtpUser) !== 0)) {
+            $fromEmail = $smtpUser;
+        }
+        if ($fromEmail !== '') {
+            $mail->setFrom($fromEmail, $fromName !== '' ? $fromName : $fromEmail);
         }
 
         return $mail;

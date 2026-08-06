@@ -63,9 +63,6 @@ function mail_config(): array
             'sender_name'     => getenv('MAIL_FROM_NAME') ?: 'UT Asset Management System',
             'sender_email'    => getenv('MAIL_FROM_ADDRESS') ?: '',
 
-            // Notification recipient (Administrator)
-            'admin_email'     => getenv('MAIL_ADMIN_ADDRESS') ?: '',
-
             // Base URL of the application (used to build absolute links in e-mails)
             'app_url'         => rtrim(getenv('APP_URL') ?: '', '/'),
         ];
