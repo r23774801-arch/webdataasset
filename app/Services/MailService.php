@@ -185,23 +185,28 @@ class MailService
             error_log('[MailService] sendStocktakingApproval skipped: recipient e-mail is empty.');
             return false;
         }
+        try {
+            $config   = mail_config();
+            $baseUrl  = $config['app_url'];
+            $reviewId = urlencode((string)($submission['id'] ?? ''));
 
-        $config   = mail_config();
-        $baseUrl  = $config['app_url'];
-        $reviewId = urlencode((string)($submission['id'] ?? ''));
+            $html = $this->renderTemplate('stocktaking_approval.php', [
+                'submission'      => $submission,
+                'assets'          => $assets,
+                'config'          => $config,
+                'logo_url'        => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+                'approval_status' => $submission['status'] ?? 'Pending',
+                'review_url'      => $baseUrl !== ''
+                    ? $baseUrl . '/approval.html?id=' . $reviewId
+                    : 'approval.html?id=' . $reviewId,
+            ]);
 
-        $html = $this->renderTemplate('stocktaking_approval.php', [
-            'submission'      => $submission,
-            'assets'          => $assets,
-            'config'          => $config,
-            'logo_url'        => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
-            'approval_status' => $submission['status'] ?? 'Pending',
-            'review_url'      => $baseUrl !== ''
-                ? $baseUrl . '/approval.html?id=' . $reviewId
-                : 'approval.html?id=' . $reviewId,
-        ]);
-
-        return $this->send($to, 'Stocktaking Approval Request', $html);
+            return $this->send($to, 'Stocktaking Approval Request', $html);
+        } catch (\Throwable $e) {
+            // E-mail must never break the caller — log and report failure.
+            error_log('[MailService] sendStocktakingApproval failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -229,19 +234,24 @@ class MailService
             error_log('[MailService] sendStocktakingResult skipped for status: ' . $status);
             return false;
         }
+        try {
+            $config  = mail_config();
+            $baseUrl = $config['app_url'];
 
-        $config  = mail_config();
-        $baseUrl = $config['app_url'];
+            $html = $this->renderTemplate('stocktaking_result.php', [
+                'submission'      => $submission,
+                'assets'          => $assets,
+                'config'          => $config,
+                'logo_url'        => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+                'approval_status' => $status,
+            ]);
 
-        $html = $this->renderTemplate('stocktaking_result.php', [
-            'submission'      => $submission,
-            'assets'          => $assets,
-            'config'          => $config,
-            'logo_url'        => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
-            'approval_status' => $status,
-        ]);
-
-        return $this->send($to, $subject, $html);
+            return $this->send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            // E-mail must never break the caller — log and report failure.
+            error_log('[MailService] sendStocktakingResult failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -268,16 +278,22 @@ class MailService
         $typeLabel  = $module === 'keluar' ? 'Keluar' : 'Masuk';
         $subject    = trim('New Barang ' . $typeLabel . ' ' . $department . ' Transaction');
 
-        $config  = mail_config();
-        $baseUrl = $config['app_url'];
+        try {
+            $config  = mail_config();
+            $baseUrl = $config['app_url'];
 
-        $html = $this->renderTemplate('barang_transaction.php', [
-            'tx'       => $tx,
-            'config'   => $config,
-            'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
-        ]);
+            $html = $this->renderTemplate('barang_transaction.php', [
+                'tx'       => $tx,
+                'config'   => $config,
+                'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+            ]);
 
-        return $this->send($to, $subject, $html);
+            return $this->send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            // E-mail must never break the caller — log and report failure.
+            error_log('[MailService] sendBarangTransaction failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -330,16 +346,22 @@ class MailService
         $assetType = strtoupper((string)($asset['asset_type'] ?? ''));
         $subject   = trim('New Asset ' . $assetType . ' Created');
 
-        $config  = mail_config();
-        $baseUrl = $config['app_url'];
+        try {
+            $config  = mail_config();
+            $baseUrl = $config['app_url'];
 
-        $html = $this->renderTemplate('asset_created.php', [
-            'asset'    => $asset,
-            'config'   => $config,
-            'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
-        ]);
+            $html = $this->renderTemplate('asset_created.php', [
+                'asset'    => $asset,
+                'config'   => $config,
+                'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+            ]);
 
-        return $this->send($to, $subject, $html);
+            return $this->send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            // E-mail must never break the caller — log and report failure.
+            error_log('[MailService] sendAssetCreated failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
