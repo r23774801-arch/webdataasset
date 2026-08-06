@@ -21,6 +21,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 
 if ($input && isset($input['id'])) {
     $id = $input['id'];
+    $asset_number = $input['asset_number'] ?? '';
     $nama_barang = $input['nama_barang'];
     $serial_number = $input['serial_number'] ?? '';
     $asset_class = $input['asset_class'] ?? '';
@@ -30,6 +31,13 @@ if ($input && isset($input['id'])) {
     $utilisasi = $input['utilisasi'] ?? 'No';
     $date_of_entry = $input['date_of_entry'] ?? null;
     $attachment = $input['attachment'] ?? '';
+
+    // Asset Number OR Serial Number must be provided (both empty is rejected).
+    // Photo stays optional on edit — the existing uploaded photo is preserved.
+    if (trim($asset_number) === '' && trim($serial_number) === '') {
+        echo json_encode(["status" => "error", "message" => "Isi Asset Number atau Serial Number minimal satu."]);
+        exit;
+    }
 
     // Build query dynamically based on whether attachment is provided (kondisi is not updated here)
     if (!empty($attachment)) {

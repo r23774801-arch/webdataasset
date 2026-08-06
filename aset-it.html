@@ -733,7 +733,7 @@
             </div>
             <div class="input-group"><label>Department</label><input type="text" id="locationNote" placeholder="Contoh: IT Operation"></div>
             <div class="input-group"><label>Date</label><input type="date" id="dateOfEntry"></div>
-            <div class="input-group"><label>Photo (Opsional)</label><input type="file" id="photo" accept="image/*"></div>
+            <div class="input-group"><label>Photo</label><input type="file" id="photo" accept="image/*"></div>
             <button class="btn-warning" onclick="simpanAsetIt()">Simpan Data Aset</button>
         </div>
     </div>
@@ -1634,6 +1634,21 @@
             if (!pic) {
                 showToast("PIC (Person In Charge) harus diisi!", "info");
                 return;
+            }
+
+            // Asset Number OR Serial Number must be provided (both empty is rejected)
+            if (!assetNumber && !serialNumber) {
+                showToast("Isi Asset Number atau Serial Number minimal satu.", "info");
+                return;
+            }
+
+            // Photo is mandatory when adding a new asset
+            if (!editId) {
+                const photoInput = document.getElementById('photo');
+                if (!photoInput || !photoInput.files || !photoInput.files[0]) {
+                    showToast("Photo wajib diunggah.", "info");
+                    return;
+                }
             }
 
             toggleLoader(true, editId ? "Memperbarui data..." : "Menyimpan data aset IT...");

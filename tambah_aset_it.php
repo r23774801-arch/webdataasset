@@ -41,6 +41,18 @@ if ($input) {
     // Hardcode kondisi to '-' for all new entries (pending status)
     $kondisi = '-';
 
+    // Asset Number OR Serial Number must be provided (both empty is rejected)
+    if (trim($asset_number) === '' && trim($serial_number) === '') {
+        echo json_encode(["status" => "error", "message" => "Isi Asset Number atau Serial Number minimal satu."]);
+        exit;
+    }
+
+    // Photo is mandatory for new assets
+    if (trim($attachment) === '') {
+        echo json_encode(["status" => "error", "message" => "Photo wajib diunggah."]);
+        exit;
+    }
+
     $query = "INSERT INTO aset_it (asset_number, nama_barang, serial_number, pic, area, location_note, utilisasi, date_of_entry, attachment, kondisi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
     
