@@ -1,6 +1,11 @@
 <?php
 header('Content-Type: application/json');
+session_start();
 include 'koneksi.php';
+require_once __DIR__ . '/app/bootstrap.php';
+
+// RBAC: ADMIN is monitoring/approval only — never allowed to transact barang.
+deny_admin_transaction();
 
 $input = json_decode(file_get_contents("php://input"), true);
 

@@ -87,19 +87,10 @@ $emailSent = null;
 $statusChanged = ($status !== ($submission['status'] ?? ''));
 if ($statusChanged && in_array($status, [ApprovalService::STATUS_APPROVED, ApprovalService::STATUS_REJECTED], true)) {
     try {
-        $userEmail = '';
-        $stmt = $conn->prepare("SELECT email FROM users WHERE nrp = ? LIMIT 1");
-        if ($stmt) {
-            $stmt->bind_param('s', $submission['submitted_by']);
-            $stmt->execute();
-            $uResult = $stmt->get_result();
-            if ($u = $uResult->fetch_assoc()) {
-                $userEmail = trim((string)($u['email'] ?? ''));
-            }
-            $stmt->close();
-        }
+        $profile = MailService::userProfile($conn, (string)($submission['submitted_by'] ?? ''));
+        $userEmail = $profile['email'];
 
-        if ($userEmail === '' || !filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+        if ($userEmail === '') {
             error_log('[approve_stocktaking] No valid e-mail on record for user ' . $submission['submitted_by'] . '; result notification skipped.');
             AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', $id, [
                 'submission_code' => $submission['submission_code'] ?? null,
@@ -107,7 +98,14 @@ if ($statusChanged && in_array($status, [ApprovalService::STATUS_APPROVED, Appro
                 'reason'          => 'No valid e-mail on record for user ' . ($submission['submitted_by'] ?? ''),
             ]);
         } else {
-            $emailSent = MailService::instance()->sendStocktakingResult($userEmail, $updated, $updated['assets'] ?? []);
+            $pengaju = [
+                'nama'       => (string)($submission['submitted_by_name'] ?? $profile['nama'] ?? ''),
+                'email'      => $userEmail,
+                'departemen' => (string)($updated['department'] ?? ($updated['asset_type'] ?? '')),
+                'role'       => $profile['role'],
+                'tanggal'    => (string)($updated['submission_date'] ?? date('Y-m-d H:i:s')),
+            ];
+            $emailSent = MailService::instance()->sendStocktakingResult($userEmail, $updated, $updated['assets'] ?? [], $pengaju);
             if (!$emailSent) {
                 error_log('[approve_stocktaking] Failed to send result notification to ' . $userEmail . ' for submission #' . $id);
                 AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', $id, [

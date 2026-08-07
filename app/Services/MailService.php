@@ -11,6 +11,12 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class MailService
 {
+    /** CID used for the embedded United Tractors logo in every e-mail. */
+    public const LOGO_CID = 'utlogo';
+
+    /** CID used for an attached photo shown inline (barang / asset e-mails). */
+    public const PHOTO_CID = 'txphoto';
+
     /** @var MailService|null */
     private static $instance = null;
 
@@ -86,6 +92,56 @@ class MailService
     }
 
     /**
+     * Resolve the full profile (name, e-mail, role) of a user by NRP from the
+     * users table. Used for the "Informasi Pengaju" block in every e-mail.
+     *
+     * The e-mail is the user's address stored in the database — never the
+     * SMTP account. Returns empty strings for any field that is missing.
+     */
+    public static function userProfile(mysqli $conn, string $nrp): array
+    {
+        $nrp = trim((string)$nrp);
+        if ($nrp === '') {
+            return ['nama' => '', 'email' => '', 'role' => ''];
+        }
+        try {
+            $stmt = $conn->prepare('SELECT username, email, role FROM users WHERE nrp = ? LIMIT 1');
+            if (!$stmt) {
+                return ['nama' => '', 'email' => '', 'role' => ''];
+            }
+            $stmt->bind_param('s', $nrp);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+        } catch (\Throwable $t) {
+            error_log('[MailService] userProfile lookup failed for nrp ' . $nrp . ': ' . $t->getMessage());
+            return ['nama' => '', 'email' => '', 'role' => ''];
+        }
+        $row   = $row ?? [];
+        $email = trim((string)($row['email'] ?? ''));
+        return [
+            'nama'  => trim((string)($row['username'] ?? '')),
+            'email' => ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : '',
+            'role'  => strtoupper(trim((string)($row['role'] ?? ''))),
+        ];
+    }
+
+    /**
+     * Build the "Informasi Pengaju" block for a template from a data array.
+     * The e-mail is the acting user's address from the DB (never SMTP).
+     */
+    private function buildPengaju(array $data, array $extra = []): array
+    {
+        return [
+            'nama'       => (string)($data['user_name'] ?? $data['submitted_by_name'] ?? ($extra['nama'] ?? '')),
+            'email'      => (string)($data['user_email'] ?? ($extra['email'] ?? '')),
+            'departemen' => (string)($data['department'] ?? $data['asset_type'] ?? ($extra['departemen'] ?? '')),
+            'role'       => (string)($data['user_role'] ?? ($extra['role'] ?? '')),
+            'tanggal'    => (string)($data['timestamp'] ?? $data['submission_date'] ?? $data['tanggal'] ?? ($extra['tanggal'] ?? '')),
+        ];
+    }
+
+    /**
      * Resolve the recipient list for a user-triggered notification.
      *
      * The acting user's own e-mail (resolved from the users table) is the
@@ -105,8 +161,16 @@ class MailService
 
     /**
      * Build a configured PHPMailer instance. Supports TLS and SSL.
+     *
+     * The sender (From) is ALWAYS the identity configured in .env via
+     * MAIL_FROM_ADDRESS / MAIL_FROM_NAME — never the SMTP account. The SMTP
+     * account is used exclusively for authentication and is never a recipient.
+     *
+     * When $replyTo is provided (e.g. the e-mail of the user who performed the
+     * action, resolved live from the users table), it is set as the Reply-To
+     * header so replies reach that person instead of the sender.
      */
-    private function createMailer(): PHPMailer
+    private function createMailer(?string $replyTo = null): PHPMailer
     {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
@@ -121,23 +185,86 @@ class MailService
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
 
-        // The authenticated SMTP account is always the sender. Gmail (and most
-        // SMTP relays) rewrite the From header to the authenticated account, so
-        // a MAIL_FROM_ADDRESS that differs from SMTP_USERNAME silently delivers
-        // a bare address without the intended display name. Prefer
-        // sender_email only when it matches the SMTP account (or when no SMTP
-        // account is configured); otherwise fall back to the account itself.
-        $smtpUser  = $this->config['smtp_username'];
-        $fromEmail = $this->config['sender_email'];
-        $fromName  = $this->config['sender_name'];
-        if ($fromEmail === '' || ($smtpUser !== '' && strcasecmp($fromEmail, $smtpUser) !== 0)) {
-            $fromEmail = $smtpUser;
+        // Sender is the configured brand identity (MAIL_FROM_ADDRESS/NAME).
+        // Fall back to the SMTP account only when MAIL_FROM_ADDRESS is empty.
+        $fromEmail = trim((string)$this->config['sender_email']);
+        $fromName  = trim((string)$this->config['sender_name']);
+        if ($fromEmail === '') {
+            $fromEmail = (string)$this->config['smtp_username'];
         }
         if ($fromEmail !== '') {
             $mail->setFrom($fromEmail, $fromName !== '' ? $fromName : $fromEmail);
         }
 
+        // Reply-To = the person who performed the action (never the sender).
+        $replyTo = trim((string)$replyTo);
+        if ($replyTo !== '' && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+            $mail->addReplyTo($replyTo);
+        }
+
         return $mail;
+    }
+
+    /**
+     * Absolute filesystem path of the UT logo used for AddEmbeddedImage().
+     * Returns '' when the file does not exist.
+     */
+    private function logoPath(): string
+    {
+        $path = __DIR__ . '/../../img/logo.png';
+        return is_file($path) ? realpath($path) : '';
+    }
+
+    /**
+     * Resolve a stored photo path (relative to the app root, e.g.
+     * "uploads/abc.jpg" or "img/xyz.png") to an absolute filesystem path.
+     * Returns '' when the file does not exist.
+     */
+    private function resolveMediaPath(string $relPath): string
+    {
+        $relPath = trim((string)$relPath);
+        if ($relPath === '') {
+            return '';
+        }
+        $path = __DIR__ . '/../../' . ltrim($relPath, '/');
+        return is_file($path) ? realpath($path) : '';
+    }
+
+    /**
+     * Embed the UT logo (AddEmbeddedImage) so it renders via cid:utlogo.
+     * Never throws — when the file is missing the mail still sends.
+     */
+    private function attachLogo(PHPMailer $mail): void
+    {
+        $path = $this->logoPath();
+        if ($path === '') {
+            error_log('[MailService] logo file not found; embedding skipped.');
+            return;
+        }
+        try {
+            $mail->AddEmbeddedImage($path, self::LOGO_CID, 'ut-logo.png', 'base64', 'image/png');
+        } catch (\Throwable $e) {
+            error_log('[MailService] failed to embed logo: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Attach a photo as a file attachment AND embed it inline (cid:txphoto)
+     * when the file exists. Never throws — missing files are skipped.
+     */
+    private function attachPhoto(PHPMailer $mail, string $relPath): void
+    {
+        $path = $this->resolveMediaPath($relPath);
+        if ($path === '') {
+            error_log('[MailService] photo file not found; attachment skipped: ' . $relPath);
+            return;
+        }
+        try {
+            $mail->AddEmbeddedImage($path, self::PHOTO_CID, basename($path), 'base64', 'image/png');
+            $mail->addAttachment($path, basename($path));
+        } catch (\Throwable $e) {
+            error_log('[MailService] failed to attach photo: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -153,14 +280,23 @@ class MailService
 
     /**
      * Send an HTML e-mail. Never throws — failures are logged and reported.
+     *
+     * @param string      $to           recipient e-mail address
+     * @param string      $subject      subject line
+     * @param string      $html         HTML body
+     * @param string|null $replyTo      optional Reply-To address (e.g. acting user)
+     * @param string      $photoRelPath optional stored photo path (uploads/...) to
+     *                                  attach as a file and embed inline (cid:txphoto)
      */
-    public function send(string $to, string $subject, string $html): bool
+    public function send(string $to, string $subject, string $html, ?string $replyTo = null, string $photoRelPath = ''): bool
     {
         try {
-            $mail = $this->createMailer();
+            $mail = $this->createMailer($replyTo);
             $mail->addAddress($to);
             $mail->Subject = $subject;
             $mail->Body    = $html;
+            $this->attachLogo($mail);
+            $this->attachPhoto($mail, $photoRelPath);
             $mail->send();
             return true;
         } catch (\Throwable $e) {
@@ -178,8 +314,10 @@ class MailService
      * @param string $to          recipient e-mail address (must be non-empty)
      * @param array  $submission  stocktaking submission row
      * @param array  $assets      snapshot of the submitted assets
+     * @param string|null $replyTo optional Reply-To address (submitting user)
+     * @param array  $pengaju     optional pre-built "Informasi Pengaju" block
      */
-    public function sendStocktakingApproval(string $to, array $submission, array $assets = []): bool
+    public function sendStocktakingApproval(string $to, array $submission, array $assets = [], ?string $replyTo = null, array $pengaju = []): bool
     {
         if (trim($to) === '') {
             error_log('[MailService] sendStocktakingApproval skipped: recipient e-mail is empty.');
@@ -194,14 +332,15 @@ class MailService
                 'submission'      => $submission,
                 'assets'          => $assets,
                 'config'          => $config,
-                'logo_url'        => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+                'logo_url'        => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
                 'approval_status' => $submission['status'] ?? 'Pending',
                 'review_url'      => $baseUrl !== ''
                     ? $baseUrl . '/approval.html?id=' . $reviewId
                     : 'approval.html?id=' . $reviewId,
+                'pengaju'         => $this->buildPengaju($submission, $pengaju),
             ]);
 
-            return $this->send($to, 'Stocktaking Approval Request', $html);
+            return $this->send($to, 'Stocktaking Approval Request', $html, $replyTo);
         } catch (\Throwable $e) {
             // E-mail must never break the caller — log and report failure.
             error_log('[MailService] sendStocktakingApproval failed: ' . $e->getMessage());
@@ -216,8 +355,9 @@ class MailService
      * @param string $to          recipient e-mail address (must be non-empty)
      * @param array  $submission  stocktaking submission row
      * @param array  $assets      snapshot of the submitted assets
+     * @param array  $pengaju     optional pre-built "Informasi Pengaju" block
      */
-    public function sendStocktakingResult(string $to, array $submission, array $assets = []): bool
+    public function sendStocktakingResult(string $to, array $submission, array $assets = [], array $pengaju = []): bool
     {
         if (trim($to) === '') {
             error_log('[MailService] sendStocktakingResult skipped: recipient e-mail is empty.');
@@ -235,15 +375,15 @@ class MailService
             return false;
         }
         try {
-            $config  = mail_config();
-            $baseUrl = $config['app_url'];
+            $config = mail_config();
 
             $html = $this->renderTemplate('stocktaking_result.php', [
                 'submission'      => $submission,
                 'assets'          => $assets,
                 'config'          => $config,
-                'logo_url'        => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+                'logo_url'        => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
                 'approval_status' => $status,
+                'pengaju'         => $this->buildPengaju($submission, $pengaju),
             ]);
 
             return $this->send($to, $subject, $html);
@@ -265,8 +405,9 @@ class MailService
      *                    department (IT/GA), asset_number, nomor_tiket,
      *                    asset_name, jumlah, supplier, pic, area, tanggal,
      *                    user_name, user_nrp, timestamp
+     * @param string|null $replyTo optional Reply-To address (acting user)
      */
-    public function sendBarangTransaction(string $to, array $tx): bool
+    public function sendBarangTransaction(string $to, array $tx, ?string $replyTo = null): bool
     {
         if (trim($to) === '') {
             error_log('[MailService] sendBarangTransaction skipped: recipient e-mail is empty.');
@@ -280,15 +421,19 @@ class MailService
 
         try {
             $config  = mail_config();
-            $baseUrl = $config['app_url'];
 
+            $txPhoto = trim((string)($tx['attachment'] ?? ''));
             $html = $this->renderTemplate('barang_transaction.php', [
                 'tx'       => $tx,
                 'config'   => $config,
-                'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+                'logo_url' => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
+                'photo_cid' => ($txPhoto !== '' && $this->resolveMediaPath($txPhoto) !== '')
+                    ? self::PHOTO_CID
+                    : '',
+                'pengaju'  => $this->buildPengaju($tx),
             ]);
 
-            return $this->send($to, $subject, $html);
+            return $this->send($to, $subject, $html, $replyTo, $txPhoto);
         } catch (\Throwable $e) {
             // E-mail must never break the caller — log and report failure.
             error_log('[MailService] sendBarangTransaction failed: ' . $e->getMessage());
@@ -335,8 +480,9 @@ class MailService
      *                      pic, area, location_note, utilisasi, date_of_entry,
      *                      attachment (photo path), user_name, user_nrp,
      *                      timestamp
+     * @param string|null $replyTo optional Reply-To address (acting user)
      */
-    public function sendAssetCreated(string $to, array $asset): bool
+    public function sendAssetCreated(string $to, array $asset, ?string $replyTo = null): bool
     {
         if (trim($to) === '') {
             error_log('[MailService] sendAssetCreated skipped: recipient e-mail is empty.');
@@ -348,15 +494,19 @@ class MailService
 
         try {
             $config  = mail_config();
-            $baseUrl = $config['app_url'];
 
+            $assetPhoto = trim((string)($asset['attachment'] ?? ''));
             $html = $this->renderTemplate('asset_created.php', [
                 'asset'    => $asset,
                 'config'   => $config,
-                'logo_url' => $baseUrl !== '' ? $baseUrl . '/img/logo.png' : '',
+                'logo_url' => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
+                'photo_cid' => ($assetPhoto !== '' && $this->resolveMediaPath($assetPhoto) !== '')
+                    ? self::PHOTO_CID
+                    : '',
+                'pengaju'  => $this->buildPengaju($asset),
             ]);
 
-            return $this->send($to, $subject, $html);
+            return $this->send($to, $subject, $html, $replyTo, $assetPhoto);
         } catch (\Throwable $e) {
             // E-mail must never break the caller — log and report failure.
             error_log('[MailService] sendAssetCreated failed: ' . $e->getMessage());
@@ -386,6 +536,74 @@ class MailService
         foreach ($recipients as $recipient) {
             if ($mailer->sendAssetCreated($recipient, $asset)) {
                 $sentCount++;
+            }
+        }
+        return $sentCount;
+    }
+
+    /**
+     * Notify every administrator about a newly created asset (IT or GA).
+     *
+     * The recipient list is resolved LIVE from the users table via
+     * adminEmails() (every row whose role is admin) — never from config or
+     * .env. Because the lookup reads the current users.email value, an admin
+     * who changes their e-mail on the Profile page automatically receives
+     * subsequent notifications at the new address.
+     *
+     * The acting user's e-mail (from asset['user_nrp']) is set as the
+     * Reply-To header, so replies reach the person who created the asset.
+     *
+     * Never throws: per-recipient failures are caught and logged, so the
+     * caller's flow (asset insert) is never affected. Returns the number of
+     * successfully delivered notifications.
+     */
+    public static function notifyAdminsAssetCreated(mysqli $conn, array $asset): int
+    {
+        $mailer     = self::instance();
+        $profile    = self::userProfile($conn, (string)($asset['user_nrp'] ?? ''));
+        $asset['user_email'] = $profile['email'];
+        $asset['user_role']  = $profile['role'];
+        $replyTo    = self::userEmail($conn, (string)($asset['user_nrp'] ?? ''));
+        $recipients = self::adminEmails($conn);
+        $sentCount  = 0;
+        foreach ($recipients as $recipient) {
+            try {
+                if ($mailer->sendAssetCreated($recipient, $asset, $replyTo)) {
+                    $sentCount++;
+                }
+            } catch (\Throwable $t) {
+                error_log('[MailService] notifyAdminsAssetCreated failed for ' . $recipient . ': ' . $t->getMessage());
+            }
+        }
+        return $sentCount;
+    }
+
+    /**
+     * Notify every administrator about a new Barang transaction
+     * (Masuk/Keluar x IT/GA).
+     *
+     * Same live-users-table contract as notifyAdminsAssetCreated(): recipients
+     * are resolved via adminEmails() only, so Profile e-mail changes are
+     * picked up automatically. The acting user's e-mail (from tx['user_nrp'])
+     * is set as the Reply-To header. Never throws; returns the number of
+     * delivered notifications.
+     */
+    public static function notifyAdminsBarangTransaction(mysqli $conn, array $tx): int
+    {
+        $mailer     = self::instance();
+        $profile    = self::userProfile($conn, (string)($tx['user_nrp'] ?? ''));
+        $tx['user_email'] = $profile['email'];
+        $tx['user_role']  = $profile['role'];
+        $replyTo    = self::userEmail($conn, (string)($tx['user_nrp'] ?? ''));
+        $recipients = self::adminEmails($conn);
+        $sentCount  = 0;
+        foreach ($recipients as $recipient) {
+            try {
+                if ($mailer->sendBarangTransaction($recipient, $tx, $replyTo)) {
+                    $sentCount++;
+                }
+            } catch (\Throwable $t) {
+                error_log('[MailService] notifyAdminsBarangTransaction failed for ' . $recipient . ': ' . $t->getMessage());
             }
         }
         return $sentCount;

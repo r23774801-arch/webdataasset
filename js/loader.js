@@ -203,13 +203,13 @@ if (document.readyState === 'loading') {
 // ==========================================
 // SHARED RBAC — ADD/MANAGE PERMISSION (Phase 4.5.3)
 // One rule used by every asset-management page:
-//   admin → manage everything
+//   admin → false (monitoring/approval only — no add/edit/delete)
 //   it    → manage IT data only
 //   ga    → manage GA data only
 // ==========================================
 function canManageData(type) {
     const role = (localStorage.getItem('userRole') || '').toLowerCase();
-    if (role === 'admin') return true;
+    if (role === 'admin') return false;
     if (role === 'it') return String(type || '').toLowerCase() === 'it';
     if (role === 'ga') return String(type || '').toLowerCase() === 'ga';
     return false;

@@ -6,7 +6,7 @@
  *                     barang_keluar_it, barang_keluar_ga
  *
  * RBAC matrix (enforced server-side here):
- *   ADMIN : full manage (create/edit/delete) on all Barang tables
+ *   ADMIN : monitoring/approval only — never manages Barang records
  *   IT    : full CRUD on *_it tables, view only on *_ga tables
  *   GA    : full CRUD on *_ga tables, view only on *_it tables
  */
@@ -30,13 +30,17 @@ class BarangService
 
     /**
      * Whether the given role may create/edit/delete records of this type.
+     *
+     * ADMIN never manages transactions (monitoring/approval only) — enforced
+     * here as defense-in-depth in addition to the deny_admin_transaction()
+     * guard on every barang endpoint.
      */
     public static function canManage(string $role, string $type): bool
     {
         $role = strtoupper($role);
         $type = strtolower($type);
         if ($role === 'ADMIN') {
-            return true;
+            return false;
         }
         if ($role === 'IT') {
             return $type === 'it';
@@ -127,6 +131,10 @@ class BarangService
 
     /**
      * Update an existing row. Returns true on success.
+     *
+     * Photo handling (mirrors the Asset update flow):
+     *   - When an $attachment is provided, it replaces the stored photo.
+     *   - When none is provided, the existing photo is preserved.
      */
     public static function update(mysqli $conn, string $module, string $type, int $id, array $data): bool
     {
@@ -144,29 +152,47 @@ class BarangService
         $supplier    = trim((string)($data['supplier'] ?? ''));
         $nomorTiket  = trim((string)($data['nomor_tiket'] ?? ''));
         $unit        = trim((string)($data['unit'] ?? ''));
+        $attachment  = trim((string)($data['attachment'] ?? ''));
+        if (!empty($attachment) && strpos($attachment, 'uploads/') !== 0 && strpos($attachment, 'img/') !== 0) {
+            $attachment = 'uploads/' . $attachment;
+        }
 
         if ($assetName === '' || $jumlah <= 0 || $tanggal === '') {
             return false;
         }
 
+        // A photo is only touched when a new one is provided — otherwise the
+        // existing attachment stays untouched.
+        $updatePhoto = $attachment !== '';
+
         if ($module === 'masuk') {
             $sql = "UPDATE $table
-                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, supplier = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?
+                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, supplier = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?"
+                . ($updatePhoto ? ", attachment = ?" : '') . "
                     WHERE id = ?";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 return false;
             }
-            $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $id);
+            if ($updatePhoto) {
+                $stmt->bind_param('ssisssssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $attachment, $id);
+            } else {
+                $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $id);
+            }
         } else {
             $sql = "UPDATE $table
-                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?
+                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?"
+                . ($updatePhoto ? ", attachment = ?" : '') . "
                     WHERE id = ?";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 return false;
             }
-            $stmt->bind_param('ssisssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $id);
+            if ($updatePhoto) {
+                $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $attachment, $id);
+            } else {
+                $stmt->bind_param('ssisssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $id);
+            }
         }
 
         return $stmt->execute();

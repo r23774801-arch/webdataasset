@@ -85,39 +85,47 @@ SpreadsheetService::sync(SpreadsheetService::SHEET_APPROVAL, [
 ], 'submission_code');
 
 // Notify every administrator (best-effort; the submission stays valid if mail fails).
-// Recipients are resolved ONLY from the users table (role = admin) — never from
-// config or .env. Admins without a valid e-mail are skipped silently; if no admin
-// has an e-mail at all, a warning is logged and the submission still completes.
-$emailSent   = null;
-$adminEmails = [];
-$adminRows   = $conn->query("SELECT nrp, email FROM users WHERE LOWER(TRIM(role)) = 'admin'");
-if ($adminRows) {
-    while ($admin = $adminRows->fetch_assoc()) {
-        $adminEmail = trim((string)($admin['email'] ?? ''));
-        if ($adminEmail !== '' && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-            $adminEmails[] = $adminEmail;
-        }
-    }
-}
+// Recipients are resolved ONLY from the users table (role = admin) via the shared
+// MailService::adminEmails() — never from config or .env. Admins without a valid
+// e-mail are skipped silently; if no admin has an e-mail at all, a warning is
+// logged and the submission still completes. The submitting user's e-mail is set
+// as the Reply-To header so admin replies reach the person who submitted.
+$emailSent = null;
+$replyTo   = MailService::userEmail($conn, (string)($user['nrp'] ?? ''));
+// "Informasi Pengaju" block — identity of the submitting user (from the DB).
+$profile   = MailService::userProfile($conn, (string)($user['nrp'] ?? ''));
+$pengaju   = [
+    'nama'       => (string)($user['username'] ?? ''),
+    'email'      => $profile['email'],
+    'departemen' => (string)($submission['department'] ?? ($submission['asset_type'] ?? '')),
+    'role'       => $profile['role'] ?: strtoupper((string)($user['role'] ?? '')),
+    'tanggal'    => (string)($submission['submission_date'] ?? date('Y-m-d H:i:s')),
+];
+try {
+    $adminEmails = MailService::adminEmails($conn);
 
-if (empty($adminEmails)) {
-    error_log('[finish_stocktaking] No admin e-mail address found in users table; admin notification skipped.');
-    AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', (int)($submission['id'] ?? 0), [
-        'submission_code' => $submission['submission_code'] ?? null,
-        'reason'          => 'No admin e-mail address in users table; admin notification not sent.',
-    ]);
-} else {
-    $mailer    = MailService::instance();
-    $sentCount = 0;
-    foreach (array_unique($adminEmails) as $adminEmail) {
-        if ($mailer->sendStocktakingApproval($adminEmail, $submission, $submission['assets'] ?? [])) {
-            $sentCount++;
+    if (empty($adminEmails)) {
+        error_log('[finish_stocktaking] No admin e-mail address found in users table; admin notification skipped.');
+        AuditService::log($conn, 'Notification Warning', 'stocktaking_submissions', (int)($submission['id'] ?? 0), [
+            'submission_code' => $submission['submission_code'] ?? null,
+            'reason'          => 'No admin e-mail address in users table; admin notification not sent.',
+        ]);
+    } else {
+        $mailer    = MailService::instance();
+        $sentCount = 0;
+        foreach ($adminEmails as $adminEmail) {
+            if ($mailer->sendStocktakingApproval($adminEmail, $submission, $submission['assets'] ?? [], $replyTo, $pengaju)) {
+                $sentCount++;
+            }
+        }
+        $emailSent = ($sentCount > 0);
+        if ($sentCount < count($adminEmails)) {
+            error_log('[finish_stocktaking] Approval notification sent to ' . $sentCount . '/' . count($adminEmails) . ' admins for submission #' . ($submission['id'] ?? 0));
         }
     }
-    $emailSent = ($sentCount > 0);
-    if ($sentCount < count($adminEmails)) {
-        error_log('[finish_stocktaking] Approval notification sent to ' . $sentCount . '/' . count($adminEmails) . ' admins for submission #' . ($submission['id'] ?? 0));
-    }
+} catch (\Throwable $e) {
+    // E-mail must never break the submission response — log and continue.
+    error_log('[finish_stocktaking] Email notification failed: ' . $e->getMessage());
 }
 
 $message = $isResubmit

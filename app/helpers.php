@@ -72,6 +72,25 @@ function require_admin(): void
 }
 
 /**
+ * RBAC guard: the ADMIN role must never perform asset/barang transactions
+ * (create / edit / delete / transfer). Admin is monitoring & approval only.
+ *
+ * Single shared rule for every transaction endpoint. Returns HTTP 403 with a
+ * consistent JSON body and stops execution when the caller is ADMIN.
+ */
+function deny_admin_transaction(): void
+{
+    if (isset($_SESSION['role']) && strtoupper($_SESSION['role']) === 'ADMIN') {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Administrator tidak diizinkan melakukan transaksi aset.',
+        ]);
+        exit;
+    }
+}
+
+/**
  * Check whether a table exists in the connected database.
  */
 function table_exists(mysqli $conn, string $name): bool

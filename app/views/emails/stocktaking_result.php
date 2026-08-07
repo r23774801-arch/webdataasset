@@ -1,11 +1,7 @@
 <?php
 /**
- * Reusable enterprise HTML e-mail template — United Tractors Asset Management System.
- * Result notification sent to the submitting user when an administrator
- * changes the approval status to Approved or Rejected.
- *
- * Same corporate layout as the admin notification (header / footer / branding),
- * only the content differs.
+ * "Stocktaking Approved / Rejected" e-mail body — rendered inside the shared
+ * layout (app/views/emails/layout.php). No HTML shell / header / footer here.
  *
  * Expected variables (set by MailService):
  *   $submission, $assets, $config, $logo_url, $approval_status
@@ -37,52 +33,14 @@ $dateValue = $isApproved
     ? ($sub['approval_date'] ?? '-')
     : ($sub['rejection_date'] ?? '-');
 $reasonText = trim((string)($sub['rejection_reason'] ?? ''));
-?>
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?php echo e($titleText); ?></title>
-</head>
-<body style="margin:0; padding:0; background-color:#F5F6F8; font-family:'Segoe UI', Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F6F8;">
-        <tr>
-            <td align="center" style="padding:32px 16px;">
-                <!-- Main Card -->
-                <table role="presentation" width="100%" style="max-width:680px; background-color:#FFFFFF; border-radius:12px; overflow:hidden; border:1px solid #E5E7EB;" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td>
-                            <!-- ============ HEADER ============ -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#1F1F1F;">
-                                <tr>
-                                    <td style="padding:28px 36px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <?php if (!empty($logo_url)): ?>
-                                                <td style="padding-right:16px; vertical-align:middle;">
-                                                    <img src="<?php echo e($logo_url); ?>" alt="United Tractors" width="52" height="52" style="display:block; border:0; border-radius:8px;">
-                                                </td>
-                                                <?php endif; ?>
-                                                <td style="vertical-align:middle;">
-                                                    <div style="color:#FFC20E; font-size:16px; font-weight:700; letter-spacing:0.5px;">United Tractors</div>
-                                                    <div style="color:#FFFFFF; font-size:13px; opacity:0.75; margin-top:2px;">Asset Management System</div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
 
-                            <!-- ============ TITLE + STATUS BADGE ============ -->
+ob_start();
+?>
+                            <!-- ============ STATUS BADGE ============ -->
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td style="padding:32px 36px 8px 36px;">
-                                        <div style="font-size:22px; font-weight:800; color:#1F1F1F; line-height:1.3;"><?php echo e($titleText); ?></div>
-                                        <div style="margin-top:12px;">
-                                            <span style="display:inline-block; background-color:<?php echo $statusBg; ?>; color:<?php echo $statusColor; ?>; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;"><?php echo e($statusLabel); ?></span>
-                                        </div>
+                                    <td style="padding:8px 36px 0 36px;">
+                                        <span style="display:inline-block; background-color:<?php echo $statusBg; ?>; color:<?php echo $statusColor; ?>; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;"><?php echo e($statusLabel); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -118,6 +76,10 @@ $reasonText = trim((string)($sub['rejection_reason'] ?? ''));
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td style="padding:6px 0;" valign="top">
+                                                    <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Nomor Submission</div>
+                                                    <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($sub['submission_code'] ?? '-'); ?></div>
+                                                </td>
                                                 <td style="padding:6px 0;" valign="top">
                                                     <div style="font-size:11px; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.5px;">Department</div>
                                                     <div style="font-size:14px; color:#1F1F1F; font-weight:600; margin-top:3px;"><?php echo e($sub['department'] ?? '-'); ?></div>
@@ -198,21 +160,8 @@ $reasonText = trim((string)($sub['rejection_reason'] ?? ''));
                                     </td>
                                 </tr>
                             </table>
+<?php
+$title   = $titleText;
+$content = ob_get_clean();
 
-                            <!-- ============ FOOTER ============ -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F6F8;">
-                                <tr>
-                                    <td align="center" style="padding:32px 36px 24px 36px; border-top:1px solid #E5E7EB;">
-                                        <div style="color:#6B7280; font-size:12px; line-height:1.7;">This is an automated notification generated by the<br><strong style="color:#1F1F1F;">United Tractors Asset Management System.</strong><br>Please do not reply to this email.</div>
-                                        <div style="color:#9CA3AF; font-size:12px; margin-top:12px;">&copy; PT United Tractors Tbk. All Rights Reserved.</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+include __DIR__ . '/layout.php';

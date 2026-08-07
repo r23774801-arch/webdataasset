@@ -1,14 +1,11 @@
 <?php
 /**
- * Reusable enterprise HTML e-mail template — United Tractors Asset Management System.
- *
- * Corporate palette:
- *   Primary   : UT Yellow  #FFC20E
- *   Secondary : Dark Charcoal #1F1F1F
- *   Background: White / Light Gray #F5F6F8
+ * "New Barang Transaction" e-mail body — rendered inside the shared layout
+ * (app/views/emails/layout.php). No HTML shell / header / footer here; the
+ * shared layout owns the corporate header (embedded UT logo) and footer.
  *
  * Expected variables (set by MailService::sendBarangTransaction):
- *   $tx, $config, $logo_url
+ *   $tx, $config, $logo_url, $photo_cid
  */
 $tx = $tx ?? [];
 
@@ -16,52 +13,18 @@ $module     = strtolower((string)($tx['module'] ?? 'masuk'));
 $department = strtoupper((string)($tx['department'] ?? ''));
 $typeLabel  = $module === 'keluar' ? 'Barang Keluar' : 'Barang Masuk';
 $hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
-?>
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>New <?php echo e($typeLabel); ?> Transaction</title>
-</head>
-<body style="margin:0; padding:0; background-color:#F5F6F8; font-family:'Segoe UI', Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F6F8;">
-        <tr>
-            <td align="center" style="padding:32px 16px;">
-                <!-- Main Card -->
-                <table role="presentation" width="100%" style="max-width:680px; background-color:#FFFFFF; border-radius:12px; overflow:hidden; border:1px solid #E5E7EB;" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td>
-                            <!-- ============ HEADER ============ -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#1F1F1F;">
-                                <tr>
-                                    <td style="padding:28px 36px;">
-                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <?php if (!empty($logo_url)): ?>
-                                                <td style="padding-right:16px; vertical-align:middle;">
-                                                    <img src="<?php echo e($logo_url); ?>" alt="United Tractors" width="52" height="52" style="display:block; border:0; border-radius:8px;">
-                                                </td>
-                                                <?php endif; ?>
-                                                <td style="vertical-align:middle;">
-                                                    <div style="color:#FFC20E; font-size:16px; font-weight:700; letter-spacing:0.5px;">United Tractors</div>
-                                                    <div style="color:#FFFFFF; font-size:13px; opacity:0.75; margin-top:2px;">Asset Management System</div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
 
-                            <!-- ============ TITLE ============ -->
+// Inline photo is rendered via an embedded CID (cid:txphoto) when the file was
+// attached; the template only renders the block when a CID is available.
+$photoCid = trim((string)($photo_cid ?? ''));
+
+ob_start();
+?>
+                            <!-- ============ INTRO ============ -->
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td style="padding:32px 36px 8px 36px;">
-                                        <div style="font-size:22px; font-weight:800; color:#1F1F1F; line-height:1.3;">New <?php echo e($typeLabel); ?> Transaction</div>
-                                        <div style="margin-top:12px;">
-                                            <span style="display:inline-block; background-color:#FFF4CC; color:#9A7300; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;">Department: <?php echo e($department !== '' ? $department : '-'); ?></span>
-                                        </div>
+                                    <td style="padding:8px 36px 0 36px;">
+                                        <span style="display:inline-block; background-color:#FFF4CC; color:#9A7300; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; padding:6px 14px; border-radius:20px;">Department: <?php echo e($department !== '' ? $department : '-'); ?></span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -163,16 +126,8 @@ $hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
                                 </tr>
                             </table>
 
+                            <?php if ($photoCid !== ''): ?>
                             <!-- ============ PHOTO ============ -->
-                            <?php
-                            $txPhoto    = trim((string)($tx['attachment'] ?? ''));
-                            $txBase     = trim((string)($config['app_url'] ?? ''));
-                            $txPhotoUrl = '';
-                            if ($txPhoto !== '') {
-                                $txPhotoUrl = ($txBase !== '' ? rtrim($txBase, '/') . '/' : '') . ltrim($txPhoto, '/');
-                            }
-                            ?>
-                            <?php if ($txPhotoUrl !== ''): ?>
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="padding:24px 36px 0 36px;">
@@ -181,26 +136,13 @@ $hasSupplier = trim((string)($tx['supplier'] ?? '')) !== '';
                                 </tr>
                                 <tr>
                                     <td align="center" style="padding:20px 36px 0 36px;">
-                                        <img src="<?php echo e($txPhotoUrl); ?>" alt="Transaction Photo" style="display:block; max-width:100%; height:auto; border-radius:8px; border:1px solid #E5E7EB;" onerror="this.style.display='none'">
+                                        <img src="cid:<?php echo e($photoCid); ?>" alt="Transaction Photo" style="display:block; max-width:100%; height:auto; border-radius:8px; border:1px solid #E5E7EB;">
                                     </td>
                                 </tr>
                             </table>
                             <?php endif; ?>
+<?php
+$title   = 'New ' . $typeLabel . ' Transaction';
+$content = ob_get_clean();
 
-                            <!-- ============ FOOTER ============ -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F5F6F8;">
-                                <tr>
-                                    <td align="center" style="padding:24px 36px; border-top:1px solid #E5E7EB;">
-                                        <div style="color:#6B7280; font-size:12px; line-height:1.7;">This is an automated notification generated by the<br><strong style="color:#1F1F1F;">United Tractors Asset Management System.</strong><br>Please do not reply to this email.</div>
-                                        <div style="color:#9CA3AF; font-size:12px; margin-top:12px;">&copy; PT United Tractors Tbk. All Rights Reserved.</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
+include __DIR__ . '/layout.php';

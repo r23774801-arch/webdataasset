@@ -33,13 +33,13 @@
     }
 
     // Can this role create records of TYPE? (Add flow only — Action column removed)
-    // Delegates to the shared rule in js/loader.js (admin manages everything).
+    // Delegates to the shared rule in js/loader.js (admin = monitoring only).
     function canManage() {
         if (typeof window.canManageData === 'function') {
             return window.canManageData(TYPE);
         }
         const role = userRole();
-        if (role === 'admin') return true;
+        if (role === 'admin') return false;
         if (role === 'it') return TYPE === 'it';
         if (role === 'ga') return TYPE === 'ga';
         return false;
@@ -117,7 +117,7 @@
     }
 
     // ---------- Table rendering + pagination ----------
-    function colSpan() { return HAS_SUPPLIER ? 10 : 9; }
+    function colSpan() { return HAS_SUPPLIER ? 11 : 10; }
 
     function renderPage() {
         const tbody = $(cfg.tbodyId);
@@ -129,6 +129,10 @@
         if (pageData.length > 0) {
             pageData.forEach((item, i) => {
                 const rowNum = start + i + 1;
+                const imgPath = item.attachment || item.foto || item.gambar || item.file || '';
+                const attachmentHtml = imgPath
+                    ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${esc(imgPath)}')">`
+                    : '<span class="text-muted" style="font-size:12px;">No Image</span>';
                 tbody.innerHTML += `<tr>
                     <td>${rowNum}</td>
                     <td>${esc(item.asset_number) || '-'}</td>
@@ -140,6 +144,7 @@
                     <td>${esc(item.tanggal) || '-'}</td>
                     <td>${esc(item.pic) || '-'}</td>
                     <td>${esc(item.area) || '-'}</td>
+                    <td>${attachmentHtml}</td>
                 </tr>`;
             });
         } else {
@@ -288,6 +293,21 @@
 
     window.tutupModal = function () { closeModal(cfg.modalId); };
 
+    // ---------- Image preview (mirror of the Asset IT/GA modules) ----------
+    window.previewImage = function (imageSrc) {
+        const modal = document.getElementById('imagePreviewModal');
+        const img = document.getElementById('previewImage');
+        if (modal && img) {
+            img.src = imageSrc;
+            modal.style.display = 'flex';
+        }
+    };
+
+    window.tutupImagePreview = function () {
+        const modal = document.getElementById('imagePreviewModal');
+        if (modal) modal.style.display = 'none';
+    };
+
     // ---------- Photo upload (optional, only during data entry) ----------
     async function uploadPhotoIfAny() {
         const input = $('photo');
@@ -312,6 +332,12 @@
         const data = collectForm();
         if (!data.asset_name || !data.jumlah || !data.tanggal) {
             if (typeof showToast === 'function') showToast('Asset Name, Jumlah, dan Tanggal wajib diisi!', 'info');
+            return;
+        }
+        // Photo is mandatory when adding a new barang (matches Asset IT/GA).
+        const photoInput = $('photo');
+        if (!photoInput || !photoInput.files || !photoInput.files[0]) {
+            if (typeof showToast === 'function') showToast('Photo wajib diunggah.', 'info');
             return;
         }
         if (typeof toggleLoader === 'function') toggleLoader(true, 'Menyimpan data...');

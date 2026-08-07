@@ -6,8 +6,9 @@ header('Content-Type: application/json');
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-// RBAC: Only IT and ADMIN roles can add IT assets
-if (!isset($_SESSION['role']) || !in_array(strtoupper($_SESSION['role']), ['IT', 'ADMIN'], true)) {
+// RBAC: Only IT role can add IT assets. ADMIN is monitoring/approval only.
+deny_admin_transaction();
+if (!isset($_SESSION['role']) || strtoupper($_SESSION['role']) !== 'IT') {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Hanya role IT yang dapat menambahkan data aset IT."]);
     exit;
 }
@@ -85,21 +86,26 @@ if ($input) {
 
         // PHASE 4.15 — notify every administrator (best-effort; the asset insert
         // stays valid if mail fails). Recipients come only from the users table.
-        MailService::notifyAdminsAssetCreated($conn, [
-            'asset_type'    => 'IT',
-            'asset_number'  => $asset_number,
-            'nama_barang'   => $nama_barang,
-            'serial_number' => $serial_number,
-            'pic'           => $pic,
-            'area'          => $area,
-            'location_note' => $location_note,
-            'utilisasi'     => ($utilisasi !== '' ? $utilisasi : 'No'),
-            'date_of_entry' => $date_of_entry,
-            'attachment'    => $attachment,
-            'user_name'     => $_SESSION['username'] ?? '',
-            'user_nrp'      => $_SESSION['nrp'] ?? '',
-            'timestamp'     => date('Y-m-d H:i:s'),
-        ]);
+        try {
+            MailService::notifyAdminsAssetCreated($conn, [
+                'asset_type'    => 'IT',
+                'asset_number'  => $asset_number,
+                'nama_barang'   => $nama_barang,
+                'serial_number' => $serial_number,
+                'pic'           => $pic,
+                'area'          => $area,
+                'location_note' => $location_note,
+                'utilisasi'     => ($utilisasi !== '' ? $utilisasi : 'No'),
+                'date_of_entry' => $date_of_entry,
+                'attachment'    => $attachment,
+                'user_name'     => $_SESSION['username'] ?? '',
+                'user_nrp'      => $_SESSION['nrp'] ?? '',
+                'timestamp'     => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            // E-mail must never break the insert response — log and continue.
+            error_log('[tambah_aset_it] Email notification failed: ' . $e->getMessage());
+        }
 
         echo json_encode(["status" => "success", "message" => "Aset IT berhasil ditambahkan!"]);
     } else {

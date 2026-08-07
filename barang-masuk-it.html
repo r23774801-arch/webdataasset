@@ -138,6 +138,37 @@
             justify-content: flex-start !important;
             gap: 12px;
         }
+        /* ===== Image preview modal (mirror of Asset IT/GA) ===== */
+        .image-preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        .image-preview-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        .image-preview-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .image-preview-close:hover {
+            color: #bbb;
+        }
     </style>
 </head>
 <body>
@@ -325,10 +356,11 @@
                             <th data-filter-col="tanggal" data-filter-placeholder="DD/MM/YYYY">Tanggal</th>
                             <th data-filter-col="pic">PIC</th>
                             <th data-filter-col="area">Area</th>
+                            <th>Foto</th>
                         </tr>
                     </thead>
                     <tbody id="tabelBarang">
-                        <tr><td colspan="10" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        <tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -355,9 +387,15 @@
                     <select id="area">
                     </select>
                 </div>
-                <div class="input-group"><label>Photo (Opsional)</label><input type="file" id="photo" accept="image/*"></div>
+                <div class="input-group"><label>Photo</label><input type="file" id="photo" accept="image/*" required></div>
                 <button id="modalSave" class="btn-warning" onclick="simpanBarang()">Simpan Data</button>
             </div>
+        </div>
+
+        <!-- Image Preview Modal -->
+        <div id="imagePreviewModal" class="image-preview-modal" onclick="tutupImagePreview()">
+            <span class="image-preview-close">&times;</span>
+            <img class="image-preview-content" id="previewImage" onclick="event.stopPropagation()">
         </div>
     </div>
 

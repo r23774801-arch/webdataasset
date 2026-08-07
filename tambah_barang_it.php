@@ -10,6 +10,9 @@ require_once __DIR__ . '/app/bootstrap.php';
 require_login();
 $user = current_user();
 
+// RBAC: ADMIN is monitoring/approval only — never allowed to transact barang.
+deny_admin_transaction();
+
 // RBAC: only IT may manage IT barang.
 if (!BarangService::canManage($user['role'], 'it')) {
     json_response(['status' => 'error', 'message' => 'Akses ditolak. Anda tidak memiliki izin untuk mengelola barang IT.']);
@@ -57,34 +60,39 @@ SpreadsheetService::sync(
 // Phase 4.12B — notify every administrator about the new transaction
 // (best-effort: a mail failure never fails the transaction).
 $emailSent = false;
-$adminEmails = MailService::adminEmails($conn);
-if (empty($adminEmails)) {
-    error_log('[tambah_barang_it] No admin e-mail address found in users table; barang notification skipped.');
-    AuditService::log($conn, 'Notification Warning', 'barang_' . $module . '_it', (int)$id, [
-        'reason' => 'No admin e-mail address in users table; barang notification not sent.',
-    ]);
-} else {
-    $sentCount = MailService::notifyAdminsBarangTransaction($conn, [
-        'module'       => $module,
-        'department'   => 'IT',
-        'asset_number' => $input['asset_number'] ?? '',
-        'nomor_tiket'  => $input['nomor_tiket'] ?? '',
-        'asset_name'   => $input['asset_name'] ?? '',
-        'jumlah'       => (int)($input['jumlah'] ?? 0),
-        'unit'         => $input['unit'] ?? '',
-        'supplier'     => $module === 'masuk' ? ($input['supplier'] ?? '') : '',
-        'pic'          => $input['pic'] ?? '',
-        'area'         => $input['area'] ?? '',
-        'tanggal'      => $input['tanggal'] ?? '',
-        'attachment'   => $input['attachment'] ?? '',
-        'user_name'    => $user['username'] ?? '',
-        'user_nrp'     => $user['nrp'] ?? '',
-        'timestamp'    => date('Y-m-d H:i:s'),
-    ]);
-    $emailSent = ($sentCount > 0);
-    if ($sentCount < count($adminEmails)) {
-        error_log('[tambah_barang_it] Notification sent to ' . $sentCount . '/' . count($adminEmails) . ' admins for barang_' . $module . '_it #' . $id);
+try {
+    $adminEmails = MailService::adminEmails($conn);
+    if (empty($adminEmails)) {
+        error_log('[tambah_barang_it] No admin e-mail address found in users table; barang notification skipped.');
+        AuditService::log($conn, 'Notification Warning', 'barang_' . $module . '_it', (int)$id, [
+            'reason' => 'No admin e-mail address in users table; barang notification not sent.',
+        ]);
+    } else {
+        $sentCount = MailService::notifyAdminsBarangTransaction($conn, [
+            'module'       => $module,
+            'department'   => 'IT',
+            'asset_number' => $input['asset_number'] ?? '',
+            'nomor_tiket'  => $input['nomor_tiket'] ?? '',
+            'asset_name'   => $input['asset_name'] ?? '',
+            'jumlah'       => (int)($input['jumlah'] ?? 0),
+            'unit'         => $input['unit'] ?? '',
+            'supplier'     => $module === 'masuk' ? ($input['supplier'] ?? '') : '',
+            'pic'          => $input['pic'] ?? '',
+            'area'         => $input['area'] ?? '',
+            'tanggal'      => $input['tanggal'] ?? '',
+            'attachment'   => $input['attachment'] ?? '',
+            'user_name'    => $user['username'] ?? '',
+            'user_nrp'     => $user['nrp'] ?? '',
+            'timestamp'    => date('Y-m-d H:i:s'),
+        ]);
+        $emailSent = ($sentCount > 0);
+        if ($sentCount < count($adminEmails)) {
+            error_log('[tambah_barang_it] Notification sent to ' . $sentCount . '/' . count($adminEmails) . ' admins for barang_' . $module . '_it #' . $id);
+        }
     }
+} catch (\Throwable $e) {
+    // E-mail must never break the transaction response — log and continue.
+    error_log('[tambah_barang_it] Email notification failed: ' . $e->getMessage());
 }
 
 json_response(['status' => 'success', 'message' => 'Data barang ' . $module . ' IT berhasil disimpan!', 'id' => $id, 'email_sent' => $emailSent]);

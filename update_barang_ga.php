@@ -10,6 +10,9 @@ require_once __DIR__ . '/app/bootstrap.php';
 require_login();
 $user = current_user();
 
+// RBAC: ADMIN is monitoring/approval only — never allowed to transact barang.
+deny_admin_transaction();
+
 // RBAC: only GA may manage GA barang.
 if (!BarangService::canManage($user['role'], 'ga')) {
     json_response(['status' => 'error', 'message' => 'Akses ditolak. Anda tidak memiliki izin untuk mengelola barang GA.']);
