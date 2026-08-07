@@ -64,7 +64,7 @@ function mail_config(): array
             'sender_email'    => getenv('MAIL_FROM_ADDRESS') ?: '',
 
             // Base URL of the application (used to build absolute links in e-mails)
-            'app_url'         => rtrim(getenv('APP_URL') ?: '', '/'),
+            'app_url'         => rtrim(trim(getenv('APP_URL') ?: ''), '/'),
         ];
     }
     return $config;
