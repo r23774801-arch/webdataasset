@@ -245,6 +245,17 @@
                     <button type="button" class="btn-warning notification-action" onclick="window.location.href='approval.html'">View Approval</button>
                 </div>
 
+                <!-- User Notification: Stocktaking Result (Approved / Rejected) -->
+                <div id="user-notification" class="user-notification" style="display: none;">
+                    <div class="notification-icon" id="user-notification-icon">&#10004;</div>
+                    <div class="notification-content">
+                        <strong id="user-notification-title">Hasil Stocktaking</strong>
+                        <p id="user-notification-message"></p>
+                    </div>
+                    <button type="button" class="btn-warning notification-action" id="user-notification-action">Lihat Data</button>
+                    <button type="button" class="notification-close" onclick="dismissUserNotification()" aria-label="Tutup" title="Tutup">&times;</button>
+                </div>
+
                 <div class="welcome-card dashboard-welcome-card">
                     <div class="welcome-content">
                         <span class="welcome-kicker">United Tractors Asset Management System</span>
@@ -509,6 +520,89 @@
             }
         }
         loadAdminApprovalNotification();
+
+        // ==========================================
+        // USER STOCKTAKING RESULT NOTIFICATION
+        // Shows a banner (+ toast) when the current
+        // user's latest stocktaking submission has been
+        // Approved or Rejected by the admin. Mirrors the
+        // admin's pending-approval banner (green/red).
+        // ==========================================
+        function dismissUserNotification() {
+            const notif = document.getElementById('user-notification');
+            if (notif) {
+                const key = notif.dataset.dismissKey;
+                if (key) localStorage.setItem(key, '1');
+                notif.style.display = 'none';
+            }
+        }
+
+        async function loadUserStocktakingResult() {
+            const role = (localStorage.getItem('userRole') || '').toLowerCase();
+            if (role === 'admin') return; // admin sees the pending banner instead
+
+            const types = ['IT', 'GA'];
+            let notification = null;
+
+            for (const type of types) {
+                try {
+                    const response = await fetch(`get_stocktaking_submissions.php?mine=1&asset_type=${type}&latest=1`);
+                    const result = await response.json();
+                    if (result.status !== 'success' || !result.data) continue;
+                    const sub = result.data;
+                    if (sub.status === 'Approved' || sub.status === 'Rejected') {
+                        notification = { type, sub };
+                        break;
+                    }
+                } catch (error) {
+                    console.error('Gagal memuat hasil stocktaking:', error);
+                }
+            }
+
+            if (!notification) return;
+
+            const { type, sub } = notification;
+            const approved = sub.status === 'Approved';
+            const dismissKey = `stkNotif_${sub.id}_${sub.status}`;
+            if (localStorage.getItem(dismissKey)) return; // already seen/dismissed
+
+            const notif = document.getElementById('user-notification');
+            const icon = document.getElementById('user-notification-icon');
+            const title = document.getElementById('user-notification-title');
+            const message = document.getElementById('user-notification-message');
+            const action = document.getElementById('user-notification-action');
+            if (!notif) return;
+
+            notif.classList.remove('status-approved', 'status-rejected');
+            notif.classList.add(approved ? 'status-approved' : 'status-rejected');
+            notif.dataset.dismissKey = dismissKey;
+
+            if (icon) icon.innerHTML = approved ? '&#10004;' : '&#10008;';
+            if (title) title.textContent = approved
+                ? `Stocktaking Aset ${type} Disetujui`
+                : `Stocktaking Aset ${type} Ditolak`;
+            if (message) {
+                message.textContent = approved
+                    ? `Pengajuan stocktaking Aset ${type} Anda (${sub.submission_code || 'STK-' + sub.id}) telah disetujui oleh admin.`
+                    : `Pengajuan stocktaking Aset ${type} Anda (${sub.submission_code || 'STK-' + sub.id}) ditolak. Alasan: ${sub.rejection_reason || '-'}`;
+            }
+            if (action) {
+                action.onclick = () => { window.location.href = type === 'IT' ? 'aset-it.html' : 'aset-ga.html'; };
+                action.textContent = approved ? 'Lihat Aset' : 'Perbaiki & Ajukan Ulang';
+            }
+
+            notif.style.display = 'flex';
+
+            if (typeof showToast === 'function') {
+                showToast(
+                    approved
+                        ? `Pengajuan stocktaking Aset ${type} Anda telah disetujui.`
+                        : `Pengajuan stocktaking Aset ${type} Anda ditolak.`,
+                    approved ? 'success' : 'error'
+                );
+            }
+        }
+        loadUserStocktakingResult();
 
         // ==========================================
         // FETCH SUMMARY CARD TOTALS FROM BACKEND

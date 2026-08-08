@@ -69,8 +69,35 @@
                         MASUK
                     </button>
                     <div class="auth-footer">
-                        <span class="auth-note">Lupa password? Hubungi Admin</span>
+                        <span class="auth-note">
+                            <span>Lupa password?</span>
+                            <button type="button" onclick="showForgotPassword()">Hubungi Admin</button>
+                        </span>
                         <button class="auth-link" type="button" onclick="showRegister()">Daftar Akun</button>
+                    </div>
+                </div>
+
+                <div id="forgotForm" class="auth-form">
+                    <div class="input-group">
+                        <label for="forgotNrp">NRP Pegawai</label>
+                        <div class="field-control">
+                            <i class="fas fa-id-badge" aria-hidden="true"></i>
+                            <input type="text" id="forgotNrp" placeholder="Masukkan NRP pegawai" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="forgotUsername">Nama Lengkap / Username</label>
+                        <div class="field-control">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <input type="text" id="forgotUsername" placeholder="Masukkan username" autocomplete="off">
+                        </div>
+                    </div>
+                    <button class="btn-ut-primary" type="button" onclick="handleForgotPassword()">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        KIRIM PERMINTAAN
+                    </button>
+                    <div class="auth-footer">
+                        <button class="auth-link" type="button" onclick="showLogin()">Kembali ke Login</button>
                     </div>
                 </div>
 

@@ -1267,13 +1267,15 @@
                     ? `<img src="${imgPath}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${imgPath}')">`
                     : '<span class="text-muted" style="font-size:12px;">No Image</span>');
 
-            // Action button — disabled only when the whole stocktaking session is
-            // locked (Pending/Approved submission). Already-Stocktaked assets can
-            // still be reopened so their Condition/Attachment/Utilisation can be
-            // reviewed and updated; only a Rejection re-enables while locked.
+            // Action button — hidden for ADMIN (monitoring/approval only, per the
+            // shared RBAC rule). For IT/GA it is disabled only when the whole
+            // stocktaking session is locked (Pending/Approved submission).
+            const canAct = typeof window.canManageData === 'function' ? window.canManageData('ga') : true;
             const submissionRejected = !!(window.stocktakingSubmission && window.stocktakingSubmission.status === 'Rejected');
             let actionButton = '';
-            if (sessionLocked && !submissionRejected) {
+            if (!canAct) {
+                actionButton = '<span class="text-muted" style="font-size:12px;">-</span>';
+            } else if (sessionLocked && !submissionRejected) {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="Stocktaking sedang terkunci">Locked</button>`;
             } else {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-action" onclick="openStocktakingModal(${item.id}, '${item.nama_barang.replace(/'/g, "\\'")}', '${item.serial_number || ''}', '${item.type}')">Action</button>`;

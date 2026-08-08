@@ -469,6 +469,43 @@ class MailService
     }
 
     /**
+     * Send the "Password Reset Request" notification to one administrator.
+     *
+     * Triggered from the Login page when a user forgets their password. The
+     * recipient MUST be resolved by the caller (e.g. via adminEmails()) from
+     * the users table — never from config or .env. The admin then looks the
+     * user up in the Data Akun page and changes their password.
+     *
+     * @param string $to   recipient e-mail address (must be non-empty)
+     * @param array  $user user data; keys: nrp, username, email, role
+     */
+    public function sendPasswordResetRequest(string $to, array $user): bool
+    {
+        if (trim($to) === '') {
+            error_log('[MailService] sendPasswordResetRequest skipped: recipient e-mail is empty.');
+            return false;
+        }
+
+        $subject = 'Password Reset Request';
+
+        try {
+            $config = mail_config();
+
+            $html = $this->renderTemplate('password_reset_request.php', [
+                'user'     => $user,
+                'config'   => $config,
+                'logo_url' => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
+            ]);
+
+            return $this->send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            // E-mail must never break the caller — log and report failure.
+            error_log('[MailService] sendPasswordResetRequest failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Send the "New Asset Created" notification to one administrator.
      *
      * The recipient MUST be resolved by the caller (e.g. via adminEmails())

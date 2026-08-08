@@ -724,6 +724,54 @@ body {
     font-weight: 700;
 }
 
+/* User Notification (Stocktaking Result) */
+.user-notification {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-top: 20px;
+    position: relative;
+}
+
+.user-notification.status-approved {
+    background: #d1e7dd;
+    border: 1px solid #198754;
+}
+
+.user-notification.status-approved .notification-icon,
+.user-notification.status-approved .notification-content strong,
+.user-notification.status-approved .notification-content p {
+    color: #0f5132;
+}
+
+.user-notification.status-rejected {
+    background: #f8d7da;
+    border: 1px solid #dc3545;
+}
+
+.user-notification.status-rejected .notification-icon,
+.user-notification.status-rejected .notification-content strong,
+.user-notification.status-rejected .notification-content p {
+    color: #842029;
+}
+
+.notification-close {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.65;
+    padding: 0 2px;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
 /* =========================================
    7. TABLE STYLES
    ========================================= */

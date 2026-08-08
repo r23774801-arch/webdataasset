@@ -12,15 +12,23 @@ if (!localStorage.getItem('usersDB')) {
 function hideAllForms() {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const forgotForm = document.getElementById('forgotForm');
     
     if (loginForm) loginForm.classList.remove('active');
     if (registerForm) registerForm.classList.remove('active');
+    if (forgotForm) forgotForm.classList.remove('active');
 }
 
 function showLogin() {
     hideAllForms();
     const loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.classList.add('active');
+}
+
+function showForgotPassword() {
+    hideAllForms();
+    const forgotForm = document.getElementById('forgotForm');
+    if (forgotForm) forgotForm.classList.add('active');
 }
 
 function showRegister() {
@@ -414,4 +422,38 @@ async function handleLogin() {
         showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
     }
 }
-    
+
+/// --- Logika Lupa Password (Hubungi Admin) Menggunakan PHP & MySQL ---
+async function handleForgotPassword() {
+    const nrp = document.getElementById('forgotNrp').value.trim();
+    const username = document.getElementById('forgotUsername').value.trim();
+
+    if (!nrp || !username) {
+        showToast("NRP dan Username wajib diisi!", "info");
+        return;
+    }
+
+    toggleLoader(true, "Mengirim permintaan...");
+    try {
+        const response = await fetch('request_password_reset.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nrp: nrp, username: username })
+        });
+
+        const result = await response.json();
+        toggleLoader(false);
+
+        showToast(result.message, result.status === "success" ? "success" : "error");
+
+        if (result.status === "success") {
+            document.getElementById('forgotNrp').value = '';
+            document.getElementById('forgotUsername').value = '';
+            setTimeout(() => { showLogin(); }, 1500);
+        }
+    } catch (error) {
+        toggleLoader(false);
+        console.error("Error:", error);
+        showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
+    }
+}

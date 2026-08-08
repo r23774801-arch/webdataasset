@@ -46,6 +46,18 @@ if ($check->num_rows === 0) {
 }
 $check->close();
 
+// Akun ADMIN adalah akun sistem — tidak boleh dihapus oleh siapa pun.
+$role = $conn->prepare("SELECT role FROM users WHERE nrp = ? LIMIT 1");
+if ($role) {
+    $role->bind_param('s', $nrp);
+    $role->execute();
+    $roleRow = $role->get_result()->fetch_assoc();
+    $role->close();
+    if (strtoupper((string)($roleRow['role'] ?? '')) === 'ADMIN') {
+        json_response(['status' => 'error', 'message' => 'Akun admin tidak dapat dihapus.']);
+    }
+}
+
 $delete = $conn->prepare("DELETE FROM users WHERE nrp = ?");
 if (!$delete) {
     json_response(['status' => 'error', 'message' => 'Terjadi kesalahan pada server.']);
