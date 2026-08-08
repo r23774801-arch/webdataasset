@@ -1,3 +1,15 @@
+// --- Toggle visibilitas password (ikon mata) ---
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    if (btn) {
+        btn.classList.toggle('is-visible', show);
+        btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+    }
+}
+
 // 1. Inisialisasi Database Dummy di LocalStorage
 if (!localStorage.getItem('usersDB')) {
     const dummyUsers = [

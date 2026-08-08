@@ -10,8 +10,10 @@
  * Response: { "status": "success", "data": [ { "id": 1, "area_name": "Main Office", "is_active": 1 }, ... ] }
  */
 header('Content-Type: application/json');
-include 'koneksi.php';
+session_start();
 require_once __DIR__ . '/app/bootstrap.php';
+require_login();
+include 'koneksi.php';
 
 json_response([
     'status' => 'success',

@@ -25,12 +25,54 @@ if (!$data || !isset($data['nrp']) || !isset($data['password'])) {
 $nrp = $conn->real_escape_string($data['nrp']);
 $password = $data['password']; 
 
+// ---- Rate limiting: max 10 attempts per IP per 5 minutes ----
+// Stored per-IP in a temp lock file (cookie-independent). Throttling happens
+// BEFORE the expensive DB lookup to also protect against NRP enumeration.
+$now       = time();
+$ipHash    = md5((string)($_SERVER['REMOTE_ADDR'] ?? 'cli'));
+$throttleDir = rtrim(sys_get_temp_dir(), '/\\') . '/webdataaset_login';
+if (!is_dir($throttleDir)) {
+    @mkdir($throttleDir, 0777, true);
+}
+$lockFile = $throttleDir . '/' . $ipHash . '.lock';
+// Read BEFORE locking: on Windows file_get_contents() on a file held with
+// LOCK_EX returns false, which would always read as "no attempts".
+// Format: "timestamp|count" — count of attempts since the window started.
+$lockData = (string)@file_get_contents($lockFile);
+$parts    = explode('|', $lockData);
+$windowStart = (int)trim($parts[0] ?? '0');
+$attempts    = (int)trim($parts[1] ?? '0');
+$lockFp  = @fopen($lockFile, 'c+');
+if ($lockFp) {
+    if (flock($lockFp, LOCK_EX)) {
+        if (($now - $windowStart) >= 300) {
+            // Window expired — start a fresh one.
+            $windowStart = $now;
+            $attempts    = 0;
+        }
+        if ($attempts >= 10) {
+            flock($lockFp, LOCK_UN);
+            fclose($lockFp);
+            echo json_encode(["status" => "error", "message" => "Terlalu banyak percobaan login. Silakan coba lagi dalam beberapa menit."]);
+            exit;
+        }
+        $attempts++;
+        ftruncate($lockFp, 0);
+        rewind($lockFp);
+        fwrite($lockFp, $windowStart . '|' . $attempts);
+        fflush($lockFp);
+        flock($lockFp, LOCK_UN);
+    }
+    fclose($lockFp);
+}
+
 // 1. Cari user berdasarkan NRP
 $query = "SELECT * FROM users WHERE nrp = '$nrp'";
 $result = $conn->query($query);
 
 if ($result->num_rows === 0) {
-    echo json_encode(["status" => "error", "message" => "NRP tidak ditemukan! Silakan daftar terlebih dahulu."]);
+    // Generic message — never reveals whether the NRP exists (anti-enumeration).
+    echo json_encode(["status" => "error", "message" => "NRP atau password salah."]);
     exit;
 }
 
@@ -38,7 +80,7 @@ $user = $result->fetch_assoc();
 
 // 2. Verifikasi Password
 if (!password_verify($password, $user['password'])) {
-    echo json_encode(["status" => "error", "message" => "Password salah!"]);
+    echo json_encode(["status" => "error", "message" => "NRP atau password salah."]);
     exit;
 }
 

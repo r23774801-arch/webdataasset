@@ -476,7 +476,7 @@ window.buildAreaCards = function (opts) {
 
     const cards = window.UTAreas.list.map(area => {
         const safe = _utAreaEsc(area);
-        return `<div class="summary-card clickable" data-area="${safe}" onclick="filterByArea('${safe}')">
+        return `<div class="summary-card clickable" data-area="${safe}" onclick="filterByArea(this.dataset.area)">
             <div class="card-icon">${icon}</div>
             <div class="card-title">${_utAreaEsc(titleFn(area))}</div>
             <div class="card-value" id="total-${safe}">0</div>
@@ -519,11 +519,11 @@ function renderAttachmentPreview(path) {
         return '<span class="text-muted" style="font-size:12px;">No Attachment</span>';
     }
     if (isPdfPath(safe)) {
-        return `<button type="button" class="btn-attachment-pdf" onclick="previewPdfAttachment('${safe}')" title="Preview PDF" style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid #dc3545; color:#dc3545; background:#fff; border-radius:6px; cursor:pointer; font-size:12px;">
+        return `<button type="button" class="btn-attachment-pdf" onclick="previewPdfAttachment(this.dataset.path)" data-path="${safe}" title="Preview PDF" style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid #dc3545; color:#dc3545; background:#fff; border-radius:6px; cursor:pointer; font-size:12px;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             PDF</button>`;
     }
-    return `<img src="${safe}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${safe}')">`;
+    return `<img src="${safe}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${safe}">`;
 }
 
 // Opens the shared PDF preview modal (created lazily on first use).
@@ -568,7 +568,7 @@ window.renderAssetPhotoPreview = function (path) {
     if (isPdfPath(safe)) {
         return '<span class="attachment-file-note">Lampiran: PDF</span>';
     }
-    return `<img src="${safe}" alt="Foto Aset" class="stocktaking-asset-photo" onclick="previewImage('${safe}')">`;
+    return `<img src="${safe}" alt="Foto Aset" class="stocktaking-asset-photo" onclick="previewImage(this.dataset.src)" data-src="${safe}">`;
 };
 
 // Renders the modal "Attachment (stocktaking evidence)" state — shows the
@@ -582,7 +582,7 @@ window.renderAttachmentNote = function (path) {
         return '<span class="attachment-file-note"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> Lampiran saat ini: PDF (tetap dipertahankan jika tidak memilih file baru).</span>';
     }
     return `<div style="display:inline-flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
-        <img src="${safe}" alt="Lampiran" class="stocktaking-asset-photo" onclick="previewImage('${safe}')">
+        <img src="${safe}" alt="Lampiran" class="stocktaking-asset-photo" onclick="previewImage(this.dataset.src)" data-src="${safe}">
         <span class="text-muted" style="font-size:12px;">Lampiran saat ini (tetap dipertahankan jika tidak memilih file baru).</span>
     </div>`;
 };

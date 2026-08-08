@@ -50,6 +50,45 @@ function require_login(): void
     if (empty($_SESSION['nrp'])) {
         json_response(['status' => 'error', 'message' => 'Akses ditolak. Silakan login kembali.']);
     }
+    require_valid_origin();
+}
+
+/**
+ * CSRF defense (defense-in-depth on top of SameSite=Lax cookies).
+ *
+ * Browsers always send an Origin/Referer header on cross-site requests, but
+ * same-site requests and non-browser clients (curl, cron, scripts) may omit
+ * them. We therefore only reject requests whose Origin/Referer is present and
+ * does NOT match the server's own host — this blocks cross-site CSRF without
+ * breaking curl, same-origin fetches, or tooling.
+ */
+function require_valid_origin(): void
+{
+    $https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $scheme = $https ? 'https' : 'http';
+    $expected = $scheme . '://' . ($_SERVER['HTTP_HOST'] ?? '');
+    $expectedHost = strtolower((string)parse_url($expected, PHP_URL_HOST));
+
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if ($origin !== '') {
+        $originHost = strtolower((string)parse_url($origin, PHP_URL_HOST));
+        if ($originHost !== $expectedHost) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Asal permintaan tidak valid.']);
+            exit;
+        }
+        return;
+    }
+
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    if ($referer !== '') {
+        $refHost = strtolower((string)parse_url($referer, PHP_URL_HOST));
+        if ($refHost !== '' && $refHost !== $expectedHost) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Asal permintaan tidak valid.']);
+            exit;
+        }
+    }
 }
 
 /**

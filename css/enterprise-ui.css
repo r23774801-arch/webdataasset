@@ -1323,6 +1323,63 @@ button[onclick*="save"]:hover,
     padding-left: 46px;
 }
 
+/* =========================================
+   PASSWORD VISIBILITY TOGGLE (SVG eye)
+   ========================================= */
+.field-control.has-pw-toggle input {
+    padding-right: 46px;
+}
+
+.pw-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 0;
+    background: transparent;
+    color: #8A94A6;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.pw-toggle:hover {
+    color: var(--ut-charcoal);
+    background: rgba(26, 32, 44, 0.06);
+}
+
+.pw-toggle svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.pw-toggle .pw-eye-off {
+    display: none;
+}
+
+.pw-toggle.is-visible .pw-eye {
+    display: none;
+}
+
+.pw-toggle.is-visible .pw-eye-off {
+    display: block;
+}
+
+/* For inputs NOT wrapped in .field-control (e.g. password modal) */
+.pw-field {
+    position: relative;
+}
+
+.pw-field input {
+    padding-right: 46px;
+}
+
 .input-group input:focus,
 .input-group select:focus {
     border-color: var(--ut-yellow) !important;

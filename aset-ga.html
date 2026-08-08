@@ -1056,7 +1056,7 @@
             document.querySelectorAll('.summary-card').forEach(card => {
                 card.classList.toggle('active-card', card.dataset.area === area);
             });
-            const statusText = area ? `Menampilkan data untuk area: <strong>${area}</strong>` : 'Menampilkan semua data';
+            const statusText = area ? `Menampilkan data untuk area: <strong>${esc(area)}</strong>` : 'Menampilkan semua data';
             const statusEl = document.getElementById('filterStatusText');
             if (statusEl) statusEl.innerHTML = statusText;
             applyColumnFilters();
@@ -1209,6 +1209,13 @@
         }
 
         // ========== RENDERING TABEL ==========
+        // Escape user-controlled values before injecting into innerHTML (XSS-safe).
+        function esc(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
         function renderEmptyState(title, message) {
             return `<div class="table-empty-state">
             
@@ -1246,7 +1253,7 @@
             // Utilisasi display — read-only in the table. It is only managed
             // inside the Action (stocktaking) modal.
             const utilisasiBadge = utilisasi
-                ? `<span class="btn-utilisasi-toggle ${utilisasi === 'Yes' ? 'utilisasi-yes' : 'utilisasi-no'}" style="cursor: default;">${utilisasi}</span>`
+                ? `<span class="btn-utilisasi-toggle ${utilisasi === 'Yes' ? 'utilisasi-yes' : 'utilisasi-no'}" style="cursor: default;">${esc(utilisasi)}</span>`
                 : '<span class="text-muted" style="font-size:12px;">-</span>';
 
             const locationDisplay = item.location_note ? `${item.area} (${item.location_note})` : item.area;
@@ -1264,7 +1271,7 @@
             const attachmentHtml = typeof renderAttachmentPreview === 'function'
                 ? renderAttachmentPreview(imgPath)
                 : (imgPath
-                    ? `<img src="${imgPath}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${imgPath}')">`
+                    ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
                     : '<span class="text-muted" style="font-size:12px;">No Image</span>');
 
             // Action button — hidden for ADMIN (monitoring/approval only, per the
@@ -1278,21 +1285,21 @@
             } else if (sessionLocked && !submissionRejected) {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="Stocktaking sedang terkunci">Locked</button>`;
             } else {
-                actionButton = `<button class="btn-stocktaking btn-stocktaking-action" onclick="openStocktakingModal(${item.id}, '${item.nama_barang.replace(/'/g, "\\'")}', '${item.serial_number || ''}', '${item.type}')">Action</button>`;
+                actionButton = `<button class="btn-stocktaking btn-stocktaking-action" onclick="openStocktakingModal(this.dataset.id, this.dataset.name, this.dataset.serial, this.dataset.type)" data-id="${esc(item.id)}" data-name="${esc(item.nama_barang)}" data-serial="${esc(item.serial_number || '')}" data-type="${esc(item.type)}">Action</button>`;
             }
 
             return `<tr>
-                <td>${item.asset_number || '-'}</td>
-                <td>${item.nama_barang}</td>
-                <td>${item.serial_number || '-'}</td>
-                <td>${item.asset_class || '-'}</td>
-                <td>${item.pic || '-'}</td>
-                <td>${locationDisplay}</td>
+                <td>${esc(item.asset_number) || '-'}</td>
+                <td>${esc(item.nama_barang)}</td>
+                <td>${esc(item.serial_number) || '-'}</td>
+                <td>${esc(item.asset_class) || '-'}</td>
+                <td>${esc(item.pic) || '-'}</td>
+                <td>${esc(locationDisplay)}</td>
                 <td>${utilisasiBadge}</td>
                 <td>${dateDisplay}</td>
                 <td>${attachmentHtml}</td>
-                <td><span class="${kondisiBadge}">${condition}</span></td>
-                <td><span class="${stBadge}">${stStatusLabel}</span></td>
+                <td><span class="${kondisiBadge}">${esc(condition)}</span></td>
+                <td><span class="${stBadge}">${esc(stStatusLabel)}</span></td>
                 <td>${actionButton}</td>
             </tr>`;
         }
@@ -1366,8 +1373,8 @@
                 ? `<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#dc3545" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`
                 : `<img src="${safe}" alt="Attachment" style="width:64px; height:64px; object-fit:cover; border-radius:8px; flex-shrink:0;">`;
             const lihatBtn = isPdf
-                ? `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewPdfAttachment('${safe}')">Lihat</button>`
-                : `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewImage('${safe}')">Lihat</button>`;
+                ? `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewPdfAttachment(this.dataset.path)" data-path="${safe}">Lihat</button>`
+                : `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewImage(this.dataset.src)" data-src="${safe}">Lihat</button>`;
             return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #e9ecef; border-radius:8px; background:#f8f9fa; flex-wrap:wrap;">
                 ${thumb}
                 <div style="min-width:0; flex:1;">

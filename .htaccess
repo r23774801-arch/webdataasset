@@ -1,0 +1,26 @@
+# Root-level protection: block direct web access to sensitive files and
+# directories. Non-public code is loaded server-side via PHP includes, so it
+# never needs to be reachable over HTTP.
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block any path segment starting with a dot (.env, .git, .gitignore, ...).
+    RewriteRule (^|/)\. - [F,L]
+
+    # Block non-public directories (never served over HTTP).
+    RewriteRule ^(app|config|vendor|google_apps_script|\.vscode)/ - [F,L]
+</IfModule>
+
+# Block sensitive file types at any depth.
+<FilesMatch "\.(?i:env|bak|old|orig|save|swp|tmp|log|sql|ini|pem|key|lock)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
