@@ -64,7 +64,8 @@ if (!$update) {
 }
 $update->bind_param('ss', $email, $nrp);
 if (!$update->execute()) {
-    json_response(['status' => 'error', 'message' => 'Gagal menyimpan email: ' . $conn->error]);
+    error_log('[update_profil] update failed: ' . $conn->error);
+    json_response(['status' => 'error', 'message' => 'Gagal menyimpan email.']);
 }
 
 AuditService::log($conn, 'Updated Profile Email', 'users', null, ['nrp' => $nrp, 'email' => $email]);

@@ -1,5 +1,8 @@
 <?php
 header('Content-Type: application/json');
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_login();
 include 'koneksi.php';
 
 $query = "SELECT id, asset_number, asset_name, jumlah, supplier, tanggal, pic, area, created_at FROM barang_masuk ORDER BY created_at DESC";

@@ -27,6 +27,9 @@ $queries = [
     // Add user e-mail address (used for approval result notifications)
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(100) DEFAULT NULL",
 
+    // Add user account status (managed by the Admin "Data Akun" feature)
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS status ENUM('Aktif','Nonaktif') NOT NULL DEFAULT 'Aktif'",
+
     // Approval workflow table
     "CREATE TABLE IF NOT EXISTS stocktaking_submissions (
         id INT AUTO_INCREMENT PRIMARY KEY,

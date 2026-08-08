@@ -69,7 +69,7 @@
                         MASUK
                     </button>
                     <div class="auth-footer">
-                        <button class="auth-link" type="button" onclick="showReset()">Lupa Password?</button>
+                        <span class="auth-note">Lupa password? Hubungi Admin</span>
                         <button class="auth-link" type="button" onclick="showRegister()">Daftar Akun</button>
                     </div>
                 </div>
@@ -120,11 +120,15 @@
                         </div>
                     </div>
                     <div class="input-group">
-                        <label for="regRole">Role (Departemen)</label>
+                        <label for="regRole">Role</label>
                         <select id="regRole">
                             <option value="it">IT</option>
                             <option value="ga">GA</option>
                         </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="regDepartment">Departemen</label>
+                        <input type="text" id="regDepartment" placeholder="Masukkan departemen" autocomplete="organization">
                     </div>
                     <button class="btn-ut-primary" type="button" onclick="handleRegister()">
                         <i class="fas fa-user-plus" aria-hidden="true"></i>
@@ -135,36 +139,6 @@
                     </div>
                 </div>
 
-                <div id="resetForm" class="auth-form">
-                    <div class="input-group">
-                        <label for="resetNrp">NRP Pegawai</label>
-                        <div class="field-control">
-                            <i class="fas fa-id-card" aria-hidden="true"></i>
-                            <input type="text" id="resetNrp" placeholder="Masukkan NRP" autocomplete="username">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="resetUsername">Username</label>
-                        <div class="field-control">
-                            <i class="fas fa-user" aria-hidden="true"></i>
-                            <input type="text" id="resetUsername" placeholder="Masukkan Username" autocomplete="name">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="resetPasswordBaru">Password Baru</label>
-                        <div class="field-control">
-                            <i class="fas fa-unlock-keyhole" aria-hidden="true"></i>
-                            <input type="password" id="resetPasswordBaru" placeholder="Password baru" autocomplete="new-password">
-                        </div>
-                    </div>
-                    <button class="btn-ut-primary" type="button" onclick="handleReset()">
-                        <i class="fas fa-rotate-right" aria-hidden="true"></i>
-                        RESET PASSWORD
-                    </button>
-                    <div class="auth-footer">
-                        <button class="auth-link" type="button" onclick="showLogin()">Kembali ke Login</button>
-                    </div>
-                </div>
                 <p class="login-footer-note">PT United Tractors asset management portal, building reliable operations for industrial asset governance.</p>
             </div>
         </section>

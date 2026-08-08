@@ -12,11 +12,9 @@ if (!localStorage.getItem('usersDB')) {
 function hideAllForms() {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    const resetForm = document.getElementById('resetForm');
     
     if (loginForm) loginForm.classList.remove('active');
     if (registerForm) registerForm.classList.remove('active');
-    if (resetForm) resetForm.classList.remove('active');
 }
 
 function showLogin() {
@@ -30,12 +28,6 @@ function showRegister() {
     const registerForm = document.getElementById('registerForm');
     if (registerForm) registerForm.classList.add('active');
     updatePasswordValidation();
-}
-
-function showReset() {
-    hideAllForms();
-    const resetForm = document.getElementById('resetForm');
-    if (resetForm) resetForm.classList.add('active');
 }
 
 const registerPasswordRules = {
@@ -295,50 +287,6 @@ if (document.readyState === 'loading') {
     initializeAuthEnhancements();
 }
 
-// --- Logika Lupa Password (Mengirim ke PHP) ---
-async function handleReset() {
-    const nrp = document.getElementById('resetNrp').value.trim();
-    const username = document.getElementById('resetUsername').value.trim();
-    const passwordBaru = document.getElementById('resetPasswordBaru').value.trim();
-    
-    if (!nrp || !username || !passwordBaru) {
-        showToast("Semua kolom (NRP, Username, Password Baru) wajib diisi!", "info");
-        return;
-    }
-
-    toggleLoader(true, "Memperbarui password...");
-    try {
-        const response = await fetch('reset_password.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                nrp: nrp,
-                username: username,
-                password_baru: passwordBaru
-            })
-        });
-
-        const result = await response.json();
-        toggleLoader(false);
-        showToast(result.message, result.status === "success" ? "success" : "error");
-
-        // Jika sukses di-reset, kosongkan form dan kembalikan ke halaman login
-        if (result.status === "success") {
-            document.getElementById('resetNrp').value = '';
-            document.getElementById('resetUsername').value = '';
-            document.getElementById('resetPasswordBaru').value = '';
-            setTimeout(() => { showLogin(); }, 1200);
-        }
-        
-    } catch (error) {
-        toggleLoader(false);
-        console.error("Error:", error);
-        showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
-    }
-}
-
 // --- Logika Registrasi Menggunakan PHP & MySQL ---
 async function handleRegister() {
     const nrp = getRegisterNrpValue();
@@ -346,6 +294,7 @@ async function handleRegister() {
     const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value.trim();
     const role = document.getElementById('regRole').value;
+    const department = document.getElementById('regDepartment').value.trim();
     
     if (!nrp || !username || !email || !password) {
         showToast("Semua field (NRP, Nama, Email, Password) wajib diisi!", "info");
@@ -374,7 +323,8 @@ async function handleRegister() {
                 username: username, 
                 email: email, 
                 password: password, 
-                role: role 
+                role: role,
+                department: department
             })
         });
 
@@ -389,6 +339,7 @@ async function handleRegister() {
             document.getElementById('regUsername').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regPassword').value = '';
+            document.getElementById('regDepartment').value = '';
             updatePasswordValidation();
             setTimeout(() => { showLogin(); }, 1500);
         }

@@ -1,0 +1,26 @@
+# Block execution of scripts stored in the uploads directory (defense-in-depth).
+# Uploaded files are validated as images/PDF only, but this ensures a stored
+# file can never be executed as PHP or any other server-side script.
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# Apache 2.4+
+<FilesMatch "\.(?i:php|phtml|php3|php4|php5|php7|phps|phar|pl|py|jsp|asp|aspx|sh|cgi|htaccess)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Apache 2.2 fallback: never run these as handlers
+RemoveHandler .php .php3 .php4 .php5 .php7 .phtml .phps
+RemoveType .php .php3 .php4 .php5 .php7 .phtml .phps

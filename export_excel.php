@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (empty($_SESSION['nrp'])) {
+    header('Location: login.html');
+    exit;
+}
 include 'koneksi.php';
 
 // Set headers for Excel download

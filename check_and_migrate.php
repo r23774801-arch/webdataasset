@@ -1,4 +1,7 @@
 <?php
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_admin();
 include 'koneksi.php';
 
 echo "Checking aset_ga table structure...\n\n";

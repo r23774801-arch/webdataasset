@@ -12,7 +12,8 @@
 # ==========================
 # Uploaded files
 # ==========================
-uploads/
+uploads/*
+!uploads/.htaccess
 
 # ==========================
 # Logs

@@ -745,11 +745,17 @@ button[onclick*="save"]:hover,
     background: #F59E0B !important;
 }
 
-.btn-stocktaking-complete,
 .btn-finish-stocktaking,
 .badge-stocktaked {
     background: var(--ut-green) !important;
     color: #fff !important;
+}
+
+/* Locked button (per-row) — neutral gray, separated from the green buttons above. */
+.btn-stocktaking-complete {
+    background: #6B7280 !important;
+    color: #fff !important;
+    cursor: not-allowed !important;
 }
 
 .badge-approved {

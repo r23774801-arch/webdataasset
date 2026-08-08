@@ -26,6 +26,15 @@ if (!in_array($role, $allowedRoles, true)) {
     exit;
 }
 
+// Departemen bebas diketik oleh pengguna (IT, GA, Finance, HR, Accounting, Marketing, Procurement, dll).
+// Tidak dibatasi dan tidak otomatis mengikuti role.
+$department = trim((string)($data['department'] ?? ''));
+if ($department !== '' && strlen($department) > 100) {
+    echo json_encode(["status" => "error", "message" => "Departemen terlalu panjang (maksimal 100 karakter)!"]);
+    exit;
+}
+$department = $conn->real_escape_string($department);
+
 // Email wajib diisi, format harus valid, dan tidak boleh sama dengan akun lain (case-insensitive).
 $email = trim((string)($data['email'] ?? ''));
 if ($email === '') {
@@ -90,12 +99,13 @@ if ($cek_nrp->num_rows > 0) {
         echo json_encode(["status" => "error", "message" => "Email sudah terdaftar di sistem!"]);
     } else {
         // 2. Jika NRP dan email belum ada, masukkan data ke database
-        $query = "INSERT INTO users (nrp, username, password, role, email) VALUES ('$nrp', '$username', '$password', '$role', '$email')";
+        $query = "INSERT INTO users (nrp, username, password, role, email, department) VALUES ('$nrp', '$username', '$password', '$role', '$email', '$department')";
         
         if ($conn->query($query) === TRUE) {
             echo json_encode(["status" => "success", "message" => "Registrasi Berhasil! Silakan login."]);
         } else {
-            echo json_encode(["status" => "error", "message" => "Gagal menyimpan data: " . $conn->error]);
+            error_log('[register] insert failed: ' . $conn->error);
+            echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
         }
     }
 }

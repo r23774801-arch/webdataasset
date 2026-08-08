@@ -42,6 +42,7 @@ $db   = getenv('DB_NAME') ?: 'db_ut_assets';
 $conn = new mysqli($host, $user, $pass, $db);
 
 if ($conn->connect_error) {
-    echo json_encode(["status" => "error", "message" => "Koneksi database gagal: " . $conn->connect_error]);
+    error_log('[koneksi] database connection failed: ' . $conn->connect_error);
+    echo json_encode(["status" => "error", "message" => "Koneksi database gagal."]);
     exit;
 }

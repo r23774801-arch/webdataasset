@@ -1,5 +1,8 @@
 <?php
 header('Content-Type: application/json');
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_login();
 include 'koneksi.php';
 
 // Count pending records from asset tables only (barang_masuk/barang_keluar no longer have status_approval)

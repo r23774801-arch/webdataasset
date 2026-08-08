@@ -69,6 +69,24 @@
             border-radius: 4px;
             display: none;
         }
+        .stocktaking-asset-photo {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .attachment-file-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 1px dashed #dc3545;
+            color: #dc3545;
+            border-radius: 6px;
+            font-size: 13px;
+            background: #fff;
+            margin-top: 10px;
+        }
         
         /* =========================================
            STYLE UNTUK KARTU RINGKASAN (CARDS GRID)
@@ -272,7 +290,7 @@
             background-color: #e0a800;
         }
         .btn-stocktaking-complete {
-            background-color: #81c784; /* Hijau pudar pastel seperti di gambar */
+            background-color: #6B7280; /* Neutral gray */
             color: #fff;
             cursor: not-allowed;
         }
@@ -338,6 +356,15 @@
                     <circle cx="12" cy="12" r="10"></circle>
                 </svg>
                 <span class="nav-label">Approval Stocktaking</span>
+            </a>
+            <a href="data-akun.html" class="sidebar-nav-item" id="navDataAkun" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span class="nav-label">Data Akun</span>
             </a>
             <a href="kontak.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -668,18 +695,47 @@
     <div id="stocktakingModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="tutupStocktakingModal()">&times;</span>
-            <div class="stocktaking-modal-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px; color: #FFCC00; margin-right: 10px;">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                Laporkan Kondisi Aset
+            <h3 style="margin-bottom: 20px; color: #333;">Laporkan Kondisi Aset</h3>
+            <div class="input-group" style="margin-bottom: 18px;">
+                <label>Informasi Aset</label>
+                <div id="stocktakingInfo">
+                    <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; font-size:0.9rem;">
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Asset Number</div>
+                            <div id="stInfoAssetNumber" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Nama Barang</div>
+                            <div id="stAssetName" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Serial Number</div>
+                            <div id="stSerialNumber" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Asset Class</div>
+                            <div id="stInfoAssetClass" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">PIC</div>
+                            <div id="stInfoPic" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Area</div>
+                            <div id="stInfoArea" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Tanggal</div>
+                            <div id="stInfoTanggal" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stocktaking-modal-asset" id="stocktakingModalAsset">Aset: <strong id="stAssetName">-</strong> (SN: <span id="stSerialNumber">-</span>)</div>
-            <div class="input-group">
+            <div class="input-group" id="assetPhotoGroup" style="margin-bottom: 18px;">
+                <label>Foto Aset Saat Ini</label>
+                <div id="assetPhotoPreview"></div>
+            </div>
+            <div class="input-group" style="margin-bottom: 18px;">
                 <label>Pilih Kondisi</label>
                 <select id="stCondition" onchange="handleConditionChange()">
                     <option value="">-- Pilih Kondisi --</option>
@@ -690,7 +746,7 @@
                 </select>
             </div>
             <!-- PHASE 4.5 — Transfer Form (shown when Transfer is selected) -->
-            <div id="transferFormGroup" style="display:none;">
+            <div id="transferFormGroup" style="display:none; margin-bottom:18px; padding:12px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:8px;">
                 <div class="input-group">
                     <label>Destination Area</label>
                     <select id="transferArea">
@@ -713,28 +769,25 @@
                     <textarea id="transferRemarks" rows="2" placeholder="Catatan transfer (opsional)"></textarea>
                 </div>
             </div>
-            <div class="input-group" id="photoGroup">
-                <label>Upload Foto Aset</label>
-                <input type="file" id="stPhoto" accept="image/*" onchange="previewStocktakingPhoto(event)">
-                <img id="stPhotoPreview" class="stocktaking-photo-preview">
+            <div class="input-group" id="attachmentGroup" style="margin-bottom: 18px;">
+                <label>Attachment (Bukti Stocktaking)</label>
+                <input type="file" id="stAttachment" accept=".jpg,.jpeg,.png,.webp,.pdf" onchange="previewStocktakingAttachment(event)">
+                <div id="stAttachmentPreview"></div>
+                <span class="text-muted" style="font-size:12px;">Jenis file: JPG, JPEG, PNG, WEBP, PDF. Maksimal 5MB. Attachment lama tetap dipertahankan jika tidak memilih file baru.</span>
             </div>
-            <button class="btn-warning" onclick="submitStocktakingAction()" style="margin-top: 10px;">Submit Laporan</button>
-        </div>
-    </div>
-
-    <!-- Update Utilisasi Modal -->
-    <div id="updateUtilisasiModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="tutupUpdateUtilisasiModal()">&times;</span>
-            <h3>Update Utilisasi Modal</h3>
-            <div class="input-group">
-                <label>Pilih Status Utilisasi</label>
-                <select id="updateUtilisasiSelect">
+            <div class="input-group" style="margin-bottom: 18px;">
+                <label>Utilisasi</label>
+                <select id="stUtilisasi">
+                    <option value="">-- Pilih Utilisasi --</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
                 </select>
             </div>
-            <button class="btn-warning" onclick="saveUtilisasiUpdate()" style="margin-top: 10px;">Save</button>
+            <div id="stocktakingValidationNote" style="margin-top:10px; font-size:13px; color:#b8860b; display:none;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+                <button type="button" onclick="tutupStocktakingModal()" style="background:#6c757d; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Batal</button>
+                <button class="btn-warning" id="submitStocktakingBtn" onclick="submitStocktakingAction()" disabled>Submit Stocktaking</button>
+            </div>
         </div>
     </div>
 
@@ -754,7 +807,16 @@
 
         // Stocktaking state
         let currentStocktakingId = null;
-        let stocktakingPhotoPath = '';
+        let currentStocktakingTableType = null;
+        let stocktakingAttachmentPath = '';
+
+        // Re-evaluate the Submit Stocktaking gating whenever the modal inputs change.
+        document.addEventListener('change', function (e) {
+            const el = e.target;
+            if (el && (el.id === 'stCondition' || el.id === 'stUtilisasi' || el.id === 'stAttachment')) {
+                if (typeof updateStocktakingGating === 'function') updateStocktakingGating();
+            }
+        });
 
         // Area filter state
         let activeAreaFilter = '';
@@ -1059,38 +1121,14 @@
             else if (stStatus === 'Stocktaked') stBadge = 'badge-stocktaked';
 
             const utilisasi = item.utilisasi || '';
-            const isStocktaked = stStatus === 'Stocktaked';
             // PHASE 4.15 — while the stocktaking session is locked no row edits are allowed.
             const sessionLocked = !!window.assetLocked;
             
-            // Utilisasi toggle button - LOCKED when Stocktaked or when the session is locked
-            let utilisasiToggle = '';
-            if (isStocktaked || sessionLocked) {
-                // LOCKED - no onclick, grayed out
-                utilisasiToggle = `<button id="badge-utilisasi-${item.id}" class="btn-utilisasi-toggle utilisasi-locked" style="cursor: not-allowed; opacity: 0.6;" disabled title="Utilisasi locked for stocktaked assets">
-                <span>${utilisasi || 'Set'}</span>
-            </button>`;
-            } else if (utilisasi === '') {
-                // Neutral button for empty state
-                utilisasiToggle = `<button id="badge-utilisasi-${item.id}" class="btn-utilisasi-toggle utilisasi-neutral" onclick="toggleUtilisasi(${item.id}, '${utilisasi}')" title="Click to set utilization status">
-                <span>Set</span>
-            </button>`;
-            } else {
-                // YES/NO buttons with icons
-                const utilisasiIcon = utilisasi === 'Yes' 
-                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                       </svg>`
-                    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                       </svg>`;
-                
-                utilisasiToggle = `<button id="badge-utilisasi-${item.id}" class="btn-utilisasi-toggle ${utilisasi === 'Yes' ? 'utilisasi-yes' : 'utilisasi-no'}" onclick="toggleUtilisasi(${item.id}, '${utilisasi}')" title="Click to toggle utilization status">
-                    ${utilisasiIcon}
-                    <span>${utilisasi}</span>
-                </button>`;
-            }
+            // Utilisasi display — read-only in the table. It is only managed
+            // inside the Action (stocktaking) modal.
+            const utilisasiBadge = utilisasi
+                ? `<span class="btn-utilisasi-toggle ${utilisasi === 'Yes' ? 'utilisasi-yes' : 'utilisasi-no'}" style="cursor: default;">${utilisasi}</span>`
+                : '<span class="text-muted" style="font-size:12px;">-</span>';
 
             const locationDisplay = item.location_note ? `${item.area} (${item.location_note})` : item.area;
 
@@ -1108,12 +1146,14 @@
                 ? `<img src="${imgPath}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${imgPath}')">`
                 : '<span class="text-muted" style="font-size:12px;">No Image</span>';
 
-            // Action button - disabled when Stocktaked or when the session is locked,
-            // unless the latest submission was Rejected (re-edit allowed)
+            // Action button — disabled only when the whole stocktaking session is
+            // locked (Pending/Approved submission). Already-Stocktaked assets can
+            // still be reopened so their Condition/Attachment/Utilisation can be
+            // reviewed and updated; only a Rejection re-enables while locked.
             const submissionRejected = !!(window.stocktakingSubmission && window.stocktakingSubmission.status === 'Rejected');
             let actionButton = '';
-            if ((isStocktaked || sessionLocked) && !submissionRejected) {
-                actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="${sessionLocked ? 'Stocktaking sedang terkunci' : 'Aset sudah Stocktaked'}">${sessionLocked ? 'Locked' : 'Stocktaked'}</button>`;
+            if (sessionLocked && !submissionRejected) {
+                actionButton = `<button class="btn-stocktaking btn-stocktaking-complete" disabled title="Stocktaking sedang terkunci">Locked</button>`;
             } else {
                 actionButton = `<button class="btn-stocktaking btn-stocktaking-action" onclick="openStocktakingModal(${item.id}, '${item.nama_barang.replace(/'/g, "\\'")}', '${item.serial_number || ''}', '${item.type}')">Action</button>`;
             }
@@ -1124,7 +1164,7 @@
                 <td>${item.serial_number || '-'}</td>
                 <td>${item.pic || '-'}</td>
                 <td>${locationDisplay}</td>
-                <td>${utilisasiToggle}</td>
+                <td>${utilisasiBadge}</td>
                 <td>${dateDisplay}</td>
                 <td>${attachmentHtml}</td>
                 <td><span class="${kondisiBadge}">${kondisi || '-'}</span></td>
@@ -1214,6 +1254,59 @@
         
 
         // ========== STOCKTAKING STATE MACHINE ==========
+        // UI helper — renders the current photo/attachment as a compact card
+        // (small thumbnail/PDF icon + filename + type + Lihat) like Barang Masuk GA.
+        function renderStocktakingAttachmentCard(path, emptyText) {
+            const safe = typeof _escAttr === 'function' ? _escAttr(path || '') : (path || '');
+            if (!safe) {
+                return `<span class="text-muted" style="font-size:13px;">${emptyText || 'Belum ada attachment.'}</span>`;
+            }
+            const isPdf = typeof isPdfPath === 'function' ? isPdfPath(safe) : String(safe).toLowerCase().endsWith('.pdf');
+            const fileName = String(safe).split('/').pop();
+            const fileType = isPdf ? 'PDF' : 'Gambar';
+            const thumb = isPdf
+                ? `<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#dc3545" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`
+                : `<img src="${safe}" alt="Attachment" style="width:64px; height:64px; object-fit:cover; border-radius:8px; flex-shrink:0;">`;
+            const lihatBtn = isPdf
+                ? `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewPdfAttachment('${safe}')">Lihat</button>`
+                : `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewImage('${safe}')">Lihat</button>`;
+            return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #e9ecef; border-radius:8px; background:#f8f9fa; flex-wrap:wrap;">
+                ${thumb}
+                <div style="min-width:0; flex:1;">
+                    <div style="font-weight:600; color:#333; font-size:0.9rem; word-break:break-all;">${fileName}</div>
+                    <div class="text-muted" style="font-size:12px;">${fileType}</div>
+                </div>
+                ${lihatBtn}
+            </div>`;
+        }
+
+        // UI helper — fills the read-only asset info card in the Action modal.
+        function renderStocktakingInfo(asset) {
+            const get = (id) => document.getElementById(id);
+            const put = (id, value) => {
+                const el = get(id);
+                if (el) el.textContent = (value === null || value === undefined || value === '') ? '-' : value;
+            };
+            if (!asset) {
+                ['stInfoAssetNumber', 'stInfoAssetClass', 'stInfoPic', 'stInfoArea', 'stInfoTanggal'].forEach(id => put(id, '-'));
+                return;
+            }
+            put('stInfoAssetNumber', asset.asset_number);
+            put('stInfoAssetClass', asset.asset_class);
+            put('stInfoPic', asset.pic);
+            const location = asset.location_note ? `${asset.area} (${asset.location_note})` : asset.area;
+            put('stInfoArea', location);
+            let dateDisplay = '-';
+            if (asset.date_of_entry) {
+                const d = new Date(asset.date_of_entry);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                dateDisplay = `${day}/${month}/${year}`;
+            }
+            put('stInfoTanggal', dateDisplay);
+        }
+
         function openStocktakingModal(id, assetName, serialNumber, tableType) {
             // PHASE 4.15 — the whole stocktaking session is locked while a
             // submission is Pending or Approved; block opening the modal.
@@ -1224,58 +1317,109 @@
 
             currentStocktakingId = id;
             currentStocktakingTableType = tableType;
-            stocktakingPhotoPath = '';
+            stocktakingAttachmentPath = '';
             document.getElementById('stAssetName').textContent = assetName;
             document.getElementById('stSerialNumber').textContent = serialNumber || '-';
             
-            // Pre-fill saved stocktaking condition; after it is saved, only photo upload remains.
+            // Condition — always visible and editable. Pre-fill the previously
+            // saved stocktaking condition when one already exists; the user can
+            // still change it on a later submit.
             const asset = allAsetData.find(item => String(item.id) === String(id));
-            const savedStocktakingCondition = asset ? (asset.stocktaking_condition || '') : '';
-            const existingCondition = savedStocktakingCondition || (asset ? (asset.kondisi || asset.condition || '') : '');
+            const existingCondition = (asset && (asset.stocktaking_condition || asset.kondisi || asset.condition)) || '';
             const conditionSelect = document.getElementById('stCondition');
-            const conditionGroup = conditionSelect.closest('.input-group');
             conditionSelect.value = existingCondition;
-            conditionSelect.disabled = !!savedStocktakingCondition;
-            if (conditionGroup) {
-                conditionGroup.style.display = savedStocktakingCondition ? 'none' : 'block';
-            }
+
+            renderStocktakingInfo(asset);
             
-            // PHASE 4.15 — reuse the existing asset photo (creation photo or a
-            // previous stocktaking photo) instead of asking for another upload.
-            const photoInput = document.getElementById('stPhoto');
-            const photoPreview = document.getElementById('stPhotoPreview');
-            const photoGroup = document.getElementById('photoGroup');
-            const photoLabel = photoGroup ? photoGroup.querySelector('label') : null;
-            const existingPhoto = asset ? (asset.stocktaking_photo || asset.attachment || '') : '';
-            if (photoInput) photoInput.value = '';
-            if (existingPhoto && photoPreview) {
-                photoPreview.src = existingPhoto;
-                photoPreview.style.display = 'block';
-                if (photoInput) photoInput.style.display = 'none';
-                if (photoLabel) photoLabel.textContent = 'Foto Aset (diunggah saat input aset)';
-            } else {
-                if (photoPreview) photoPreview.style.display = 'none';
-                if (photoInput) photoInput.style.display = 'block';
-                if (photoLabel) photoLabel.textContent = 'Upload Foto Aset';
+            // Current asset photo — preview only (reference, never replaced).
+            const assetPhoto = asset ? (asset.foto || asset.gambar || asset.attachment || '') : '';
+            const assetPhotoPreview = document.getElementById('assetPhotoPreview');
+            if (assetPhotoPreview) {
+                assetPhotoPreview.innerHTML = renderStocktakingAttachmentCard(assetPhoto, 'Tidak ada foto aset.');
             }
+
+            // Attachment — stocktaking evidence. Show the existing attachment,
+            // allow replacing it, and keep it when no new file is chosen.
+            const attachmentInput = document.getElementById('stAttachment');
+            const attachmentPreview = document.getElementById('stAttachmentPreview');
+            if (attachmentInput) attachmentInput.value = '';
+            stocktakingAttachmentPath = asset ? (asset.stocktaking_photo || asset.attachment || '') : '';
+            if (attachmentPreview) {
+                attachmentPreview.innerHTML = renderStocktakingAttachmentCard(stocktakingAttachmentPath);
+            }
+
+            // Utilisasi — prefill the current asset value.
+            const utilisasiSelect = document.getElementById('stUtilisasi');
+            if (utilisasiSelect) {
+                utilisasiSelect.value = (asset && asset.utilisasi) ? asset.utilisasi : '';
+            }
+
+            const validationNote = document.getElementById('stocktakingValidationNote');
+            if (validationNote) validationNote.style.display = 'none';
+
             document.getElementById('stocktakingModal').style.display = 'flex';
+            updateStocktakingGating();
         }
 
         function tutupStocktakingModal() {
             document.getElementById('stocktakingModal').style.display = 'none';
             currentStocktakingId = null;
+            currentStocktakingTableType = null;
+            stocktakingAttachmentPath = '';
         }
 
-        function previewStocktakingPhoto(event) {
+        function previewStocktakingAttachment(event) {
             const file = event.target.files[0];
+            const preview = document.getElementById('stAttachmentPreview');
+            if (!preview) return;
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('stPhotoPreview');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+                const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+                if (isPdf) {
+                    preview.innerHTML = `<span class="attachment-file-note">PDF dipilih: ${typeof _escAttr === 'function' ? _escAttr(file.name) : file.name}</span>`;
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Lampiran" class="stocktaking-asset-photo">`;
+                        updateStocktakingGating();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            updateStocktakingGating();
+        }
+
+        // ========== STOCKTAKING GATING — Submit enabled only when
+        // Condition + Attachment (old or new) + Utilisasi are all complete. ==========
+        function getStocktakingAttachmentReady() {
+            const attachmentInput = document.getElementById('stAttachment');
+            const hasNewFile = !!(attachmentInput && attachmentInput.files && attachmentInput.files[0]);
+            return hasNewFile || stocktakingAttachmentPath !== '';
+        }
+
+        function updateStocktakingGating() {
+            const conditionSelect = document.getElementById('stCondition');
+            const utilisasiSelect = document.getElementById('stUtilisasi');
+            const submitBtn = document.getElementById('submitStocktakingBtn');
+            const validationNote = document.getElementById('stocktakingValidationNote');
+            if (!conditionSelect || !utilisasiSelect || !submitBtn) return;
+
+            const isTransfer = conditionSelect.value === 'Transfer';
+            const conditionReady = isTransfer || conditionSelect.value !== '';
+            const utilisasiReady = utilisasiSelect.value !== '';
+            const attachmentReady = isTransfer || getStocktakingAttachmentReady();
+
+            const ready = conditionReady && attachmentReady && utilisasiReady;
+            submitBtn.disabled = !ready;
+
+            if (ready) {
+                if (validationNote) validationNote.style.display = 'none';
+            } else if (validationNote) {
+                const missing = [];
+                if (!conditionReady) missing.push('Kondisi');
+                if (!attachmentReady) missing.push('Attachment');
+                if (!utilisasiReady) missing.push('Utilisasi');
+                validationNote.innerHTML = 'Lengkapi data berikut sebelum submit: <strong>' + missing.join(', ') + '</strong>.';
+                validationNote.style.display = 'block';
             }
         }
 
@@ -1283,9 +1427,10 @@
         function handleConditionChange() {
             const isTransfer = document.getElementById('stCondition').value === 'Transfer';
             const transferGroup = document.getElementById('transferFormGroup');
-            const photoGroup = document.getElementById('photoGroup');
+            const attachmentGroup = document.getElementById('attachmentGroup');
             if (transferGroup) transferGroup.style.display = isTransfer ? 'block' : 'none';
-            if (photoGroup) photoGroup.style.display = isTransfer ? 'none' : 'block';
+            if (attachmentGroup) attachmentGroup.style.display = isTransfer ? 'none' : 'block';
+            updateStocktakingGating();
         }
 
         async function submitTransferAction() {
@@ -1334,6 +1479,7 @@
 
         async function submitStocktakingAction() {
             const condition = document.getElementById('stCondition').value;
+            const utilisasi = document.getElementById('stUtilisasi').value;
 
             // PHASE 4.5 — Transfer condition routes to the transfer workflow.
             if (condition === 'Transfer') {
@@ -1341,26 +1487,33 @@
                 return;
             }
 
-            const photoInput = document.getElementById('stPhoto');
+            const attachmentInput = document.getElementById('stAttachment');
 
             if (!condition) {
                 showToast('Silakan pilih kondisi aset!', 'warning');
                 return;
             }
+            if (!utilisasi) {
+                showToast('Silakan pilih utilisasi aset!', 'warning');
+                return;
+            }
+            if (!getStocktakingAttachmentReady()) {
+                showToast('Attachment (bukti stocktaking) wajib ada!', 'warning');
+                return;
+            }
 
-            toggleLoader(true, 'Mengirim laporan kondisi...');
+            toggleLoader(true, 'Mengirim laporan stocktaking...');
 
             try {
-                if (photoInput.files && photoInput.files[0]) {
-                    const formData = new FormData();
-                    formData.append('attachment', photoInput.files[0]);
-                    const uploadResponse = await fetch('upload_attachment.php', { method: 'POST', body: formData });
-                    const uploadResult = await uploadResponse.json();
+                // Keep the existing attachment when no new file is chosen.
+                let attachmentPath = stocktakingAttachmentPath;
+                if (attachmentInput.files && attachmentInput.files[0]) {
+                    const uploadResult = await window.uploadAttachmentFile(attachmentInput.files[0]);
                     if (uploadResult.status === 'success') {
-                        stocktakingPhotoPath = uploadResult.path;
+                        attachmentPath = uploadResult.path;
                     } else {
                         toggleLoader(false);
-                        showToast('Gagal upload foto: ' + uploadResult.message, 'error');
+                        showToast('Gagal upload attachment: ' + uploadResult.message, 'error');
                         return;
                     }
                 }
@@ -1373,7 +1526,8 @@
                         table_type: TABLE_TYPE,
                         action: 'submit_action',
                         condition: condition,
-                        photo_path: stocktakingPhotoPath
+                        utilisasi: utilisasi,
+                        photo_path: attachmentPath
                     })
                 });
                 const result = await response.json();
@@ -1392,77 +1546,6 @@
                 toggleLoader(false);
                 showToast('Gagal menghubungi server: ' + err.message, 'error');
             }
-        }
-
-        // ========== INTERACTIVE UTILISASI TOGGLE ==========
-        let currentUtilisasiId = null;
-        let currentUtilisasiType = 'it';
-
-        function bukaUpdateUtilisasiModal(id, currentStatus) {
-            currentUtilisasiId = id;
-            currentUtilisasiType = 'it';
-            document.getElementById('updateUtilisasiSelect').value = currentStatus;
-            document.getElementById('updateUtilisasiModal').style.display = 'flex';
-        }
-
-        function tutupUpdateUtilisasiModal() {
-            document.getElementById('updateUtilisasiModal').style.display = 'none';
-            currentUtilisasiId = null;
-        }
-
-        async function saveUtilisasiUpdate() {
-            if (!currentUtilisasiId) return;
-            
-            const newUtilisasi = document.getElementById('updateUtilisasiSelect').value;
-            const previousStatus = allAsetData.find(item => item.id === currentUtilisasiId)?.utilisasi || 'No';
-            
-            // Optimistic UI update
-            const asset = allAsetData.find(item => item.id === currentUtilisasiId);
-            if (asset) {
-                asset.utilisasi = newUtilisasi;
-                renderPageIt();
-            }
-            
-            try {
-                // Create JSON payload with exact parameters required by backend
-                const payload = {
-                    action: 'update_utilisasi',
-                    id: currentUtilisasiId,
-                    table_type: currentUtilisasiType,
-                    utilisasi: newUtilisasi
-                };
-                
-                const response = await fetch('update_stocktaking.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                
-                if (result.status !== 'success') {
-                    // Revert on failure
-                    if (asset) asset.utilisasi = previousStatus;
-                    renderPageIt();
-                    showToast(result.message || 'Gagal memperbarui utilisasi', 'error');
-                } else {
-                    showToast(`Utilisasi berhasil diubah ke "${newUtilisasi}"`, 'success');
-                    // Refresh data from server to ensure UI is in sync
-                    await muatDataAset();
-                }
-            } catch (err) {
-                // Revert on error
-                if (asset) asset.utilisasi = previousStatus;
-                renderPageIt();
-                showToast('Gagal menghubungi server: ' + err.message, 'error');
-            }
-            
-            tutupUpdateUtilisasiModal();
-        }
-
-        // Override the old toggleUtilisasi function to use modal
-        async function toggleUtilisasi(id, currentStatus) {
-            bukaUpdateUtilisasiModal(id, currentStatus);
         }
 
         // ========== CRUD OPERATIONS ==========

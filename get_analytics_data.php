@@ -5,11 +5,14 @@
  * The Google Spreadsheet is never queried for reports.
  */
 header('Content-Type: application/json');
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_login();
 
 include 'koneksi.php';
-require_once __DIR__ . '/app/bootstrap.php';
 
-// No login guard: mirrors get_laporan_data.php, the existing report endpoint.
+// Note: previously public; now gated by require_login to match the rest of
+// the dashboard/report data model.
 
 // Defensive: the report tables must exist (run migrate_db.php once).
 if (!table_exists($conn, 'aset_it') || !table_exists($conn, 'aset_ga')) {

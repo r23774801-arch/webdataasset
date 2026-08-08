@@ -83,7 +83,8 @@ $stmt = $conn->prepare(
 );
 
 if (!$stmt) {
-    json_response(['status' => 'error', 'message' => 'Gagal menyiapkan query: ' . $conn->error]);
+    error_log('[import_employee] prepare failed: ' . $conn->error);
+    json_response(['status' => 'error', 'message' => 'Gagal menyiapkan query.']);
 }
 
 $inserted = 0;
@@ -109,7 +110,8 @@ try {
     $conn->commit();
 } catch (Exception $e) {
     $conn->rollback();
-    json_response(['status' => 'error', 'message' => 'Gagal menyimpan data: ' . $e->getMessage()]);
+    error_log('[import_employee] import failed: ' . $e->getMessage());
+    json_response(['status' => 'error', 'message' => 'Gagal menyimpan data.']);
 }
 
 json_response([

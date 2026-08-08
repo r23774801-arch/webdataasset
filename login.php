@@ -2,7 +2,16 @@
 header("Content-Type: application/json");
 require 'koneksi.php';
 
-// Start session for RBAC
+// Start session for RBAC with hardened cookies (HttpOnly + SameSite=Lax,
+// Secure when served over HTTPS). Must run before session_start().
+$https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path'     => '/',
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'secure'   => $https,
+]);
 session_start();
 
 // Menangkap data JSON dari JavaScript
@@ -33,7 +42,16 @@ if (!password_verify($password, $user['password'])) {
     exit;
 }
 
-// 3. Jika lolos, set session untuk RBAC
+// 2b. Blokir akun yang dinonaktifkan oleh Admin (kolom status bersifat opsional/pre-migrasi)
+$checkStatus = $conn->query("SHOW COLUMNS FROM users LIKE 'status'");
+if ($checkStatus && $checkStatus->num_rows > 0 && strtolower(trim((string)($user['status'] ?? 'Aktif'))) === 'nonaktif') {
+    echo json_encode(["status" => "error", "message" => "Akun Anda dinonaktifkan. Silakan hubungi Admin."]);
+    exit;
+}
+
+// 3. Regenerate the session ID after a successful login (fixes session fixation)
+//    and set the session variables used by RBAC.
+session_regenerate_id(true);
 $_SESSION['nrp'] = $user['nrp'];
 $_SESSION['username'] = $user['username'];
 $_SESSION['role'] = $user['role'];

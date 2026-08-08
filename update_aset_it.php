@@ -31,6 +31,7 @@ if ($input && isset($input['id'])) {
     $utilisasi = $input['utilisasi'] ?? 'No';
     $date_of_entry = $input['date_of_entry'] ?? null;
     $attachment = $input['attachment'] ?? '';
+    $kondisi = $input['kondisi'] ?? '';
 
     // Asset Number OR Serial Number must be provided (both empty is rejected).
     // Photo stays optional on edit — the existing uploaded photo is preserved.
@@ -39,11 +40,22 @@ if ($input && isset($input['id'])) {
         exit;
     }
 
-    // Build query dynamically based on whether attachment is provided (kondisi is not updated here)
-    if (!empty($attachment)) {
+    // Condition is only updated when explicitly provided (edit modal).
+    $updateKondisi = trim($kondisi) !== '';
+
+    // Build query dynamically based on whether attachment/kondisi are provided.
+    if (!empty($attachment) && $updateKondisi) {
+        $query = "UPDATE aset_it SET nama_barang = ?, serial_number = ?, pic = ?, area = ?, location_note = ?, utilisasi = ?, date_of_entry = ?, attachment = ?, kondisi = ? WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("sssssssssi", $nama_barang, $serial_number, $pic, $area, $location_note, $utilisasi, $date_of_entry, $attachment, $kondisi, $id);
+    } elseif (!empty($attachment)) {
         $query = "UPDATE aset_it SET nama_barang = ?, serial_number = ?, pic = ?, area = ?, location_note = ?, utilisasi = ?, date_of_entry = ?, attachment = ? WHERE id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("ssssssssi", $nama_barang, $serial_number, $pic, $area, $location_note, $utilisasi, $date_of_entry, $attachment, $id);
+    } elseif ($updateKondisi) {
+        $query = "UPDATE aset_it SET nama_barang = ?, serial_number = ?, pic = ?, area = ?, location_note = ?, utilisasi = ?, date_of_entry = ?, kondisi = ? WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssssssssi", $nama_barang, $serial_number, $pic, $area, $location_note, $utilisasi, $date_of_entry, $kondisi, $id);
     } else {
         $query = "UPDATE aset_it SET nama_barang = ?, serial_number = ?, pic = ?, area = ?, location_note = ?, utilisasi = ?, date_of_entry = ? WHERE id = ?";
         $stmt = $conn->prepare($query);

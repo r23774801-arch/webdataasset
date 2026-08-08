@@ -55,8 +55,9 @@ function upload_config(): array
             // Maximum allowed file size in bytes (default: 5 MB).
             'max_size' => (int)(getenv('UPLOAD_MAX_SIZE') ?: (5 * 1024 * 1024)),
 
-            // Allowed image extensions (mime type is validated separately).
-            'allowed_extensions' => ['jpg', 'jpeg', 'png', 'webp'],
+            // Allowed attachment extensions (mime type is validated separately).
+            // Images (JPG/JPEG/PNG/WEBP) plus PDF documents.
+            'allowed_extensions' => ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
         ];
     }
     return $config;

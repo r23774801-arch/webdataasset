@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
@@ -24,6 +24,7 @@ $table_type = $input['table_type']; // 'it' or 'ga'
 $action = $input['action']; // 'submit_action' or 'create_document'
 $condition = $input['condition'] ?? '';
 $photo_path = $input['photo_path'] ?? '';
+$utilisasi = trim((string)($input['utilisasi'] ?? ''));
 
 // Determine table name
 $table = ($table_type === 'it') ? 'aset_it' : 'aset_ga';
@@ -44,7 +45,7 @@ if ($userRole === 'GA' && $table !== 'aset_ga') {
     exit;
 }
 
-// PHASE 4.15 — session lock: the entire stocktaking session (all actions:
+// PHASE 4.15 â€” session lock: the entire stocktaking session (all actions:
 // submit_action, create_document, transfer, update_utilisasi) is locked while
 // the latest submission for this asset type is Pending or Approved. Only a
 // Rejection unlocks it again so users can add missing data and resubmit.
@@ -75,7 +76,7 @@ try {
                 exit;
             }
 
-            // PHASE 4.15 — reuse an existing photo so the user is never asked to
+            // PHASE 4.15 â€” reuse an existing photo so the user is never asked to
             // upload again when one already exists. Preference order:
             //   1) stocktaking_photo (already uploaded during a previous cycle)
             //   2) attachment (photo uploaded during asset creation)
@@ -96,32 +97,34 @@ try {
 
             if ($existingPhoto !== '') {
                 // Complete stocktaking using the existing photo.
-                $query = "UPDATE $table SET stocktaking_status = 'Stocktaked', stocktaking_condition = ?, stocktaking_photo = ?, kondisi = ? WHERE id = ?";
+                $query = "UPDATE $table SET stocktaking_status = 'Stocktaked', stocktaking_condition = ?, stocktaking_photo = ?, kondisi = ?, utilisasi = ? WHERE id = ?";
                 $stmt = $conn->prepare($query);
                 $kondisiVal = $kondisiMap[$condition] ?? $condition;
-                $stmt->bind_param("sssi", $condition, $existingPhoto, $kondisiVal, $id);
+                $utilisasiVal = ($utilisasi === '') ? 'No' : $utilisasi;
+                $stmt->bind_param("ssssi", $condition, $existingPhoto, $kondisiVal, $utilisasiVal, $id);
 
                 if ($stmt->execute()) {
-                    // Phase 4.20 — mirror the condition/photo change to the sheet.
+                    // Phase 4.20 â€” mirror the condition/photo change to the sheet.
                     SpreadsheetService::syncAsset($conn, $table, $table === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA, $id);
                     echo json_encode(["status" => "success", "message" => "Kondisi aset berhasil dilaporkan. Status: Stocktaked."]);
                 } else {
-                    echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+                    echo json_encode(["status" => "error", "message" => "Database error."]);
                 }
                 exit;
             }
 
             // No existing photo: first step, save only the stocktaking condition and keep status pending.
-            $query = "UPDATE $table SET stocktaking_condition = ? WHERE id = ?";
+            $query = "UPDATE $table SET stocktaking_condition = ?, utilisasi = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("si", $condition, $id);
+            $utilisasiVal = ($utilisasi === '') ? 'No' : $utilisasi;
+            $stmt->bind_param("ssi", $condition, $utilisasiVal, $id);
             
             if ($stmt->execute()) {
-                // Phase 4.20 — mirror the condition change to the sheet.
+                // Phase 4.20 â€” mirror the condition change to the sheet.
                 SpreadsheetService::syncAsset($conn, $table, $table === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA, $id);
                 echo json_encode(["status" => "success", "message" => "Kondisi aset berhasil disimpan. Silakan upload foto untuk menyelesaikan stocktaking."]);
             } else {
-                echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+                echo json_encode(["status" => "error", "message" => "Database error."]);
             }
             exit;
         }
@@ -143,17 +146,18 @@ try {
         }
 
         // Final step: photo is present, complete stocktaking.
-        $query = "UPDATE $table SET stocktaking_status = 'Stocktaked', stocktaking_condition = ?, stocktaking_photo = ?, kondisi = ? WHERE id = ?";
+        $query = "UPDATE $table SET stocktaking_status = 'Stocktaked', stocktaking_condition = ?, stocktaking_photo = ?, kondisi = ?, utilisasi = ? WHERE id = ?";
         $stmt = $conn->prepare($query);
         $kondisiVal = $kondisiMap[$condition] ?? $condition;
-        $stmt->bind_param("sssi", $condition, $photo_path, $kondisiVal, $id);
+        $utilisasiVal = ($utilisasi === '') ? 'No' : $utilisasi;
+        $stmt->bind_param("ssssi", $condition, $photo_path, $kondisiVal, $utilisasiVal, $id);
         
         if ($stmt->execute()) {
-            // Phase 4.20 — mirror the condition/photo change to the sheet.
+            // Phase 4.20 â€” mirror the condition/photo change to the sheet.
             SpreadsheetService::syncAsset($conn, $table, $table === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA, $id);
             echo json_encode(["status" => "success", "message" => "Kondisi aset berhasil dilaporkan. Status: Stocktaked."]);
         } else {
-            echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+            echo json_encode(["status" => "error", "message" => "Database error."]);
         }
     } elseif ($action === 'create_document') {
         // Step 2: Create document - change status to "Stocktaked"
@@ -162,15 +166,15 @@ try {
         $stmt->bind_param("i", $id);
         
         if ($stmt->execute()) {
-            // Phase 4.20 — mirror the stocktaking status change to the sheet.
+            // Phase 4.20 â€” mirror the stocktaking status change to the sheet.
             SpreadsheetService::syncAsset($conn, $table, $table === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA, $id);
             echo json_encode(["status" => "success", "message" => "Dokumen berhasil dibuat. Status: Stocktaked."]);
         } else {
-            echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+            echo json_encode(["status" => "error", "message" => "Database error."]);
         }
     } elseif ($action === 'transfer') {
         // ==========================================
-        // PHASE 4.5 — Transfer workflow
+        // PHASE 4.5 â€” Transfer workflow
         // Moves an asset to a new area, records history,
         // audits the change, and mirrors to the spreadsheet.
         // ==========================================
@@ -207,7 +211,7 @@ try {
         // 1) Update the asset location + condition to Transfer.
         //    (stocktaking_condition mirrors kondisi so the asset page
         //     and reports both show 'Transfer' consistently.)
-        // 2) Record the transfer history — both steps run in one
+        // 2) Record the transfer history â€” both steps run in one
         //    transaction so the asset move and its history stay atomic.
         $transferBy = $_SESSION['username'] ?? ($_SESSION['nrp'] ?? '');
         $assetType  = strtoupper($table_type);
@@ -218,7 +222,7 @@ try {
             $stmt = $conn->prepare($query);
             $stmt->bind_param("sssi", $newArea, $newDepartment, $transferPic, $id);
             if (!$stmt->execute()) {
-                throw new Exception("Database error: " . $stmt->error);
+                throw new Exception("Database error.");
             }
 
             $hist = $conn->prepare(
@@ -234,17 +238,18 @@ try {
                 $transferPic, $transferDate, $transferBy, $remarks
             );
             if (!$hist->execute()) {
-                throw new Exception("Database error: " . $hist->error);
+                throw new Exception("Database error.");
             }
 
             $conn->commit();
         } catch (Exception $e) {
             $conn->rollback();
-            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+            error_log("[update_stocktaking] transfer failed: " . $e->getMessage());
+            echo json_encode(["status" => "error", "message" => "Database error."]);
             exit;
         }
 
-        // 3) Audit the transfer (Transferred Asset — old/new values).
+        // 3) Audit the transfer (Transferred Asset â€” old/new values).
         AuditService::log($conn, 'Transferred Asset', $table, (int)$id, [
             'old' => ['area' => $oldArea, 'department' => $oldDepartment],
             'new' => ['area' => $newArea, 'department' => $newDepartment],
@@ -268,7 +273,7 @@ try {
             'created_at'     => date('Y-m-d H:i:s'),
         ]);
 
-        // Phase 4.20 — the asset row itself changed (area/location/pic/kondisi); mirror it too.
+        // Phase 4.20 â€” the asset row itself changed (area/location/pic/kondisi); mirror it too.
         SpreadsheetService::syncAsset($conn, $table, $table === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA, $id);
 
         echo json_encode(["status" => "success", "message" => "Aset berhasil dipindahkan ke area " . htmlspecialchars($newArea, ENT_QUOTES, 'UTF-8') . ". Kondisi: Transfer."]);
@@ -281,16 +286,17 @@ try {
         $stmt->bind_param("si", $utilisasi_value, $id);
         
         if ($stmt->execute()) {
-            // Phase 4.20 — mirror the utilisasi change to the sheet.
+            // Phase 4.20 â€” mirror the utilisasi change to the sheet.
             SpreadsheetService::syncAsset($conn, $table, $table === 'aset_it' ? SpreadsheetService::SHEET_ASSET_IT : SpreadsheetService::SHEET_ASSET_GA, $id);
             echo json_encode(["status" => "success", "message" => "Utilisasi berhasil diubah ke '$utilisasi_value'."]);
         } else {
-            echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+            echo json_encode(["status" => "error", "message" => "Database error."]);
         }
     } else {
         echo json_encode(["status" => "error", "message" => "Aksi tidak dikenal."]);
     }
 } catch (Exception $e) {
-    echo json_encode(["status" => "error", "message" => "Server error: " . $e->getMessage()]);
+    echo json_encode(["status" => "error", "message" => "Server error."]);
 }
 ?>
+

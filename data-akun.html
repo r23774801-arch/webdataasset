@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Akun - PT United Tractors</title>
+    <link rel="icon" href="img/ikon.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/enterprise-ui.css">
+    <style>
+        /* ===== User table (approval-table pattern — horizontal scroll only inside .table-responsive) ===== */
+        .user-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 1290px;
+        }
+        .user-table th,
+        .user-table td {
+            padding: 10px 12px !important;
+            font-size: 0.85rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .user-table th {
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .user-table td.reason-cell {
+            white-space: normal;
+        }
+        .user-table .user-status-badge {
+            white-space: nowrap;
+            display: inline-block;
+            line-height: 1.4;
+        }
+
+        .user-status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .usr-aktif { background-color: #e8f5e9; color: #2e7d32; }
+        .usr-nonaktif { background-color: #ffebee; color: #c62828; }
+
+        .user-role-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: inline-block;
+        }
+        .role-admin { background-color: #fff4cc; color: #9A7300; }
+        .role-it { background-color: #e3f2fd; color: #1565c0; }
+        .role-ga { background-color: #e0f2f1; color: #0f766e; }
+
+        .btn-soft {
+            background: #ffffff;
+            color: #1E5AA8;
+            border: 1px solid #1E5AA8;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-soft:hover { background: #1E5AA8; color: #ffffff; }
+        .btn-soft.btn-danger {
+            color: #c62828;
+            border-color: #c62828;
+        }
+        .btn-soft.btn-danger:hover { background: #c62828; color: #ffffff; }
+        .btn-soft.btn-toggle {
+            color: #0f766e;
+            border-color: #0f766e;
+        }
+        .btn-soft.btn-toggle:hover { background: #0f766e; color: #ffffff; }
+        .btn-soft:disabled,
+        .btn-soft[disabled] {
+            background: #f1f1f1;
+            color: #bdbdbd;
+            border-color: #e0e0e0;
+            cursor: not-allowed;
+        }
+
+        .user-actions {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 8px;
+            padding: 4px 8px;
+            background: #F5F6F8;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+        .user-actions .btn-soft {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        .modal-user-info {
+            padding: 10px 12px;
+            background: #F5F6F8;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin: 10px 0 16px;
+            font-size: 0.9rem;
+            color: #1F1F1F;
+            line-height: 1.6;
+        }
+        .modal-user-info strong { color: #1F1F1F; }
+
+        .change-pw-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .change-pw-form .input-group {
+            margin: 0;
+        }
+        .pw-hint {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-top: 2px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .delete-warning {
+            background-color: #ffebee;
+            border: 1px solid #f5c6cb;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: #7F1D1D;
+            line-height: 1.6;
+        }
+        .self-row .btn-self-disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="img/logo.png" alt="UT Logo">
+            <div class="sidebar-brand-text">UT Asset Dashboard</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">UTAMA</div>
+            <a href="dashboard.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="nav-label">Home</span>
+            </a>
+
+            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-dropdown">
+                <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                        <span class="nav-label">Data Aset</span>
+                    </div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <div class="sidebar-dropdown-menu">
+                    <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
+                    <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
+                </div>
+            </div>
+
+            <div class="sidebar-section-label">OTHERS</div>
+            <a href="approval.html" class="sidebar-nav-item" id="navApproval" style="display:none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 12l2 2 4-4"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                <span class="nav-label">Approval Stocktaking</span>
+            </a>
+            <a href="data-akun.html" class="sidebar-nav-item" id="navDataAkun">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span class="nav-label">Data Akun</span>
+            </a>
+            <a href="kontak.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+                <span class="nav-label">Kontak</span>
+            </a>
+            <a href="laporan.html" class="sidebar-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span class="nav-label">Laporan Aset</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
+                <div class="sidebar-user-details">
+                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
+                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
+                </div>
+            </div>
+            <button onclick="logout()" class="sidebar-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="top-header-left">
+            <button class="sidebar-toggle-btn" title="Toggle Sidebar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div>
+                <div class="page-title">Data Akun</div>
+                <div class="page-breadcrumb">Dashboard / <span>Data Akun</span></div>
+            </div>
+        </div>
+        <div class="top-header-right">
+            <div class="top-user-menu">
+                <div class="top-user-badge" onclick="toggleUserMenu(event)" role="button" tabindex="0" aria-label="Menu pengguna" aria-haspopup="true" aria-expanded="false">
+                    <div class="top-user-avatar" id="topAvatar">U</div>
+                    <div>
+                        <div class="top-user-name" id="topUserName">User</div>
+                        <div class="top-user-role" id="topUserRole">ADMIN</div>
+                    </div>
+                </div>
+                <div class="user-menu-dropdown">
+                    <a href="profil.html" class="user-menu-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>Profile</span>
+                    </a>
+                    <button type="button" onclick="logout()" class="user-menu-item user-menu-logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+            <button onclick="logout()" class="top-logout-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="container">
+            <div class="enterprise-page-header">
+                <div class="enterprise-page-heading">
+                    <button onclick="window.location.href='dashboard.html'" class="btn-back">
+                        &larr; Kembali ke Dashboard
+                    </button>
+                    <h2>Pengelolaan Akun User</h2>
+                    <p>Kelola akun user: ubah password, aktifkan/nonaktifkan, atau hapus akun.</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-responsive">
+                <table class="user-table">
+                    <colgroup>
+                        <col style="min-width:180px">
+                        <col style="min-width:140px">
+                        <col style="min-width:160px">
+                        <col style="min-width:100px">
+                        <col style="min-width:160px">
+                        <col style="min-width:120px">
+                        <col style="min-width:430px">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>NRP / ID</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Departemen</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelAkun">
+                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ubah Password Modal -->
+    <div id="pwModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 480px; width: 95%;">
+            <span class="close-btn" onclick="tutupPwModal()">&times;</span>
+            <h3>Ubah Password</h3>
+            <div class="modal-user-info" id="pwUserInfo"></div>
+            <div class="change-pw-form">
+                <div class="input-group">
+                    <label>Password Baru</label>
+                    <input type="password" id="pwBaru" placeholder="Password baru" autocomplete="new-password">
+                    <div class="pw-hint">Minimal 4 karakter.</div>
+                </div>
+                <div class="input-group">
+                    <label>Konfirmasi Password Baru</label>
+                    <input type="password" id="pwKonfirmasi" placeholder="Ulangi password baru" autocomplete="new-password">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-back" onclick="tutupPwModal()">Batal</button>
+                <button class="btn-approve" id="simpanPwBtn" onclick="simpanPassword()">Simpan Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hapus User Modal -->
+    <div id="hapusModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 460px; width: 95%;">
+            <span class="close-btn" onclick="tutupHapusModal()">&times;</span>
+            <h3>Hapus Akun</h3>
+            <div class="delete-warning">
+                Anda akan menghapus akun berikut secara permanen. Aksi ini tidak dapat dibatalkan.
+            </div>
+            <div class="modal-user-info" id="hapusUserInfo"></div>
+            <div class="modal-actions">
+                <button class="btn-back" onclick="tutupHapusModal()">Batal</button>
+                <button class="btn-reject" id="hapusBtn" onclick="konfirmasiHapus()">Ya, Hapus Akun</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/loader.js"></script>
+    <script>
+        // ========== SIDEBAR & USER ==========
+        function toggleSidebarDropdown() {
+            const dropdown = document.querySelector('.sidebar-dropdown');
+            if (dropdown) dropdown.classList.toggle('open');
+        }
+
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.querySelector('.user-menu-dropdown');
+            if (dropdown) dropdown.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function (e) {
+            const menu = document.querySelector('.user-menu-dropdown');
+            if (menu && menu.classList.contains('open') && !e.target.closest('.top-user-menu')) {
+                menu.classList.remove('open');
+            }
+        });
+
+        function loadUserInfo() {
+            const nrp = localStorage.getItem('currentNrp') || 'User';
+            const username = localStorage.getItem('currentUser') || 'User';
+            const role = localStorage.getItem('userRole') || 'admin';
+            const initial = username.charAt(0).toUpperCase();
+
+            document.getElementById('sidebarNrp').textContent = nrp + ' (' + role.toUpperCase() + ')';
+            document.getElementById('sidebarRole').textContent = role.toUpperCase();
+            document.getElementById('sidebarAvatar').textContent = initial;
+            document.getElementById('topAvatar').textContent = initial;
+            document.getElementById('topUserName').textContent = username;
+            document.getElementById('topUserRole').textContent = role.toUpperCase();
+        }
+
+        function logout() {
+            try { fetch('logout.php', { method: 'POST' }); } catch (err) {}
+            sessionStorage.removeItem('isLoggedIn');
+            localStorage.clear();
+            window.location.replace('login.html');
+        }
+
+        loadUserInfo();
+
+        // Admin-only page guard (UI level; the backend enforces it too)
+        const userRole = (localStorage.getItem('userRole') || '').toLowerCase();
+        if (userRole !== 'admin') {
+            window.location.replace('dashboard.html');
+        }
+
+        // ========== USER LIST ==========
+        let currentUserNrp = localStorage.getItem('currentNrp') || '';
+
+        function esc(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function roleBadge(role) {
+            const r = (role || '').toUpperCase();
+            const map = { ADMIN: 'role-admin', IT: 'role-it', GA: 'role-ga' };
+            const cls = map[r] || 'role-admin';
+            const label = r || 'ADMIN';
+            return `<span class="user-role-badge ${cls}">${label}</span>`;
+        }
+
+        function statusBadge(status) {
+            const aktif = String(status || '').toLowerCase() !== 'nonaktif';
+            return `<span class="user-status-badge ${aktif ? 'usr-aktif' : 'usr-nonaktif'}">${aktif ? 'Aktif' : 'Nonaktif'}</span>`;
+        }
+
+        async function loadUsers() {
+            const tbody = document.getElementById('tabelAkun');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>';
+
+            try {
+                const response = await fetch('get_users.php');
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#c62828;">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Tidak ada akun user.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = result.data.map(user => {
+                    const isSelf = String(user.nrp) === currentUserNrp;
+                    const nonaktif = String(user.status || '').toLowerCase() === 'nonaktif';
+                    const toggleLabel = nonaktif ? 'Aktifkan' : 'Nonaktifkan';
+                    return `<tr${isSelf ? ' class="self-row"' : ''}>
+                        <td><strong>${esc(user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:#0f766e; font-weight:700;">(Anda)</div>' : ''}</td>
+                        <td>${esc(user.nrp)}</td>
+                        <td>${esc(user.username)}</td>
+                        <td>${roleBadge(user.role)}</td>
+                        <td>${esc(user.department || '-')}</td>
+                        <td>${statusBadge(user.status)}</td>
+                        <td><div class="user-actions">
+                            <button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>
+                            <button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>
+                            <button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>
+                        </div></td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #c62828;">Gagal memuat data dari server.</td></tr>';
+            }
+        }
+
+        // ========== UBAH PASSWORD MODAL ==========
+        let pwTargetNrp = null;
+
+        function bukaPwModal(nrp, username) {
+            pwTargetNrp = nrp;
+            document.getElementById('pwUserInfo').innerHTML =
+                '<strong>User:</strong> ' + esc(username) + '<br><strong>NRP:</strong> ' + esc(nrp);
+            document.getElementById('pwBaru').value = '';
+            document.getElementById('pwKonfirmasi').value = '';
+            document.getElementById('pwModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('pwBaru').focus(), 60);
+        }
+
+        function tutupPwModal() {
+            document.getElementById('pwModal').style.display = 'none';
+            pwTargetNrp = null;
+        }
+
+        async function simpanPassword() {
+            const pwBaru = document.getElementById('pwBaru').value;
+            const pwKonfirmasi = document.getElementById('pwKonfirmasi').value;
+
+            if (pwBaru.length < 4) {
+                showToast('Password baru minimal 4 karakter.', 'warning');
+                return;
+            }
+            if (pwBaru !== pwKonfirmasi) {
+                showToast('Konfirmasi password tidak cocok.', 'warning');
+                return;
+            }
+
+            const nrp = pwTargetNrp;
+            tutupPwModal();
+
+            toggleLoader(true, 'Mengubah password...');
+            try {
+                const response = await fetch('ubah_password_user.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nrp: nrp, password_baru: pwBaru, password_konfirmasi: pwKonfirmasi })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                showToast(result.message, result.status === 'success' ? 'success' : 'error');
+                if (result.status === 'success') {
+                    loadUsers();
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal mengubah password.', 'error');
+            }
+        }
+
+        // ========== STATUS TOGGLE ==========
+        async function ubahStatus(nrp, username, aktif) {
+            const tujuan = aktif ? 'Aktif' : 'Nonaktif';
+            const konfirmasi = aktif
+                ? `Aktifkan akun "${username}" (${nrp})?`
+                : `Nonaktifkan akun "${username}" (${nrp})? Akun ini tidak dapat login selama nonaktif.`;
+            if (!confirm(konfirmasi)) return;
+
+            toggleLoader(true, 'Mengubah status akun...');
+            try {
+                const response = await fetch('update_status_user.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nrp: nrp, status: tujuan })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                showToast(result.message, result.status === 'success' ? 'success' : 'error');
+                if (result.status === 'success') {
+                    loadUsers();
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal mengubah status akun.', 'error');
+            }
+        }
+
+        // ========== HAPUS USER MODAL ==========
+        let hapusTargetNrp = null;
+
+        function bukaHapusModal(nrp, username) {
+            hapusTargetNrp = nrp;
+            document.getElementById('hapusUserInfo').innerHTML =
+                '<strong>Nama:</strong> ' + esc(username) + '<br><strong>Username:</strong> ' + esc(username) + '<br><strong>NRP:</strong> ' + esc(nrp);
+            document.getElementById('hapusModal').style.display = 'flex';
+        }
+
+        function tutupHapusModal() {
+            document.getElementById('hapusModal').style.display = 'none';
+            hapusTargetNrp = null;
+        }
+
+        async function konfirmasiHapus() {
+            const nrp = hapusTargetNrp;
+            tutupHapusModal();
+
+            toggleLoader(true, 'Menghapus akun...');
+            try {
+                const response = await fetch('hapus_user.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nrp: nrp })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                showToast(result.message, result.status === 'success' ? 'success' : 'error');
+                if (result.status === 'success') {
+                    loadUsers();
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal menghapus akun.', 'error');
+            }
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>

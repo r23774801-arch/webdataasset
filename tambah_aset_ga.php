@@ -58,7 +58,8 @@ if ($input) {
     $stmt = $conn->prepare($query);
     
     if (!$stmt) {
-        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+        error_log('[tambah_aset_ga] prepare failed: ' . $conn->error);
+        echo json_encode(["status" => "error", "message" => "Database error."]);
         exit;
     }
     
@@ -111,7 +112,8 @@ if ($input) {
 
         echo json_encode(["status" => "success", "message" => "Aset GA berhasil ditambahkan!"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+        error_log('[tambah_aset_ga] insert failed: ' . $stmt->error);
+        echo json_encode(["status" => "error", "message" => "Database error."]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "Data tidak valid."]);

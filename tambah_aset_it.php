@@ -58,7 +58,8 @@ if ($input) {
     $stmt = $conn->prepare($query);
     
     if (!$stmt) {
-        echo json_encode(["status" => "error", "message" => "Database error: " . $conn->error]);
+        error_log('[tambah_aset_it] prepare failed: ' . $conn->error);
+        echo json_encode(["status" => "error", "message" => "Database error."]);
         exit;
     }
     
@@ -109,7 +110,8 @@ if ($input) {
 
         echo json_encode(["status" => "success", "message" => "Aset IT berhasil ditambahkan!"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Database error: " . $stmt->error]);
+        error_log('[tambah_aset_it] insert failed: ' . $stmt->error);
+        echo json_encode(["status" => "error", "message" => "Database error."]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "Data tidak valid."]);

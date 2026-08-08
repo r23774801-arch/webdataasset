@@ -1,6 +1,13 @@
 <?php
 header('Content-Type: application/json');
 
+// Authentication: uploads are only allowed for authenticated, non-ADMIN
+// (transaction) roles. Admin is monitoring/approval only.
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_login();
+deny_admin_transaction();
+
 require_once __DIR__ . '/config/upload.php';
 
 $cfg = upload_config();
@@ -20,18 +27,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
         exit;
     }
 
-    // Validate MIME type — only JPG / JPEG / PNG / WEBP are allowed
-    $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+    // Validate MIME type — JPG / JPEG / PNG / WEBP images and PDF documents
+    $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     $mime = function_exists('mime_content_type') ? mime_content_type($file['tmp_name']) : ($file['type'] ?? '');
     if (!in_array($mime, $allowedMimes, true)) {
-        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, dan WEBP yang diizinkan."]);
+        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, WEBP, dan PDF yang diizinkan."]);
         exit;
     }
 
-    // Extension whitelist (must match the MIME type)
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $cfg['allowed_extensions'], true)) {
-        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, dan WEBP yang diizinkan."]);
+    // Extension is derived from the VERIFIED MIME type (never from the
+    // client-supplied filename) so a stored file can never claim a PHP ext.
+    $mimeToExt = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/webp' => 'webp',
+        'application/pdf' => 'pdf',
+    ];
+    $ext = $mimeToExt[$mime] ?? '';
+    if ($ext === '' || !in_array($ext, $cfg['allowed_extensions'], true)) {
+        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, WEBP, dan PDF yang diizinkan."]);
         exit;
     }
 

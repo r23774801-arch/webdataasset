@@ -19,6 +19,11 @@
     const API = `barang_${TYPE}`;
     const HAS_SUPPLIER = !!cfg.hasSupplier;
 
+    // When a page opts in (cfg.detailedActionModal) the Action modal renders the
+    // richer "Action Attachment" layout (read-only info tiles, current-attachment
+    // detail with file name/type and "Lihat", plus the optional new upload).
+    const DETAILED_ACTION = !!cfg.detailedActionModal;
+
     const itemsPerPage = 10;
     let currentPage = 1;
     let allData = [];
@@ -117,7 +122,7 @@
     }
 
     // ---------- Table rendering + pagination ----------
-    function colSpan() { return HAS_SUPPLIER ? 11 : 10; }
+    function colSpan() { return HAS_SUPPLIER ? 12 : 11; }
 
     function renderPage() {
         const tbody = $(cfg.tbodyId);
@@ -130,9 +135,11 @@
             pageData.forEach((item, i) => {
                 const rowNum = start + i + 1;
                 const imgPath = item.attachment || item.foto || item.gambar || item.file || '';
-                const attachmentHtml = imgPath
-                    ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${esc(imgPath)}')">`
-                    : '<span class="text-muted" style="font-size:12px;">No Image</span>';
+                const attachmentHtml = typeof renderAttachmentPreview === 'function'
+                    ? renderAttachmentPreview(imgPath)
+                    : (imgPath
+                        ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${esc(imgPath)}')">`
+                        : '<span class="text-muted" style="font-size:12px;">No Image</span>');
                 tbody.innerHTML += `<tr>
                     <td>${rowNum}</td>
                     <td>${esc(item.asset_number) || '-'}</td>
@@ -145,6 +152,7 @@
                     <td>${esc(item.pic) || '-'}</td>
                     <td>${esc(item.area) || '-'}</td>
                     <td>${attachmentHtml}</td>
+                    <td>${canManage() ? `<button class="btn-stocktaking btn-stocktaking-action" onclick="bukaActionBarang(${item.id})">Action</button>` : ''}</td>
                 </tr>`;
             });
         } else {
@@ -286,12 +294,206 @@
     }
 
     window.bukaModal = function () {
+        const modal = $(cfg.modalId);
+        if (modal) modal.dataset.editId = '';
         clearForm();
         setModalTitle(cfg.addLabel || 'Tambah Barang');
         openModal(cfg.modalId);
     };
 
-    window.tutupModal = function () { closeModal(cfg.modalId); };
+    window.tutupModal = function () {
+        const modal = $(cfg.modalId);
+        if (modal) modal.dataset.editId = '';
+        clearForm();
+        closeModal(cfg.modalId);
+    };
+
+    // ---------- Action modal: manage attachment only ----------
+    // The Action button no longer opens the Edit form. It is dedicated to
+    // viewing and replacing the transaction's Attachment (image or PDF).
+    let actionBarangId = null;
+    let actionBarangData = null;
+
+    window.bukaActionBarang = function (id) {
+        if (!canManage()) {
+            if (typeof showToast === 'function') showToast('Anda tidak memiliki izin untuk mengelola data ini.', 'error');
+            return;
+        }
+        const item = sourceData.find(d => String(d.id) === String(id)) || allData.find(d => String(d.id) === String(id));
+        if (!item) {
+            if (typeof showToast === 'function') showToast('Data tidak ditemukan.', 'error');
+            return;
+        }
+        actionBarangId = id;
+        actionBarangData = item;
+
+        // Read-only transaction information — the Action modal never edits these.
+        const info = $('actionInfo');
+        if (info) {
+            let rows;
+            if (DETAILED_ACTION && Array.isArray(cfg.actionInfoFields) && cfg.actionInfoFields.length) {
+                rows = cfg.actionInfoFields.map(([label, key]) => [label, item[key]]);
+            } else {
+                rows = [
+                    ['Asset Number', item.asset_number],
+                    ['Nomor Tiket / Resi', item.nomor_tiket],
+                    ['Asset Name', item.asset_name],
+                    ['Jumlah', item.jumlah],
+                    ['Unit', item.unit]
+                ];
+                if (HAS_SUPPLIER) rows.push(['Supplier', item.supplier]);
+                rows.push(['Tanggal', item.tanggal]);
+                rows.push(['PIC', item.pic]);
+                rows.push(['Area', item.area]);
+            }
+            info.innerHTML = DETAILED_ACTION
+                ? `<div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; font-size:0.9rem;">
+                    ${rows.map(([label, value]) => `<div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
+                        <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">${esc(label)}</div>
+                        <div style="color:#1e1e1e; font-weight:600; word-break:break-word;">${esc(value) || '-'}</div>
+                    </div>`).join('')}
+                </div>`
+                : `<div style="display:grid; grid-template-columns:minmax(130px,220px) 1fr; gap:6px 12px; font-size:0.9rem;">
+                    ${rows.map(([label, value]) => `<span style="color:#6c757d; font-weight:600;">${label}</span><span>${esc(value) || '-'}</span>`).join('')}
+                </div>`;
+        }
+
+        // Current attachment — shown and kept unless a new file is chosen.
+        const input = $('actionAttachmentInput');
+        if (input) input.value = '';
+        const newPreview = $('actionAttachmentNewPreview');
+        if (newPreview) newPreview.innerHTML = '';
+        const preview = $('actionAttachmentPreview');
+        if (preview) {
+            const existingPath = item.attachment || item.foto || item.gambar || item.file || '';
+            preview.innerHTML = DETAILED_ACTION
+                ? buildAttachmentDetail(existingPath)
+                : (typeof renderAttachmentNote === 'function'
+                    ? renderAttachmentNote(existingPath)
+                    : (existingPath ? esc(existingPath) : '<span class="text-muted" style="font-size:12px;">Belum ada attachment.</span>'));
+        }
+
+        openModal('actionModal');
+    };
+
+    // Detailed "Attachment Saat Ini" block — thumbnail/PDF icon + file name +
+    // type + a "Lihat" button reusing the existing preview modals.
+    function buildAttachmentDetail(existingPath) {
+        if (!existingPath) {
+            return '<span class="text-muted" style="font-size:13px;">Belum ada attachment.</span>';
+        }
+        const isPdf = isPdfPath(existingPath);
+        const fileName = String(existingPath).split('/').pop();
+        const ext = (fileName.split('.').pop() || '').toUpperCase();
+        const fileType = isPdf ? 'PDF' : 'Gambar';
+        const thumb = isPdf
+            ? `<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#dc3545" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`
+            : `<img src="${_escAttr(existingPath)}" alt="Attachment" style="width:48px; height:48px; object-fit:cover; border-radius:6px; flex-shrink:0;">`;
+        const lihatBtn = isPdf
+            ? `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewPdfAttachment('${_escAttr(existingPath)}')">Lihat</button>`
+            : `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewImage('${_escAttr(existingPath)}')">Lihat</button>`;
+        return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #e9ecef; border-radius:8px; background:#f8f9fa; flex-wrap:wrap;">
+            ${thumb}
+            <div style="min-width:0; flex:1;">
+                <div style="font-weight:600; color:#333; font-size:0.9rem; word-break:break-all;">${_escAttr(fileName)}</div>
+                <div class="text-muted" style="font-size:12px;">${fileType}</div>
+            </div>
+            ${lihatBtn}
+        </div>`;
+    }
+
+    window.tutupActionBarang = function () {
+        closeModal('actionModal');
+        actionBarangId = null;
+        actionBarangData = null;
+        const input = $('actionAttachmentInput');
+        if (input) input.value = '';
+        const newPreview = $('actionAttachmentNewPreview');
+        if (newPreview) newPreview.innerHTML = '';
+    };
+
+    // Live preview of a newly selected file (name/type/size + thumbnail).
+    window.previewActionAttachment = function (event) {
+        const container = $('actionAttachmentNewPreview');
+        const input = $('actionAttachmentInput');
+        if (!container || !input || !input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const isPdf = file.type === 'application/pdf' || (file.name || '').toLowerCase().endsWith('.pdf');
+        const sizeText = file.size >= 1048576
+            ? ((file.size / 1048576).toFixed(2) + ' MB')
+            : ((file.size / 1024).toFixed(1) + ' KB');
+        const nameBlock = `<div style="font-weight:600; color:#333; font-size:0.85rem; word-break:break-all;">${_escAttr(file.name)}</div>
+            <div class="text-muted" style="font-size:12px;">${isPdf ? 'PDF' : 'Gambar'} &middot; ${sizeText}</div>`;
+        if (isPdf) {
+            container.innerHTML = `<div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#dc3545" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <div>${nameBlock}</div></div>`;
+        } else {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                container.innerHTML = `<div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+                    <img src="${e.target.result}" alt="Preview" style="width:48px; height:48px; object-fit:cover; border-radius:6px; flex-shrink:0;">
+                    <div>${nameBlock}</div></div>`;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.simpanAttachmentBarang = async function () {
+        if (!actionBarangId) {
+            if (typeof showToast === 'function') showToast('Data tidak ditemukan.', 'error');
+            return;
+        }
+        const input = $('actionAttachmentInput');
+        let attachmentPath = actionBarangData ? (actionBarangData.attachment || actionBarangData.foto || actionBarangData.gambar || actionBarangData.file || '') : '';
+
+        // If a new file is chosen it replaces the current attachment; otherwise
+        // the existing attachment path is kept and sent back unchanged.
+        if (input && input.files && input.files[0]) {
+            const file = input.files[0];
+            const name = (file.name || '').toLowerCase();
+            const okExt = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+            const okMime = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+            if (!okExt.some(e => name.endsWith(e)) && !okMime.includes((file.type || '').toLowerCase())) {
+                if (typeof showToast === 'function') showToast('Tipe file tidak didukung. Hanya JPG, JPEG, PNG, WEBP, dan PDF.', 'warning');
+                return;
+            }
+            if (typeof toggleLoader === 'function') toggleLoader(true, 'Mengunggah attachment...');
+            try {
+                const uploadResult = await window.uploadAttachmentFile(file);
+                if (typeof toggleLoader === 'function') toggleLoader(false);
+                if (uploadResult.status === 'success') {
+                    attachmentPath = uploadResult.path;
+                } else {
+                    if (typeof showToast === 'function') showToast('Gagal upload attachment: ' + (uploadResult.message || 'Gagal upload.'), 'error');
+                    return;
+                }
+            } catch (err) {
+                if (typeof toggleLoader === 'function') toggleLoader(false);
+                if (typeof showToast === 'function') showToast('Gagal menghubungi server saat upload.', 'error');
+                return;
+            }
+        }
+
+        if (typeof toggleLoader === 'function') toggleLoader(true, 'Menyimpan attachment...');
+        try {
+            const res = await fetch(`update_barang_attachment_${TYPE}.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: actionBarangId, module: MODULE, attachment: attachmentPath })
+            });
+            const result = await res.json();
+            if (typeof toggleLoader === 'function') toggleLoader(false);
+            if (typeof showToast === 'function') showToast(result.message, result.status === 'success' ? 'success' : 'error');
+            if (result.status === 'success') {
+                tutupActionBarang();
+                loadData();
+            }
+        } catch (err) {
+            if (typeof toggleLoader === 'function') toggleLoader(false);
+            if (typeof showToast === 'function') showToast('Terjadi kesalahan saat menghubungi server.', 'error');
+        }
+    };
 
     // ---------- Image preview (mirror of the Asset IT/GA modules) ----------
     window.previewImage = function (imageSrc) {
@@ -329,22 +531,32 @@
             if (typeof showToast === 'function') showToast('Anda tidak memiliki izin untuk mengelola data ini.', 'error');
             return;
         }
+        const modal = $(cfg.modalId);
+        const editId = modal ? (modal.dataset.editId || '') : '';
         const data = collectForm();
         if (!data.asset_name || !data.jumlah || !data.tanggal) {
             if (typeof showToast === 'function') showToast('Asset Name, Jumlah, dan Tanggal wajib diisi!', 'info');
             return;
         }
-        // Photo is mandatory when adding a new barang (matches Asset IT/GA).
+        // Photo is mandatory only when adding a new barang (matches Asset IT/GA).
+        // On edit it stays optional and the existing file is preserved.
         const photoInput = $('photo');
-        if (!photoInput || !photoInput.files || !photoInput.files[0]) {
-            if (typeof showToast === 'function') showToast('Photo wajib diunggah.', 'info');
-            return;
+        if (!editId) {
+            if (!photoInput || !photoInput.files || !photoInput.files[0]) {
+                if (typeof showToast === 'function') showToast('Photo wajib diunggah.', 'info');
+                return;
+            }
         }
         if (typeof toggleLoader === 'function') toggleLoader(true, 'Menyimpan data...');
         try {
-            // Optional photo upload — happens only during data entry.
-            data.attachment = await uploadPhotoIfAny();
-            const res = await fetch(`tambah_${API}.php`, {
+            // Optional photo upload — happens only during data entry or when a
+            // new file is selected during an edit (old file is kept otherwise).
+            if (photoInput && photoInput.files && photoInput.files[0]) {
+                data.attachment = await uploadPhotoIfAny();
+            }
+            const endpoint = editId ? `update_${API}.php` : `tambah_${API}.php`;
+            if (editId) data.id = editId;
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -354,6 +566,7 @@
             if (typeof showToast === 'function') showToast(result.message, result.status === 'success' ? 'success' : 'error');
             if (result.status === 'success') {
                 closeModal(cfg.modalId);
+                if (modal) modal.dataset.editId = '';
                 clearForm();
                 loadData();
             }

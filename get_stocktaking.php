@@ -1,5 +1,8 @@
 <?php
 header('Content-Type: application/json');
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_login();
 include 'koneksi.php';
 
 $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';

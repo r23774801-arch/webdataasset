@@ -1,6 +1,13 @@
 <?php
 header('Content-Type: application/json');
 
+// Authentication: uploads are only allowed for authenticated, non-ADMIN
+// (transaction) roles. Admin is monitoring/approval only.
+session_start();
+require_once __DIR__ . '/app/bootstrap.php';
+require_login();
+deny_admin_transaction();
+
 // Create uploads directory if it doesn't exist
 $uploadDir = 'uploads/';
 if (!file_exists($uploadDir)) {
@@ -16,12 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
         exit;
     }
     
-    // Check file type (only images)
-    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    $fileType = mime_content_type($file['tmp_name']);
+    // Check file type �?" images (JPG/JPEG/PNG/GIF/WEBP) and PDF documents
+    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    $fileType = function_exists('mime_content_type') ? mime_content_type($file['tmp_name']) : ($file['type'] ?? '');
     
     if (!in_array($fileType, $allowedTypes)) {
-        echo json_encode(["status" => "error", "message" => "Only image files are allowed (JPG, PNG, GIF, WebP)"]);
+        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, GIF, WebP, dan PDF yang diizinkan."]);
         exit;
     }
     
@@ -32,8 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
         exit;
     }
     
-    // Generate unique filename
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    // Extension is derived from the VERIFIED MIME type (never from the
+    // client-supplied filename) so a stored file can never claim a PHP ext.
+    $mimeToExt = [
+        'image/jpeg' => 'jpg',
+        'image/jpg'  => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
+        'application/pdf' => 'pdf',
+    ];
+    $extension = $mimeToExt[$fileType] ?? 'jpg';
     $filename = uniqid() . '.' . $extension;
     $destination = $uploadDir . $filename;
     

@@ -135,10 +135,17 @@ window.addEventListener('DOMContentLoaded', () => {
 // ADMIN-ONLY NAV - SHOW APPROVAL LINK FOR ADMIN ONLY
 // ==========================================
 function applyRoleNav() {
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
+    const isAdmin = role === 'admin';
+
     const navApproval = document.getElementById('navApproval');
     if (navApproval) {
-        const role = (localStorage.getItem('userRole') || '').toLowerCase();
-        navApproval.style.display = role === 'admin' ? 'flex' : 'none';
+        navApproval.style.display = isAdmin ? 'flex' : 'none';
+    }
+
+    const navDataAkun = document.getElementById('navDataAkun');
+    if (navDataAkun) {
+        navDataAkun.style.display = isAdmin ? 'flex' : 'none';
     }
 }
 
@@ -283,6 +290,133 @@ if (document.readyState === 'loading') {
 }
 
 // ==========================================
+// MOBILE SIDEBAR TOGGLE (off-canvas drawer)
+// Shared for every page that renders .sidebar.
+// Uses the existing .sidebar / .open classes and the
+// .sidebar-overlay + .sidebar-close-btn elements.
+// All listeners are delegated once => no duplicates,
+// no conflicts with any pre-existing sidebar script.
+// ==========================================
+let sidebarOverlayEl = null;
+let sidebarCloseBtnEl = null;
+
+function getSidebarElement() {
+    return document.querySelector('#sidebar, .sidebar');
+}
+
+function isMobileBreakpoint() {
+    return window.matchMedia('(max-width: 768px)').matches;
+}
+
+function closeSidebar() {
+    const sidebar = getSidebarElement();
+    if (sidebar) sidebar.classList.remove('open');
+    if (sidebarOverlayEl) sidebarOverlayEl.classList.remove('active');
+    if (sidebarCloseBtnEl) sidebarCloseBtnEl.setAttribute('aria-expanded', 'false');
+}
+
+function openSidebar() {
+    const sidebar = getSidebarElement();
+    if (!sidebar) return;
+    sidebar.classList.add('open');
+    if (isMobileBreakpoint()) {
+        ensureSidebarOverlay();
+        ensureSidebarCloseButton();
+        if (sidebarOverlayEl) sidebarOverlayEl.classList.add('active');
+    }
+    if (sidebarCloseBtnEl) sidebarCloseBtnEl.setAttribute('aria-expanded', 'true');
+}
+
+function toggleSidebar() {
+    const sidebar = getSidebarElement();
+    if (!sidebar) return;
+    if (sidebar.classList.contains('open')) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
+}
+
+function ensureSidebarOverlay() {
+    if (sidebarOverlayEl) return;
+    sidebarOverlayEl = document.createElement('div');
+    sidebarOverlayEl.className = 'sidebar-overlay';
+    sidebarOverlayEl.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(sidebarOverlayEl);
+}
+
+function ensureSidebarCloseButton() {
+    const sidebar = getSidebarElement();
+    if (!sidebar || sidebarCloseBtnEl || document.getElementById('sidebarCloseBtn')) return;
+    const brand = sidebar.querySelector('.sidebar-brand');
+    if (!brand) return;
+    sidebarCloseBtnEl = document.createElement('button');
+    sidebarCloseBtnEl.type = 'button';
+    sidebarCloseBtnEl.id = 'sidebarCloseBtn';
+    sidebarCloseBtnEl.className = 'sidebar-close-btn';
+    sidebarCloseBtnEl.setAttribute('aria-label', 'Tutup menu');
+    sidebarCloseBtnEl.setAttribute('aria-expanded', 'false');
+    sidebarCloseBtnEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+    sidebarCloseBtnEl.addEventListener('click', closeSidebar);
+    brand.appendChild(sidebarCloseBtnEl);
+}
+
+function initSidebarToggle() {
+    if (!getSidebarElement()) return; // pages without a sidebar (e.g. login.html)
+
+    ensureSidebarCloseButton(); // CSS hides it on desktop
+
+    // Single delegated listener: open/close on hamburger click (no duplicates).
+    document.addEventListener('click', function (event) {
+        const toggle = event.target.closest('.sidebar-toggle-btn');
+        if (toggle) {
+            event.preventDefault();
+            toggleSidebar();
+        }
+    });
+
+    // Close when tapping the overlay.
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.sidebar-overlay')) {
+            closeSidebar();
+        }
+    });
+
+    // Close the drawer before navigating after picking a sidebar link (mobile).
+    document.addEventListener('click', function (event) {
+        const link = event.target.closest('.sidebar a[href]');
+        if (link && !link.href.startsWith('javascript:') && isMobileBreakpoint()) {
+            closeSidebar();
+        }
+    });
+
+    // Close on Escape.
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeSidebar();
+    });
+
+    // Leaving the mobile breakpoint resets the drawer to closed.
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handleMqChange = function () {
+        if (!mq.matches) closeSidebar();
+    };
+    if (mq.addEventListener) mq.addEventListener('change', handleMqChange);
+    else if (mq.addListener) mq.addListener(handleMqChange);
+
+    // A fresh page load always starts with the drawer closed.
+    closeSidebar();
+}
+
+window.toggleSidebar = toggleSidebar;
+window.closeSidebar = closeSidebar;
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarToggle);
+} else {
+    initSidebarToggle();
+}
+
+// ==========================================
 // MASTER AREA — single source of truth for Area lists (Phase 4.24)
 // Area dropdowns, summary cards and charts read from master_area via
 // get_areas.php, so a new Area appears everywhere without code changes.
@@ -356,4 +490,99 @@ window.buildAreaCards = function (opts) {
         <div class="card-subtitle">${subtitle}</div>
     </div>`);
     container.innerHTML = cards.join('');
+};
+
+// ==========================================
+// SHARED ATTACHMENT PREVIEW — images get a
+// thumbnail, PDF documents get an icon that
+// opens an embedded preview modal.
+// ==========================================
+function isPdfPath(path) {
+    return String(path || '').toLowerCase().endsWith('.pdf');
+}
+
+function _escAttr(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Renders the small table-cell preview for an attachment path.
+//  - images -> 40x40 thumbnail opening the page's image preview modal
+//  - PDF    -> a PDF icon button opening the shared PDF preview modal
+function renderAttachmentPreview(path) {
+    const safe = _escAttr(path || '');
+    if (!safe) {
+        return '<span class="text-muted" style="font-size:12px;">No Attachment</span>';
+    }
+    if (isPdfPath(safe)) {
+        return `<button type="button" class="btn-attachment-pdf" onclick="previewPdfAttachment('${safe}')" title="Preview PDF" style="display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid #dc3545; color:#dc3545; background:#fff; border-radius:6px; cursor:pointer; font-size:12px;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            PDF</button>`;
+    }
+    return `<img src="${safe}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage('${safe}')">`;
+}
+
+// Opens the shared PDF preview modal (created lazily on first use).
+function previewPdfAttachment(path) {
+    let modal = document.getElementById('pdfPreviewModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'pdfPreviewModal';
+        modal.className = 'image-preview-modal';
+        modal.style.cssText = 'position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; padding:24px;';
+        modal.innerHTML = `<span class="image-preview-close" onclick="document.getElementById('pdfPreviewModal').style.display='none'" style="position:absolute; top:16px; right:24px; font-size:2rem; color:#fff; cursor:pointer; z-index:2;">&times;</span>
+            <iframe class="image-preview-content" title="PDF Preview" style="width:90%; height:90%; border:0; border-radius:8px; background:#fff;" onclick="event.stopPropagation()"></iframe>`;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+    const frame = modal.querySelector('iframe');
+    if (frame) frame.src = path;
+    modal.style.display = 'flex';
+}
+
+// ==========================================
+// SHARED STOCKTAKING ATTACHMENT UPLOAD —
+// single entry point used by aset-it.html and
+// aset-ga.html. Reuses upload_attachment.php
+// (JPG/JPEG/PNG/WEBP images and PDF documents).
+// ==========================================
+window.uploadAttachmentFile = async function (file) {
+    const formData = new FormData();
+    formData.append('attachment', file);
+    const response = await fetch('upload_attachment.php', { method: 'POST', body: formData });
+    return response.json();
+};
+
+// Renders the modal "current asset photo" — preview only, never replaced.
+window.renderAssetPhotoPreview = function (path) {
+    const safe = _escAttr(path || '');
+    if (!safe) {
+        return '<span class="text-muted" style="font-size:12px;">Tidak ada foto aset.</span>';
+    }
+    if (isPdfPath(safe)) {
+        return '<span class="attachment-file-note">Lampiran: PDF</span>';
+    }
+    return `<img src="${safe}" alt="Foto Aset" class="stocktaking-asset-photo" onclick="previewImage('${safe}')">`;
+};
+
+// Renders the modal "Attachment (stocktaking evidence)" state — shows the
+// existing attachment, is kept when no new file is chosen.
+window.renderAttachmentNote = function (path) {
+    const safe = _escAttr(path || '');
+    if (!safe) {
+        return '<span class="text-muted" style="font-size:12px;">Belum ada lampiran. Upload gambar (JPG/JPEG/PNG/WEBP) atau PDF.</span>';
+    }
+    if (isPdfPath(safe)) {
+        return '<span class="attachment-file-note"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> Lampiran saat ini: PDF (tetap dipertahankan jika tidak memilih file baru).</span>';
+    }
+    return `<div style="display:inline-flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
+        <img src="${safe}" alt="Lampiran" class="stocktaking-asset-photo" onclick="previewImage('${safe}')">
+        <span class="text-muted" style="font-size:12px;">Lampiran saat ini (tetap dipertahankan jika tidak memilih file baru).</span>
+    </div>`;
 };

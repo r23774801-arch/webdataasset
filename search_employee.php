@@ -35,7 +35,8 @@ $stmt = $conn->prepare(
 );
 
 if (!$stmt) {
-    json_response(['status' => 'error', 'message' => 'Gagal menyiapkan query: ' . $conn->error]);
+    error_log('[search_employee] prepare failed: ' . $conn->error);
+    json_response(['status' => 'error', 'message' => 'Gagal menyiapkan pencarian.']);
 }
 
 $stmt->bind_param('ss', $like, $like);
