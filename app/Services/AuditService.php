@@ -48,7 +48,6 @@ class AuditService
             // MySQL remains the source of truth; a sync failure is logged only.
             if (class_exists('SpreadsheetService') && SpreadsheetService::enabled()) {
                 SpreadsheetService::sync(SpreadsheetService::SHEET_AUDIT_LOG, [
-                    'id'         => (int)$conn->insert_id,
                     'user_nrp'   => $nrp,
                     'user_name'  => $name,
                     'action'     => $action,

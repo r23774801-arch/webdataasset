@@ -154,8 +154,19 @@ function getHeaders(sheet, row) {
   if (lastRow > 0) {
     var firstRow = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     if (firstRow.join('').trim() !== '') {
-      // Existing header row — reuse its order.
-      return firstRow.map(String);
+      // Existing header row — reuse its order, then append any columns the
+      // payload carries that the sheet does not have yet (e.g. new columns
+      // added later like stocktaking_status). New columns are appended at
+      // the end so old rows are never shifted.
+      var headers = firstRow.map(String);
+      var missing = Object.keys(row).filter(function (k) {
+        return headers.indexOf(k) < 0;
+      });
+      if (missing.length > 0) {
+        headers = headers.concat(missing);
+        sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+      }
+      return headers;
     }
   }
   // No header yet — seed it from this row's keys.

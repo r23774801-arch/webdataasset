@@ -64,7 +64,6 @@ if (!$submission) {
 
 // Mirror the submission to the Approval worksheet (best-effort only).
 SpreadsheetService::sync(SpreadsheetService::SHEET_APPROVAL, [
-    'id'              => (int)($submission['id'] ?? 0),
     'submission_code' => $submission['submission_code'] ?? null,
     'asset_type'      => $submission['asset_type'] ?? $assetType,
     'submitted_by'    => $submission['submitted_by'] ?? $user['nrp'],

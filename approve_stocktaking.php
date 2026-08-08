@@ -60,7 +60,6 @@ AuditService::log(
 
 // Mirror the status change to the Approval worksheet (best-effort only).
 SpreadsheetService::sync(SpreadsheetService::SHEET_APPROVAL, [
-    'id'               => $id,
     'submission_code'  => $updated['submission_code'] ?? $submission['submission_code'] ?? null,
     'asset_type'       => $updated['asset_type'] ?? $submission['asset_type'] ?? null,
     'submitted_by'     => $updated['submitted_by'] ?? $submission['submitted_by'] ?? null,

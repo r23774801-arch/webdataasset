@@ -71,7 +71,6 @@ if ($input) {
 
         // Mirror the new record to the Asset_IT worksheet (best-effort only).
         SpreadsheetService::sync(SpreadsheetService::SHEET_ASSET_IT, [
-            'id'             => $newId,
             'asset_number'   => $asset_number,
             'nama_barang'    => $nama_barang,
             'serial_number'  => $serial_number,
@@ -82,8 +81,9 @@ if ($input) {
             'date_of_entry'  => $date_of_entry,
             'attachment'     => $attachment,
             'kondisi'        => $kondisi,
+            'stocktaking_status' => 'Pending',
             'created_at'     => date('Y-m-d H:i:s'),
-        ], $asset_number !== '' ? 'asset_number' : 'id');
+        ], $asset_number !== '' ? 'asset_number' : null);
 
         // PHASE 4.15 — notify every administrator (best-effort; the asset insert
         // stays valid if mail fails). Recipients come only from the users table.

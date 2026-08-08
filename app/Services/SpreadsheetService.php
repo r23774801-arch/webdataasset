@@ -122,13 +122,14 @@ class SpreadsheetService
             if ($table === 'aset_ga' && array_key_exists('asset_class', $row)) {
                 $payload['asset_class'] = (string)($row['asset_class'] ?? '');
             }
-            $payload['pic']           = (string)($row['pic'] ?? '');
-            $payload['area']          = (string)($row['area'] ?? '');
-            $payload['location_note'] = (string)($row['location_note'] ?? '');
-            $payload['utilisasi']     = (string)($row['utilisasi'] ?? '');
-            $payload['date_of_entry'] = $row['date_of_entry'] ?? null;
-            $payload['attachment']    = (string)($row['attachment'] ?? '');
-            $payload['kondisi']       = (string)($row['kondisi'] ?? '-');
+            $payload['pic']               = (string)($row['pic'] ?? '');
+            $payload['area']              = (string)($row['area'] ?? '');
+            $payload['location_note']     = (string)($row['location_note'] ?? '');
+            $payload['utilisasi']         = (string)($row['utilisasi'] ?? '');
+            $payload['date_of_entry']     = $row['date_of_entry'] ?? null;
+            $payload['attachment']        = (string)($row['attachment'] ?? '');
+            $payload['kondisi']           = (string)($row['kondisi'] ?? '-');
+            $payload['stocktaking_status'] = (string)($row['stocktaking_status'] ?? 'Pending');
             if (array_key_exists('created_at', $row) && $row['created_at'] !== null) {
                 $payload['created_at'] = (string)$row['created_at'];
             }

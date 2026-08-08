@@ -41,7 +41,6 @@ AuditService::log(
 SpreadsheetService::sync(
     $module === 'masuk' ? SpreadsheetService::SHEET_BARANG_MASUK_GA : SpreadsheetService::SHEET_BARANG_KELUAR_GA,
     [
-        'id'           => $id,
         'asset_number' => $input['asset_number'] ?? '',
         'nomor_tiket'  => $input['nomor_tiket'] ?? '',
         'asset_name'   => $input['asset_name'] ?? '',
@@ -54,7 +53,7 @@ SpreadsheetService::sync(
         'attachment'   => $input['attachment'] ?? '',
         'created_at'   => date('Y-m-d H:i:s'),
     ],
-    ($input['nomor_tiket'] ?? '') !== '' ? 'nomor_tiket' : 'id'
+    ($input['nomor_tiket'] ?? '') !== '' ? 'nomor_tiket' : null
 );
 
 // Phase 4.12B — notify every administrator about the new transaction
