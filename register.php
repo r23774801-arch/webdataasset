@@ -1,6 +1,8 @@
 <?php
 // Mengatur header agar bisa mengembalikan respon dalam format JSON
 header("Content-Type: application/json");
+ini_set('display_errors', 0);
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 // Memanggil file koneksi
 require 'koneksi.php';
@@ -12,6 +14,47 @@ $data = json_decode(file_get_contents("php://input"), true);
 if (!$data) {
     echo json_encode(["status" => "error", "message" => "Data tidak valid!"]);
     exit;
+}
+
+// ---- Rate limiting: max 5 registrations per IP per 5 minutes ----
+// Stored per-IP in a temp lock file (cookie-independent) to prevent sign-up
+// spam / account flooding. Same pattern as login.php.
+$now       = time();
+$ipHash    = md5((string)($_SERVER['REMOTE_ADDR'] ?? 'cli'));
+$throttleDir = rtrim(sys_get_temp_dir(), '/\\') . '/webdataaset_register';
+if (!is_dir($throttleDir)) {
+    @mkdir($throttleDir, 0777, true);
+}
+$lockFile = $throttleDir . '/' . $ipHash . '.lock';
+// Read BEFORE locking: on Windows file_get_contents() on a file held with
+// LOCK_EX returns false, which would always read as "no attempts".
+// Format: "timestamp|count" — count of attempts since the window started.
+$lockData = (string)@file_get_contents($lockFile);
+$parts    = explode('|', $lockData);
+$windowStart = (int)trim($parts[0] ?? '0');
+$attempts    = (int)trim($parts[1] ?? '0');
+$lockFp  = @fopen($lockFile, 'c+');
+if ($lockFp) {
+    if (flock($lockFp, LOCK_EX)) {
+        if (($now - $windowStart) >= 300) {
+            // Window expired — start a fresh one.
+            $windowStart = $now;
+            $attempts    = 0;
+        }
+        if ($attempts >= 5) {
+            flock($lockFp, LOCK_UN);
+            fclose($lockFp);
+            echo json_encode(["status" => "error", "message" => "Terlalu banyak percobaan pendaftaran. Silakan coba lagi dalam beberapa menit."]);
+            exit;
+        }
+        $attempts++;
+        ftruncate($lockFp, 0);
+        rewind($lockFp);
+        fwrite($lockFp, $windowStart . '|' . $attempts);
+        fflush($lockFp);
+        flock($lockFp, LOCK_UN);
+    }
+    fclose($lockFp);
 }
 
 // Membersihkan input agar terhindar dari SQL Injection

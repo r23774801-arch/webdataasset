@@ -1,5 +1,7 @@
 <?php
 header("Content-Type: application/json");
+ini_set('display_errors', 0);
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 require 'koneksi.php';
 
 // Start session for RBAC with hardened cookies (HttpOnly + SameSite=Lax,

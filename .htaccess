@@ -24,3 +24,28 @@ Options -Indexes
         Deny from all
     </IfModule>
 </FilesMatch>
+
+# ---------------------------------------------------------------------------
+# Security headers (best-effort; skipped silently when mod_headers is absent)
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Clickjacking protection: this site must not be embedded by other origins.
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # MIME-sniffing protection (uploads are images/PDF only).
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Reduces what the browser sends as Referer to third parties.
+    Header always set Referrer-Policy "same-origin"
+
+    # Legacy XSS filter for older browsers (harmless; modern CSP does the job).
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Content-Security-Policy:
+    #  - 'unsafe-inline' is required because pages use inline <script>/<style>
+    #    and inline event handlers (existing app design).
+    #  - CDNs are needed by login.html (tom-select + font-awesome) and
+    #    laporan.html (chart.js).
+    #  - frame-src allows the embedded Google Maps iframe on kontak.html.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: blob:; font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; frame-src https://www.google.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+</IfModule>
