@@ -59,8 +59,32 @@ if (!$check_email_col || $check_email_col->num_rows === 0) {
 
 $email = $conn->real_escape_string($email);
 
+// Password policy: min 8, huruf besar, huruf kecil, angka, dan simbol.
+// Diterapkan di server (authoritative), sama dengan validasi client.
+$password = (string)($data['password'] ?? '');
+if (strlen($password) < 8) {
+    echo json_encode(["status" => "error", "message" => "Password minimal 8 karakter!"]);
+    exit;
+}
+if (!preg_match('/[A-Z]/', $password)) {
+    echo json_encode(["status" => "error", "message" => "Password harus mengandung huruf besar (A-Z)!"]);
+    exit;
+}
+if (!preg_match('/[a-z]/', $password)) {
+    echo json_encode(["status" => "error", "message" => "Password harus mengandung huruf kecil (a-z)!"]);
+    exit;
+}
+if (!preg_match('/\d/', $password)) {
+    echo json_encode(["status" => "error", "message" => "Password harus mengandung angka (0-9)!"]);
+    exit;
+}
+if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+    echo json_encode(["status" => "error", "message" => "Password harus mengandung simbol (!@#$% dll)!"]);
+    exit;
+}
+
 // ENKRIPSI PASSWORD DI SINI
-$password = password_hash($data['password'], PASSWORD_DEFAULT); 
+$password = password_hash($password, PASSWORD_DEFAULT); 
 
 // 1. Cek apakah NRP sudah terdaftar di database
 $cek_nrp = $conn->query("SELECT id FROM users WHERE nrp = '$nrp'");

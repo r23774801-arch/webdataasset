@@ -28,8 +28,22 @@ $passwordKonfirmasi = (string)($input['password_konfirmasi'] ?? '');
 if ($nrp === '') {
     json_response(['status' => 'error', 'message' => 'NRP user tidak boleh kosong.']);
 }
-if (strlen($passwordBaru) < 4) {
-    json_response(['status' => 'error', 'message' => 'Password baru minimal 4 karakter.']);
+// Password policy identik dengan daftar akun: min 8, huruf besar, huruf
+// kecil, angka, dan simbol. Diterapkan di server (authoritative).
+if (strlen($passwordBaru) < 8) {
+    json_response(['status' => 'error', 'message' => 'Password baru minimal 8 karakter.']);
+}
+if (!preg_match('/[A-Z]/', $passwordBaru)) {
+    json_response(['status' => 'error', 'message' => 'Password harus mengandung huruf besar (A-Z).']);
+}
+if (!preg_match('/[a-z]/', $passwordBaru)) {
+    json_response(['status' => 'error', 'message' => 'Password harus mengandung huruf kecil (a-z).']);
+}
+if (!preg_match('/\d/', $passwordBaru)) {
+    json_response(['status' => 'error', 'message' => 'Password harus mengandung angka (0-9).']);
+}
+if (!preg_match('/[^A-Za-z0-9]/', $passwordBaru)) {
+    json_response(['status' => 'error', 'message' => 'Password harus mengandung simbol (!@#$% dll).']);
 }
 if ($passwordBaru !== $passwordKonfirmasi) {
     json_response(['status' => 'error', 'message' => 'Konfirmasi password tidak cocok.']);

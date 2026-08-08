@@ -353,7 +353,7 @@
                 <div class="input-group">
                     <label>Password Baru</label>
                     <input type="password" id="pwBaru" placeholder="Password baru" autocomplete="new-password">
-                    <div class="pw-hint">Minimal 4 karakter.</div>
+                    <div class="pw-hint">Minimal 8 karakter, harus ada huruf besar, huruf kecil, angka, dan simbol.</div>
                 </div>
                 <div class="input-group">
                     <label>Konfirmasi Password Baru</label>
@@ -503,6 +503,27 @@
         // ========== UBAH PASSWORD MODAL ==========
         let pwTargetNrp = null;
 
+        // Validasi password sama dengan aturan daftar akun:
+        // minimal 8 karakter, huruf besar, huruf kecil, angka, dan simbol.
+        function validatePassword(value) {
+            if (typeof value !== 'string' || value.length < 8) {
+                return 'Password minimal 8 karakter.';
+            }
+            if (!/[A-Z]/.test(value)) {
+                return 'Password harus mengandung huruf besar (A-Z).';
+            }
+            if (!/[a-z]/.test(value)) {
+                return 'Password harus mengandung huruf kecil (a-z).';
+            }
+            if (!/\d/.test(value)) {
+                return 'Password harus mengandung angka (0-9).';
+            }
+            if (!/[^A-Za-z0-9]/.test(value)) {
+                return 'Password harus mengandung simbol (!@#$% dll).';
+            }
+            return null;
+        }
+
         function bukaPwModal(nrp, username) {
             pwTargetNrp = nrp;
             document.getElementById('pwUserInfo').innerHTML =
@@ -522,8 +543,9 @@
             const pwBaru = document.getElementById('pwBaru').value;
             const pwKonfirmasi = document.getElementById('pwKonfirmasi').value;
 
-            if (pwBaru.length < 4) {
-                showToast('Password baru minimal 4 karakter.', 'warning');
+            const pwError = validatePassword(pwBaru);
+            if (pwError) {
+                showToast(pwError, 'warning');
                 return;
             }
             if (pwBaru !== pwKonfirmasi) {
