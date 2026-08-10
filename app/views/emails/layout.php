@@ -98,7 +98,7 @@ foreach ($pengajuFields as $val) {
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="padding:24px 36px 0 36px;">
-                                        <div style="font-size:13px; font-weight:800; color:#1F1F1F; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:10px; border-bottom:3px solid #FFC20E;">Informasi Pengaju</div>
+                                        <div style="font-size:13px; font-weight:800; color:#1F1F1F; text-transform:uppercase; letter-spacing:0.8px; padding-bottom:10px; border-bottom:3px solid #FFC20E;">Informasi Pengajuan</div>
                                     </td>
                                 </tr>
                                 <tr>
