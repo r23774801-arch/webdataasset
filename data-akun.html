@@ -487,15 +487,17 @@
                     const isSelf = String(user.nrp) === currentUserNrp;
                     const nonaktif = String(user.status || '').toLowerCase() === 'nonaktif';
                     const toggleLabel = nonaktif ? 'Aktifkan' : 'Nonaktifkan';
-                    // Akun ADMIN adalah akun sistem: tidak boleh diubah, dinonaktifkan, atau dihapus.
+                    // Akun ADMIN adalah akun sistem: tidak boleh dinonaktifkan atau
+                    // dihapus, tetapi password-nya tetap boleh diubah (termasuk sendiri).
                     const isAdminRole = String(user.role || '').toUpperCase() === 'ADMIN';
-                    const actionCell = isAdminRole
-                        ? '<span class="text-muted" style="font-size:12px;">-</span>'
-                        : `<div class="user-actions">
-                            <button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>
-                            <button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>
-                            <button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>
-                        </div>`;
+                    const pwBtn = `<button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>`;
+                    const toggleBtn = isAdminRole
+                        ? ''
+                        : `<button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>`;
+                    const hapusBtn = isAdminRole
+                        ? ''
+                        : `<button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>`;
+                    const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
                     return `<tr${isSelf ? ' class="self-row"' : ''}>
                         <td><strong>${esc(user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:#0f766e; font-weight:700;">(Anda)</div>' : ''}</td>
                         <td>${esc(user.nrp)}</td>
