@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Aset IT - PT United Tractors</title>
+    <title>Data Asset IT - PT United Tractors</title>
     <link rel="icon" href="img/ikon.png" type="image/png">
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -327,22 +327,22 @@
                 </svg>
                 <span class="nav-label">Home</span>
             </a>
-            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-section-label">MANAJEMEN ASSET</div>
             <div class="sidebar-dropdown open">
                 <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                         </svg>
-                        <span class="nav-label">Data Aset</span>
+                        <span class="nav-label">Data Asset</span>
                     </div>
                     <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </a>
                 <div class="sidebar-dropdown-menu">
-                    <a href="aset-it.html" class="sidebar-dropdown-item active">Aset IT</a>
-                    <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
+                    <a href="aset-it.html" class="sidebar-dropdown-item active">Asset IT</a>
+                    <a href="aset-ga.html" class="sidebar-dropdown-item">Asset GA</a>
                     <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
                     <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
                     <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
@@ -380,7 +380,7 @@
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                     <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
-                <span class="nav-label">Laporan Aset</span>
+                <span class="nav-label">Laporan Asset</span>
             </a>
         </nav>
         <div class="sidebar-user">
@@ -413,8 +413,8 @@
                 </svg>
             </button>
             <div>
-                <div class="page-title">Data Aset IT</div>
-                <div class="page-breadcrumb">Dashboard / Manajemen Aset / <span>Aset IT</span></div>
+                <div class="page-title">Data Asset IT</div>
+                <div class="page-breadcrumb">Dashboard / Manajemen Asset / <span>Asset IT</span></div>
             </div>
         </div>
         <div class="top-header-right">
@@ -460,7 +460,7 @@
                     <p>Mengelola data asset IT secara terintegrasi untuk memastikan keakuratan informasi, kejelasan kepemilikan, serta kesiapan operasional dalam setiap proses inventaris.</p>
                 </div>
                 <div class="enterprise-page-actions">
-                    <button onclick="bukaModalTambah()" class="btn-warning">+ Tambah Aset IT</button>
+                    <button onclick="bukaModalTambah()" class="btn-warning">+ Tambah Asset IT</button>
                     <span id="stkStatusIt" class="stk-approval-status" style="display:none;"></span>
                     <button onclick="finishStocktaking()" class="btn-finish-stocktaking" id="btnFinishStocktakingIt">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
@@ -669,7 +669,7 @@
     <div id="modalTambah" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="tutupModalTambah()">&times;</span>
-            <h3>Tambah Data Aset IT</h3>
+            <h3>Tambah Data Asset IT</h3>
             <div class="input-group"><label>Asset Number</label><input type="text" id="assetNumber" placeholder="Contoh: AST-001"></div>
             <div class="input-group"><label>Serial Number</label><input type="text" id="serialNumber" placeholder="Contoh: SN123456"></div>
             <div class="input-group"><label>Brand</label><input type="text" id="namaBarang" placeholder="Contoh: Lenovo ThinkPad"></div>
@@ -681,7 +681,7 @@
             <div class="input-group"><label>Department</label><input type="text" id="locationNote" placeholder="Contoh: IT Operation"></div>
             <div class="input-group"><label>Date</label><input type="date" id="dateOfEntry"></div>
             <div class="input-group"><label>Photo / Lampiran</label><input type="file" id="photo" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
-            <button class="btn-warning" onclick="simpanAsetIt()">Simpan Data Aset</button>
+            <button class="btn-warning" onclick="simpanAsetIt()">Simpan Data Asset</button>
         </div>
     </div>
 
@@ -695,9 +695,9 @@
     <div id="stocktakingModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="tutupStocktakingModal()">&times;</span>
-            <h3 style="margin-bottom: 20px; color: #333;">Laporkan Kondisi Aset</h3>
+            <h3 style="margin-bottom: 20px; color: #333;">Laporkan Kondisi Asset</h3>
             <div class="input-group" style="margin-bottom: 18px;">
-                <label>Informasi Aset</label>
+                <label>Informasi Asset</label>
                 <div id="stocktakingInfo">
                     <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; font-size:0.9rem;">
                         <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
@@ -732,7 +732,7 @@
                 </div>
             </div>
             <div class="input-group" id="assetPhotoGroup" style="margin-bottom: 18px;">
-                <label>Foto Aset Saat Ini</label>
+                <label>Foto Asset Saat Ini</label>
                 <div id="assetPhotoPreview"></div>
             </div>
             <div class="input-group" style="margin-bottom: 18px;">
