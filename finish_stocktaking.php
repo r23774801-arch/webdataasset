@@ -35,6 +35,22 @@ if (!table_exists($conn, 'stocktaking_submissions')) {
     json_response(['status' => 'error', 'message' => 'Sistem persetujuan belum tersedia. Jalankan migrate_db.php terlebih dahulu.']);
 }
 
+// Every Stocktaked asset must have a photo/PDF, a condition, and an utilisasi
+// before the submission can be created. Block early and list the incomplete ones
+// (by asset number) so the user knows exactly what still needs to be filled in.
+$incomplete = ApprovalService::findIncompleteAssets($conn, $assetType);
+if (!empty($incomplete)) {
+    $preview = implode('; ', array_slice($incomplete, 0, 8));
+    if (count($incomplete) > 8) {
+        $preview .= '; +' . (count($incomplete) - 8) . ' aset lainnya';
+    }
+    json_response([
+        'status'  => 'error',
+        'message' => 'Stocktaking belum bisa diselesaikan. Data aset berikut masih belum lengkap (photo/PDF, kondisi, atau utilisasi): ' . $preview,
+        'data'    => ['incomplete' => $incomplete],
+    ]);
+}
+
 // Route based on the latest submission: block while Pending/Approved,
 // resubmit the same row after a rejection, create a new one otherwise.
 $latest = ApprovalService::getLatestForUser($conn, $user['nrp'], $assetType);

@@ -140,6 +140,65 @@ class ApprovalService
     }
 
     /**
+     * List assets whose stocktaking data is incomplete — i.e. any Stocktaked
+     * asset that is missing a photo/PDF, a condition, or an utilisasi value.
+     * Used by finish_stocktaking.php to block submission until everything is
+     * filled in. Returns an array of human-readable strings like
+     * "SN123 (kurang: Photo/PDF, Kondisi)". Empty array = all complete.
+     */
+    public static function findIncompleteAssets(mysqli $conn, string $assetType): array
+    {
+        $table = ($assetType === 'GA') ? 'aset_ga' : 'aset_it';
+
+        $result = $conn->query(
+            "SELECT id, asset_number, nama_barang, serial_number,
+                    stocktaking_photo, attachment, stocktaking_condition, kondisi, utilisasi
+             FROM $table
+             WHERE stocktaking_status = 'Stocktaked'"
+        );
+        if (!$result) {
+            return [];
+        }
+
+        $missing = [];
+        while ($r = $result->fetch_assoc()) {
+            $problems = [];
+
+            // Photo or PDF required (either the stocktaking photo or the asset attachment).
+            $photo  = trim((string)($r['stocktaking_photo'] ?? ''));
+            $attach = trim((string)($r['attachment'] ?? ''));
+            if ($photo === '' && $attach === '') {
+                $problems[] = 'Photo/PDF';
+            }
+
+            // Condition required (stocktaking_condition first, then kondisi fallback).
+            $condition = trim((string)($r['stocktaking_condition'] ?? ''));
+            if ($condition === '' || $condition === '-') {
+                $condition = trim((string)($r['kondisi'] ?? ''));
+            }
+            if ($condition === '' || $condition === '-') {
+                $problems[] = 'Kondisi';
+            }
+
+            // Utilisasi required.
+            $utilisasi = trim((string)($r['utilisasi'] ?? ''));
+            if ($utilisasi === '' || $utilisasi === '-') {
+                $problems[] = 'Utilisasi';
+            }
+
+            if ($problems) {
+                $label = trim((string)($r['asset_number'] ?? ''));
+                if ($label === '') $label = trim((string)($r['nama_barang'] ?? ''));
+                if ($label === '') $label = trim((string)($r['serial_number'] ?? ''));
+                if ($label === '') $label = 'ID #' . $r['id'];
+                $missing[] = $label . ' (kurang: ' . implode(', ', $problems) . ')';
+            }
+        }
+
+        return $missing;
+    }
+
+    /**
      * Resubmit a previously rejected submission by reusing the same row:
      * status back to Pending, approval + rejection fields cleared, snapshot refreshed.
      * Returns the updated submission or null on failure. Never duplicates.

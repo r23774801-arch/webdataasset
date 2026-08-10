@@ -990,6 +990,28 @@
                 showToast('Tidak ada data untuk diselesaikan.', 'info');
                 return;
             }
+            // Setiap aset yang Stocktaked wajib punya photo/PDF, kondisi, dan utilisasi.
+            const incomplete = [];
+            allAsetData.forEach(item => {
+                const problems = [];
+                const photo = String(item.stocktaking_photo || item.attachment || '').trim();
+                if (!photo) problems.push('Photo/PDF');
+                let condition = String(item.stocktaking_condition || '').trim();
+                if (!condition || condition === '-') condition = String(item.kondisi || '').trim();
+                if (!condition || condition === '-') problems.push('Kondisi');
+                const utilisasi = String(item.utilisasi || '').trim();
+                if (!utilisasi || utilisasi === '-') problems.push('Utilisasi');
+                if (problems.length > 0) {
+                    const label = String(item.asset_number || item.nama_barang || item.serial_number || ('ID ' + item.id)).trim();
+                    incomplete.push(`${label} (kurang: ${problems.join(', ')})`);
+                }
+            });
+            if (incomplete.length > 0) {
+                const preview = incomplete.slice(0, 8).join('; ');
+                const tail = incomplete.length > 8 ? `; +${incomplete.length - 8} aset lainnya` : '';
+                showToast(`Tidak dapat menyelesaikan stocktaking. Data masih belum lengkap: ${preview}${tail}`, 'warning');
+                return;
+            }
             toggleLoader(true, 'Mengirim pengajuan stocktaking...');
             try {
                 const response = await fetch('finish_stocktaking.php', {
