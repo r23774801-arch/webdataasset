@@ -4,13 +4,15 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 header('Content-Type: application/json');
 include 'koneksi.php';
+require_once __DIR__ . '/app/bootstrap.php';
 
-// RBAC: Check if user is logged in
+// RBAC: Check if user is logged in (also enforces the CSRF origin check).
 $userRole = strtoupper($_SESSION['role'] ?? '');
 if (!$userRole) {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Silakan login kembali."]);
     exit;
 }
+require_valid_origin();
 
 $input = json_decode(file_get_contents('php://input'), true);
 
@@ -49,7 +51,6 @@ if ($userRole === 'GA' && $table !== 'aset_ga') {
 // submit_action, create_document, transfer, update_utilisasi) is locked while
 // the latest submission for this asset type is Pending or Approved. Only a
 // Rejection unlocks it again so users can add missing data and resubmit.
-require_once __DIR__ . '/app/bootstrap.php';
 $assetTypeForGuard = strtoupper($table_type);
 if (in_array($assetTypeForGuard, ['IT', 'GA'], true) && ApprovalService::isStocktakingLocked($conn, $assetTypeForGuard)) {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking sedang terkunci (menunggu persetujuan admin atau telah disetujui). Data stocktaking tidak dapat diubah sekarang."]);

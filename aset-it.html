@@ -803,7 +803,6 @@
         let filteredDataIt = [];
         let currentPageIt = 1;
         const itemsPerPageIt = 10;
-        let currentConfirmCallback = null;
 
         // Stocktaking state
         let currentStocktakingId = null;
@@ -1582,41 +1581,6 @@
         }
 
         // ========== CRUD OPERATIONS ==========
-        async function ubahStatus(id, status) {
-            toggleLoader(true, "Memperbarui status...");
-            try {
-                const response = await fetch('verify_aset_it.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: id, status: status })
-                });
-                const result = await response.json();
-                toggleLoader(false);
-                showToast(result.message, result.status === 'success' ? 'success' : 'error');
-                if (result.status === 'success') muatDataAset();
-            } catch (err) {
-                toggleLoader(false);
-                showToast("Gagal menghubungi server.", "error");
-            }
-        }
-
-        async function updateStatus(id, status) {
-            try {
-                const response = await fetch('update_status.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: id, kondisi: status })
-                });
-                const result = await response.json();
-                showToast(result.message, result.status === 'success' ? 'success' : 'error');
-                if (result.status === 'success') {
-                    muatDataAset();
-                }
-            } catch (err) {
-                showToast("Gagal menghubungi server.", "error");
-            }
-        }
-
         // Edit Asset
         function editAset(id) {
             fetch(GET_ENDPOINT)
@@ -1760,40 +1724,6 @@
                 console.error('Error:', error);
                 showToast("Terjadi kesalahan saat menghubungi server: " + error.message, "error");
             }
-        }
-
-        // ========== CUSTOM MODAL CONFIRMATION ==========
-        function tampilkanModalKonfirmasi(id, status) {
-            const modal = document.getElementById('customModal');
-            const icon = document.getElementById('modalIcon');
-            const title = document.getElementById('modalTitle');
-            const message = document.getElementById('modalMessage');
-            const confirmBtn = document.getElementById('modalConfirmBtn');
-
-            if (status === 'Approved') {
-                icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; color: #4caf50;"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                title.textContent = 'Konfirmasi Persetujuan';
-                message.textContent = 'Apakah Anda yakin ingin menyetujui data ini?';
-                confirmBtn.className = 'custom-modal-btn custom-modal-btn-confirm approve';
-                confirmBtn.textContent = 'Oke';
-            } else {
-                icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 48px; height: 48px; color: #f44336;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-                title.textContent = 'Konfirmasi Penolakan';
-                message.textContent = 'Apakah Anda yakin ingin menolak data ini?';
-                confirmBtn.className = 'custom-modal-btn custom-modal-btn-confirm reject';
-                confirmBtn.textContent = 'Oke';
-            }
-            currentConfirmCallback = () => ubahStatus(id, status);
-            modal.style.display = 'flex';
-        }
-
-        function tutupModalKonfirmasi() {
-            document.getElementById('customModal').style.display = 'none';
-            currentConfirmCallback = null;
-        }
-        function konfirmasiAction() {
-            if (currentConfirmCallback) currentConfirmCallback();
-            tutupModalKonfirmasi();
         }
 
         // ========== DATA LOADING ==========

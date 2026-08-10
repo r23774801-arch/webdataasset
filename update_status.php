@@ -4,6 +4,10 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 header('Content-Type: application/json');
 include 'koneksi.php';
+require_once __DIR__ . '/app/bootstrap.php';
+
+// CSRF: reject requests from foreign origins (browser-originated only).
+require_valid_origin();
 
 // RBAC: Check user role for status update
 $userRole = strtoupper($_SESSION['role'] ?? '');
@@ -21,7 +25,6 @@ if ($userRole === 'ADMIN') {
 
 // PHASE 4.15 — session lock: no asset edits while a stocktaking cycle is
 // Pending or Approved (lock follows the role's own asset type).
-require_once __DIR__ . '/app/bootstrap.php';
 $lockAssetType = ($userRole === 'GA') ? 'GA' : 'IT';
 if (ApprovalService::isStocktakingLocked($conn, $lockAssetType)) {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking sedang berlangsung atau telah disetujui. Perubahan aset tidak diizinkan."]);
