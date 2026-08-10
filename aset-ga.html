@@ -1036,7 +1036,7 @@
             if (incomplete.length > 0) {
                 const preview = incomplete.slice(0, 8).join('; ');
                 const tail = incomplete.length > 8 ? `; +${incomplete.length - 8} aset lainnya` : '';
-                showToast(`Tidak dapat menyelesaikan stocktaking. Data masih belum lengkap: ${preview}${tail}`, 'warning');
+                showToast(`Tidak dapat menyelesaikan stocktaking. Data masih belum lengkap: ${preview}${tail}`, 'warning', 20000);
                 return;
             }
             toggleLoader(true, 'Mengirim pengajuan stocktaking...');

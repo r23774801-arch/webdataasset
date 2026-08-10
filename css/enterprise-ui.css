@@ -2155,6 +2155,26 @@ body.page-transition-exit {
     line-height: 1.4;
 }
 
+.toast-copy {
+    background: rgba(255,255,255,0.18);
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: background 0.2s;
+}
+
+.toast-copy:hover {
+    background: rgba(255,255,255,0.32);
+}
+
 .toast-progress {
     position: absolute;
     bottom: 0;

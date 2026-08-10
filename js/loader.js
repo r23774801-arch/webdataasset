@@ -74,7 +74,7 @@ function attachTransitionHandlers() {
     });
 }
 
-function showToast(message, type = 'info') {
+function showToast(message, type = 'info', duration = 3400) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
@@ -84,7 +84,10 @@ function showToast(message, type = 'info') {
     toast.setAttribute('aria-live', 'polite');
     toast.innerHTML = `
         <span class="toast-message">${message}</span>
-        <span class="toast-progress"></span>
+        <button type="button" class="toast-copy" title="Salin teks notifikasi" aria-label="Salin teks notifikasi">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
+        <span class="toast-progress" style="animation-duration:${duration}ms"></span>
     `;
 
     container.appendChild(toast);
@@ -96,8 +99,39 @@ function showToast(message, type = 'info') {
         }
     };
 
+    const copyBtn = toast.querySelector('.toast-copy');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const text = toast.querySelector('.toast-message').textContent;
+            const done = () => {
+                copyBtn.innerHTML = '<span style="font-size:11px;font-weight:700;">Disalin!</span>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+            } else {
+                fallbackCopy(text, done);
+            }
+        });
+    }
+
     toast.addEventListener('click', removeToast);
-    setTimeout(removeToast, 3400);
+    setTimeout(removeToast, duration);
+}
+
+function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (err) { /* ignore */ }
+    document.body.removeChild(ta);
+    done();
 }
 
 // ==========================================
