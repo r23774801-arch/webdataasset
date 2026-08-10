@@ -680,7 +680,7 @@
             </div>
             <div class="input-group"><label>Department</label><input type="text" id="locationNote" placeholder="Contoh: IT Operation"></div>
             <div class="input-group"><label>Date</label><input type="date" id="dateOfEntry"></div>
-            <div class="input-group"><label>Photo</label><input type="file" id="photo" accept="image/*"></div>
+            <div class="input-group"><label>Photo / Lampiran</label><input type="file" id="photo" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
             <button class="btn-warning" onclick="simpanAsetIt()">Simpan Data Aset</button>
         </div>
     </div>
@@ -1149,9 +1149,11 @@
             }
 
             const imgPath = item.stocktaking_photo || item.attachment || item.foto || item.gambar || item.file || '';
-            let attachmentHtml = imgPath
-                ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
-                : '<span class="text-muted" style="font-size:12px;">No Image</span>';
+            const attachmentHtml = typeof renderAttachmentPreview === 'function'
+                ? renderAttachmentPreview(imgPath)
+                : (imgPath
+                    ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
+                    : '<span class="text-muted" style="font-size:12px;">No Image</span>');
 
             // Action button — hidden for ADMIN (monitoring/approval only, per the
             // shared RBAC rule). For IT/GA it is disabled only when the whole
