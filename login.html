@@ -8,8 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
+    <link rel="stylesheet" href="css/night-mode.css">
 </head>
 <body class="login-body">
+    <button type="button" id="themeToggleBtn" class="theme-toggle-btn login-theme-toggle" title="Ganti tema" aria-label="Ganti tema" onclick="toggleTheme()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
     <div class="login-layout">
         <section class="login-side login-side-brand" aria-label="PT United Tractors enterprise portal">
             <div class="hero-pattern" aria-hidden="true"></div>
@@ -104,17 +108,23 @@
 
                 <div id="registerForm" class="auth-form">
                     <div class="input-group">
+                        <label for="regUsername">Username</label>
+                        <div class="field-control">
+                            <i class="fas fa-user" aria-hidden="true"></i>
+                            <input type="text" id="regUsername" placeholder="Masukkan username" autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="input-group">
                         <label for="regNrp">NRP Pegawai</label>
                         <select id="regNrp" class="nrp-select" placeholder="Search Employee NRP or Name..." autocomplete="off">
                             <option value="">Type at least 2 characters...</option>
                         </select>
-                        <input type="hidden" id="regEmployeeName">
                     </div>
                     <div class="input-group">
-                        <label for="regUsername">Nama Lengkap / Username</label>
+                        <label for="regNamaLengkap">Nama Lengkap</label>
                         <div class="field-control">
-                            <i class="fas fa-user" aria-hidden="true"></i>
-                            <input type="text" id="regUsername" placeholder="Masukkan username" autocomplete="name">
+                            <i class="fas fa-id-card" aria-hidden="true"></i>
+                            <input type="text" id="regNamaLengkap" placeholder="Terisi otomatis dari NRP" readonly>
                         </div>
                     </div>
                     <div class="input-group">
@@ -150,17 +160,6 @@
                                 <li data-rule="length">Minimum length</li>
                             </ul>
                         </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="regRole">Role</label>
-                        <select id="regRole">
-                            <option value="it">IT</option>
-                            <option value="ga">GA</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="regDepartment">Departemen</label>
-                        <input type="text" id="regDepartment" placeholder="Masukkan departemen" autocomplete="organization">
                     </div>
                     <button class="btn-ut-primary" type="button" onclick="handleRegister()">
                         <i class="fas fa-user-plus" aria-hidden="true"></i>

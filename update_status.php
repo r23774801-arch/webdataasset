@@ -23,10 +23,9 @@ if ($userRole === 'ADMIN') {
     exit;
 }
 
-// PHASE 4.15 — session lock: no asset edits while a stocktaking cycle is
-// Pending or Approved (lock follows the role's own asset type).
-$lockAssetType = ($userRole === 'GA') ? 'GA' : 'IT';
-if (ApprovalService::isStocktakingLocked($conn, $lockAssetType)) {
+// PHASE 4.15 — session lock: no asset edits while either asset-type stocktaking
+// cycle is Pending or Approved (non-ADMIN roles manage both IT and GA).
+if (ApprovalService::isStocktakingLocked($conn, 'IT') || ApprovalService::isStocktakingLocked($conn, 'GA')) {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Stocktaking sedang berlangsung atau telah disetujui. Perubahan aset tidak diizinkan."]);
     exit;
 }
@@ -37,22 +36,19 @@ if ($input && isset($input['id']) && isset($input['kondisi'])) {
     $id = $input['id'];
     $kondisi = $input['kondisi']; // 'Baik' or 'Rusak'
 
-    // Determine which table to update based on user role
-    // IT role can only update aset_it, GA role can only update aset_ga, Admin can update both
+    // All non-ADMIN roles may update the condition of IT and GA assets.
     $updated = false;
     $updatedTable = '';
     
-    if ($userRole === 'IT' || $userRole === 'ADMIN') {
-        $query_it = "UPDATE aset_it SET kondisi = ? WHERE id = ?";
-        $stmt_it = $conn->prepare($query_it);
-        $stmt_it->bind_param("si", $kondisi, $id);
-        if ($stmt_it->execute() && $stmt_it->affected_rows > 0) {
-            $updated = true;
-            $updatedTable = 'aset_it';
-        }
+    $query_it = "UPDATE aset_it SET kondisi = ? WHERE id = ?";
+    $stmt_it = $conn->prepare($query_it);
+    $stmt_it->bind_param("si", $kondisi, $id);
+    if ($stmt_it->execute() && $stmt_it->affected_rows > 0) {
+        $updated = true;
+        $updatedTable = 'aset_it';
     }
     
-    if (!$updated && ($userRole === 'GA' || $userRole === 'ADMIN')) {
+    if (!$updated) {
         $query_ga = "UPDATE aset_ga SET kondisi = ? WHERE id = ?";
         $stmt_ga = $conn->prepare($query_ga);
         $stmt_ga->bind_param("si", $kondisi, $id);

@@ -31,24 +31,17 @@ class BarangService
     /**
      * Whether the given role may create/edit/delete records of this type.
      *
-     * ADMIN never manages transactions (monitoring/approval only) — enforced
-     * here as defense-in-depth in addition to the deny_admin_transaction()
-     * guard on every barang endpoint.
+     * All non-ADMIN roles manage both IT and GA records; ADMIN is
+     * monitoring/approval only — enforced here as defense-in-depth in addition
+     * to the deny_admin_transaction() guard on every barang endpoint.
      */
     public static function canManage(string $role, string $type): bool
     {
         $role = strtoupper($role);
-        $type = strtolower($type);
-        if ($role === 'ADMIN') {
+        if ($role === 'ADMIN' || $role === '') {
             return false;
         }
-        if ($role === 'IT') {
-            return $type === 'it';
-        }
-        if ($role === 'GA') {
-            return $type === 'ga';
-        }
-        return false;
+        return in_array(strtolower($type), self::TYPES, true);
     }
 
     /**
@@ -56,7 +49,7 @@ class BarangService
      */
     public static function canView(string $role): bool
     {
-        return in_array(strtoupper($role), ['ADMIN', 'IT', 'GA'], true);
+        return strtoupper($role) !== '';
     }
 
     /**
@@ -95,6 +88,7 @@ class BarangService
         $supplier    = trim((string)($data['supplier'] ?? ''));
         $nomorTiket  = trim((string)($data['nomor_tiket'] ?? ''));
         $unit        = trim((string)($data['unit'] ?? ''));
+        $submission  = trim((string)($data['submission_code'] ?? ''));
         $attachment  = trim((string)($data['attachment'] ?? ''));
         // Ensure path includes uploads/ prefix if a file was uploaded
         if (!empty($attachment) && strpos($attachment, 'uploads/') !== 0 && strpos($attachment, 'img/') !== 0) {
@@ -106,21 +100,21 @@ class BarangService
         }
 
         if ($module === 'masuk') {
-            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, unit, supplier, tanggal, pic, area, nomor_tiket, attachment, created_at)
+            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, unit, supplier, tanggal, pic, area, nomor_tiket, submission_code, attachment, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                return null;
+            }
+            $stmt->bind_param('ssissssssss', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $submission, $attachment);
+        } else {
+            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, unit, tanggal, pic, area, nomor_tiket, submission_code, attachment, created_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
             if (!$stmt) {
                 return null;
             }
-            $stmt->bind_param('ssisssssss', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $attachment);
-        } else {
-            $sql = "INSERT INTO $table (asset_number, asset_name, jumlah, unit, tanggal, pic, area, nomor_tiket, attachment, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                return null;
-            }
-            $stmt->bind_param('ssissssss', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $attachment);
+            $stmt->bind_param('ssisssssss', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $submission, $attachment);
         }
 
         if (!$stmt->execute()) {
@@ -152,6 +146,7 @@ class BarangService
         $supplier    = trim((string)($data['supplier'] ?? ''));
         $nomorTiket  = trim((string)($data['nomor_tiket'] ?? ''));
         $unit        = trim((string)($data['unit'] ?? ''));
+        $submission  = trim((string)($data['submission_code'] ?? ''));
         $attachment  = trim((string)($data['attachment'] ?? ''));
         if (!empty($attachment) && strpos($attachment, 'uploads/') !== 0 && strpos($attachment, 'img/') !== 0) {
             $attachment = 'uploads/' . $attachment;
@@ -167,7 +162,7 @@ class BarangService
 
         if ($module === 'masuk') {
             $sql = "UPDATE $table
-                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, supplier = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?"
+                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, supplier = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?, submission_code = ?"
                 . ($updatePhoto ? ", attachment = ?" : '') . "
                     WHERE id = ?";
             $stmt = $conn->prepare($sql);
@@ -175,13 +170,13 @@ class BarangService
                 return false;
             }
             if ($updatePhoto) {
-                $stmt->bind_param('ssisssssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $attachment, $id);
+                $stmt->bind_param('ssissssssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $submission, $attachment, $id);
             } else {
-                $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $id);
+                $stmt->bind_param('ssisssssssi', $assetNumber, $assetName, $jumlah, $unit, $supplier, $tanggal, $pic, $area, $nomorTiket, $submission, $id);
             }
         } else {
             $sql = "UPDATE $table
-                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?"
+                    SET asset_number = ?, asset_name = ?, jumlah = ?, unit = ?, tanggal = ?, pic = ?, area = ?, nomor_tiket = ?, submission_code = ?"
                 . ($updatePhoto ? ", attachment = ?" : '') . "
                     WHERE id = ?";
             $stmt = $conn->prepare($sql);
@@ -189,9 +184,9 @@ class BarangService
                 return false;
             }
             if ($updatePhoto) {
-                $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $attachment, $id);
+                $stmt->bind_param('ssisssssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $submission, $attachment, $id);
             } else {
-                $stmt->bind_param('ssisssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $id);
+                $stmt->bind_param('ssissssssi', $assetNumber, $assetName, $jumlah, $unit, $tanggal, $pic, $area, $nomorTiket, $submission, $id);
             }
         }
 

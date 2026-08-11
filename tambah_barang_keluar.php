@@ -4,16 +4,9 @@ session_start();
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-// RBAC: only authenticated IT/GA transaction roles may post. ADMIN is
-// monitoring/approval only. This legacy table is fed by the redirect-stub
-// pages (barang-keluar.html), not the typed barang-keluar-it/ga pages.
-require_login();
-deny_admin_transaction();
-$userRole = strtoupper($_SESSION['role'] ?? '');
-if (!in_array($userRole, ['IT', 'GA'], true)) {
-    echo json_encode(["status" => "error", "message" => "Akses ditolak."]);
-    exit;
-}
+// Barang Masuk/Keluar is ADMIN-only: ordinary users never transact barang.
+// This legacy table is fed by the redirect-stub pages (barang-keluar.html).
+require_admin();
 
 $input = json_decode(file_get_contents("php://input"), true);
 

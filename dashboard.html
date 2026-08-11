@@ -7,6 +7,7 @@
     <link rel="icon" href="img/ikon.png" type="image/png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
+    <link rel="stylesheet" href="css/night-mode.css">
     <style>
         /* Welcome meta (date / time / role / area) */
         .welcome-meta {
@@ -51,7 +52,7 @@
         }
         .summary-card.card-division-it .card-icon svg { stroke: #0d6efd !important; }
         .summary-card.card-division-it .card-value { color: #0d6efd !important; }
-        .summary-card.card-division-it::after { background: rgba(13, 110, 253, 0.08) !important; }
+
 
         .summary-card.card-division-ga { border-top-color: #0F766E !important; }
         .summary-card.card-division-ga .card-icon {
@@ -60,7 +61,7 @@
         }
         .summary-card.card-division-ga .card-icon svg { stroke: #0F766E !important; }
         .summary-card.card-division-ga .card-value { color: #0F766E !important; }
-        .summary-card.card-division-ga::after { background: #CCFBF1 !important; }
+
 
         .summary-card.card-status-pending { border-top-color: #ffc107 !important; }
         .summary-card.card-status-pending .card-icon {
@@ -69,7 +70,7 @@
         }
         .summary-card.card-status-pending .card-icon svg { stroke: #b8860b !important; }
         .summary-card.card-status-pending .card-value { color: #b8860b !important; }
-        .summary-card.card-status-pending::after { background: rgba(255, 193, 7, 0.15) !important; }
+
 
         .summary-card.card-status-approved { border-top-color: #198754 !important; }
         .summary-card.card-status-approved .card-icon {
@@ -78,7 +79,7 @@
         }
         .summary-card.card-status-approved .card-icon svg { stroke: #198754 !important; }
         .summary-card.card-status-approved .card-value { color: #198754 !important; }
-        .summary-card.card-status-approved::after { background: rgba(25, 135, 84, 0.10) !important; }
+
 
         .summary-card.card-status-rejected { border-top-color: #dc3545 !important; }
         .summary-card.card-status-rejected .card-icon {
@@ -87,7 +88,7 @@
         }
         .summary-card.card-status-rejected .card-icon svg { stroke: #dc3545 !important; }
         .summary-card.card-status-rejected .card-value { color: #dc3545 !important; }
-        .summary-card.card-status-rejected::after { background: rgba(220, 53, 69, 0.10) !important; }
+
     </style>
 </head>
 <body>
@@ -95,12 +96,12 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="img/logo.png" alt="UT Logo">
+            <img src="img/logo_ut.jpeg" alt="UT Logo">
             <div class="sidebar-brand-text">UT Asset Dashboard</div>
         </div>
 
         <nav class="sidebar-nav">
-            <div class="sidebar-section-label">UTAMA</div>
+            <div class="sidebar-section-label">HOME</div>
             <a href="dashboard.html" class="sidebar-nav-item active">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -109,7 +110,7 @@
                 <span class="nav-label">Home</span>
             </a>
 
-            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-section-label">ASSET MANAGEMENT</div>
             <div class="sidebar-dropdown">
                 <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
                     <div style="display: flex; align-items: center; gap: 14px;">
@@ -125,10 +126,10 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
-                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
-                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
-                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar GA</a>
                 </div>
             </div>            <div class="sidebar-section-label">OTHERS</div>
 <a href="approval.html" class="sidebar-nav-item" id="navApproval" style="display:none;">
@@ -165,24 +166,7 @@
             </a>
         </nav>
 
-        <div class="sidebar-user">
-            <a href="javascript:void(0)" class="sidebar-user-info" style="text-decoration: none; color: inherit; cursor: default;">
-                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
-                <div class="sidebar-user-details">
-                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
-                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
-                </div>
-            </a>
-            <button onclick="logout()" class="sidebar-logout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+        </aside>
 
     <!-- Top Header Bar -->
     <header class="top-header">
@@ -512,7 +496,7 @@
                     if (badge) badge.textContent = result.data.length;
                     if (message) message.textContent = 'Ada pengajuan stocktaking yang menunggu persetujuan Anda!';
                 } else if (notification) {
-                    // Phase 4.18 â€” hide completely when there are no pending stocktaking submissions.
+                    // Phase 4.18 Ã¢â‚¬â€ hide completely when there are no pending stocktaking submissions.
                     notification.style.display = 'none';
                 }
             } catch (error) {
@@ -583,8 +567,8 @@
                 : `Stocktaking Aset ${type} Ditolak`;
             if (message) {
                 message.textContent = approved
-                    ? `Pengajuan stocktaking Aset ${type} Anda (${sub.submission_code || 'STK-' + sub.id}) telah disetujui oleh admin.`
-                    : `Pengajuan stocktaking Aset ${type} Anda (${sub.submission_code || 'STK-' + sub.id}) ditolak. Alasan: ${sub.rejection_reason || '-'}`;
+                    ? `Pengajuan stocktaking Aset ${type} Anda (${sub.submission_code || 'BKJ-' + sub.id}) telah disetujui oleh admin.`
+                    : `Pengajuan stocktaking Aset ${type} Anda (${sub.submission_code || 'BKJ-' + sub.id}) ditolak. Alasan: ${sub.rejection_reason || '-'}`;
             }
             if (action) {
                 action.onclick = () => { window.location.href = type === 'IT' ? 'aset-it.html' : 'aset-ga.html'; };

@@ -7,13 +7,13 @@ header('Content-Type: application/json');
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-// Server-side authorization: must be logged in as IT or GA.
+// Server-side authorization: must be logged in as a non-ADMIN role.
 require_login();
 $user = current_user();
 $role = $user['role'];
 
-if (!in_array($role, ['IT', 'GA'], true)) {
-    json_response(['status' => 'error', 'message' => 'Akses ditolak. Hanya role IT/GA yang dapat mengirim stocktaking untuk persetujuan.']);
+if ($role === 'ADMIN') {
+    json_response(['status' => 'error', 'message' => 'Akses ditolak. Hanya role non-ADMIN yang dapat mengirim stocktaking untuk persetujuan.']);
 }
 
 $input = read_json_input();
@@ -24,11 +24,6 @@ if (!in_array($tableType, ['it', 'ga'], true)) {
 }
 
 $assetType = strtoupper($tableType);
-
-// Role can only submit stocktaking for its own asset type.
-if (($assetType === 'IT' && $role !== 'IT') || ($assetType === 'GA' && $role !== 'GA')) {
-    json_response(['status' => 'error', 'message' => 'Akses ditolak. Role ' . $role . ' hanya dapat mengirim stocktaking untuk aset ' . $role . '.']);
-}
 
 // The approval system must exist (run migrate_db.php once).
 if (!table_exists($conn, 'stocktaking_submissions')) {

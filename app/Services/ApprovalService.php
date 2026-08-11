@@ -48,8 +48,8 @@ class ApprovalService
 
         $id = (int)$conn->insert_id;
 
-        // Human-friendly submission code, e.g. STK-20260731-001
-        $code = 'STK-' . date('Ymd') . '-' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
+        // Human-friendly submission code, e.g. BKJ-20260731-001
+        $code = 'BKJ-' . date('Ymd') . '-' . str_pad((string)$id, 3, '0', STR_PAD_LEFT);
         $conn->query("UPDATE stocktaking_submissions SET submission_code = '" . $conn->real_escape_string($code) . "' WHERE id = " . $id);
 
         return self::getById($conn, $id);
@@ -338,6 +338,39 @@ class ApprovalService
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+    }
+
+    /**
+     * List APPROVED submissions for an asset type (IT or GA) so the admin can
+     * link a Barang Masuk/Keluar transaction to the stocktaking submission that
+     * drove the movement. Newest approval first; returns empty array on any
+     * error so the caller can safely degrade to "no link".
+     */
+    public static function getApprovedForBarang(mysqli $conn, string $assetType): array
+    {
+        $assetType = strtoupper($assetType);
+        if (!in_array($assetType, ['IT', 'GA'], true)) {
+            return [];
+        }
+        $stmt = $conn->prepare(
+            "SELECT id, submission_code, asset_type, total_assets, normal_count,
+                    broken_count, lost_count, submitted_by, submitted_by_name,
+                    submission_date, approval_date
+             FROM stocktaking_submissions
+             WHERE asset_type = ? AND status = ?
+             ORDER BY approval_date DESC, id DESC"
+        );
+        if (!$stmt) {
+            return [];
+        }
+        $status = self::STATUS_APPROVED;
+        $stmt->bind_param('ss', $assetType, $status);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if (!$result) {
+            return [];
+        }
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     /**

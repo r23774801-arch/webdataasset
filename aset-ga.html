@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -309,17 +309,18 @@
     </style>
     <link rel="stylesheet" href="css/table-filters.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
+    <link rel="stylesheet" href="css/night-mode.css">
 </head>
 <body>
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="img/logo.png" alt="UT Logo">
+            <img src="img/logo_ut.jpeg" alt="UT Logo">
             <div class="sidebar-brand-text">UT Asset Dashboard</div>
         </div>
         <nav class="sidebar-nav">
-            <div class="sidebar-section-label">UTAMA</div>
+            <div class="sidebar-section-label">HOME</div>
             <a href="dashboard.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -327,7 +328,7 @@
                 </svg>
                 <span class="nav-label">Home</span>
             </a>
-            <div class="sidebar-section-label">MANAJEMEN ASSET</div>
+            <div class="sidebar-section-label">ASSET MANAGEMENT</div>
             <div class="sidebar-dropdown open">
                 <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
                     <div style="display: flex; align-items: center; gap: 14px;">
@@ -343,10 +344,10 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Asset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item active">Asset GA</a>
-                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
-                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
-                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
-                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar GA</a>
                 </div>
             </div>
             <div class="sidebar-section-label">OTHERS</div>
@@ -383,24 +384,7 @@
                 <span class="nav-label">Laporan Asset</span>
             </a>
         </nav>
-        <div class="sidebar-user">
-            <div class="sidebar-user-info">
-                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
-                <div class="sidebar-user-details">
-                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
-                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
-                </div>
-            </div>
-            <button onclick="logout()" class="sidebar-logout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+        </aside>
 
     <!-- Top Header Bar -->
     <header class="top-header">
@@ -774,7 +758,7 @@
                     <option value="Transfer">Transfer</option>
                 </select>
             </div>
-            <!-- PHASE 4.5 — Transfer Form (shown when Transfer is selected) -->
+            <!-- PHASE 4.5 â€” Transfer Form (shown when Transfer is selected) -->
             <div id="transferFormGroup" style="display:none; margin-bottom:18px; padding:12px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:8px;">
                 <div class="input-group">
                     <label>Destination Area</label>
@@ -843,10 +827,6 @@
             const username = localStorage.getItem('currentUser') || 'User';
             const role = localStorage.getItem('userRole') || 'admin';
             const initial = username.charAt(0).toUpperCase();
-
-            document.getElementById('sidebarNrp').textContent = nrp + ' (' + role.toUpperCase() + ')';
-            document.getElementById('sidebarRole').textContent = role.toUpperCase();
-            document.getElementById('sidebarAvatar').textContent = initial;
             document.getElementById('topAvatar').textContent = initial;
             document.getElementById('topUserName').textContent = username;
             document.getElementById('topUserRole').textContent = role.toUpperCase();
@@ -873,7 +853,7 @@
             if (btnTambahGa) btnTambahGa.style.display = 'none';
         }
 
-        // RBAC: Finish Stocktaking belongs to the GA role only — hidden for Admin and IT (shared rule in js/loader.js)
+        // RBAC: Finish Stocktaking belongs to the GA role only â€” hidden for Admin and IT (shared rule in js/loader.js)
         if (typeof window.canFinishStocktaking === 'function' && !window.canFinishStocktaking('ga')) {
             const btnFinishGa = document.getElementById('btnFinishStocktakingGa');
             const chipStatusGa = document.getElementById('stkStatusGa');
@@ -881,13 +861,7 @@
             if (chipStatusGa) chipStatusGa.style.display = 'none';
         }
 
-        // RBAC: Sembunyikan kolom Action untuk role IT di halaman GA (ditambahkan agar
-        // renderPageGa() tidak error dan pagination bisa dirender)
-        function hideActionColumnForRole() {
-            if (userRole.toLowerCase() === 'it') {
-                document.querySelectorAll('#tabelAsetGa tr td:last-child').forEach(cell => cell.style.display = 'none');
-            }
-        }
+        // All non-ADMIN roles manage both IT and GA assets â€” no per-type action hiding.
 
         // Stocktaking state
         let currentStocktakingId = null;
@@ -917,14 +891,14 @@
             return document.getElementById('btnFinishStocktakingGa');
         }
 
-        // Phase 4.11 — hide the Add button while a GA stocktaking cycle is Pending or
-        // Approved (asset-type-wide lock). UX only — the backend enforces the lock.
+        // Phase 4.11 â€” hide the Add button while a GA stocktaking cycle is Pending or
+        // Approved (asset-type-wide lock). UX only â€” the backend enforces the lock.
         async function syncAssetCreationLock() {
             try {
                 const resp = await fetch('get_stocktaking_submissions.php?lock=1&asset_type=GA');
                 const result = await resp.json();
                 const locked = result.status === 'success' && result.data && result.data.locked;
-                // PHASE 4.15 — the whole stocktaking session is locked (Pending/Approved).
+                // PHASE 4.15 â€” the whole stocktaking session is locked (Pending/Approved).
                 window.assetLocked = locked;
                 const btnTambah = document.querySelector('button[onclick="bukaModalTambahGa()"]');
                 if (btnTambah) {
@@ -963,7 +937,7 @@
 
             if (btn) {
                 if (isRejected) {
-                    // Rejected → re-enable Finish Stocktaking so the user can resubmit.
+                    // Rejected â†’ re-enable Finish Stocktaking so the user can resubmit.
                     btn.disabled = false;
                     btn.classList.remove('submitted');
                     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"></path></svg> Finish Stocktaking';
@@ -979,7 +953,7 @@
                     };
                     btn.innerHTML = icon + ' ' + (labels[sub.status] || sub.status);
                 } else if (locked) {
-                    // PHASE 4.15 — session locked for this asset type (a Pending or
+                    // PHASE 4.15 â€” session locked for this asset type (a Pending or
                     // Approved submission exists, possibly submitted by another user).
                     btn.disabled = true;
                     btn.classList.add('submitted');
@@ -1136,7 +1110,7 @@
 
         // ========== CRUD OPERATIONS ==========
         async function simpanAsetGa() {
-            // PHASE 4.15 — session lock: block add/edit from the form too (the
+            // PHASE 4.15 â€” session lock: block add/edit from the form too (the
             // backend enforces this; this is only for a better user experience).
             if (window.assetLocked) {
                 if (typeof showToast === 'function') showToast('Stocktaking sedang terkunci. Anda tidak dapat menambah atau mengubah aset sekarang.', 'warning');
@@ -1181,7 +1155,7 @@
             toggleLoader(true, editId ? "Memperbarui data..." : "Menyimpan data aset GA...");
 
             try {
-                // Optional photo upload — only when a new file is selected.
+                // Optional photo upload â€” only when a new file is selected.
                 // On edit the existing attachment is preserved when no file is chosen.
                 let attachmentPath = '';
                 const photoInput = document.getElementById('photo');
@@ -1262,17 +1236,17 @@
             else if (condition === 'Lost' || condition === 'Hilang') kondisiBadge = 'badge-lost';
 
             const stStatus = item.stocktaking_status || 'Pending';
-            // Display label — 'Belum Stocktake' for any state that is not yet Stocktaked.
+            // Display label â€” 'Belum Stocktake' for any state that is not yet Stocktaked.
             const stStatusLabel = stStatus === 'Stocktaked' ? 'Stocktaked' : 'Belum Stocktake';
             let stBadge = 'badge-pending';
             if (stStatus === 'Document Needed') stBadge = 'badge-document-needed';
             else if (stStatus === 'Stocktaked') stBadge = 'badge-stocktaked';
 
             const utilisasi = item.utilisasi || '';
-            // PHASE 4.15 — while the stocktaking session is locked no row edits are allowed.
+            // PHASE 4.15 â€” while the stocktaking session is locked no row edits are allowed.
             const sessionLocked = !!window.assetLocked;
 
-            // Utilisasi display — read-only in the table. It is only managed
+            // Utilisasi display â€” read-only in the table. It is only managed
             // inside the Action (stocktaking) modal.
             const utilisasiBadge = utilisasi
                 ? `<span class="btn-utilisasi-toggle ${utilisasi === 'Yes' ? 'utilisasi-yes' : 'utilisasi-no'}" style="cursor: default;">${esc(utilisasi)}</span>`
@@ -1296,7 +1270,7 @@
                     ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
                     : '<span class="text-muted" style="font-size:12px;">No Image</span>');
 
-            // Action button — hidden for ADMIN (monitoring/approval only, per the
+            // Action button â€” hidden for ADMIN (monitoring/approval only, per the
             // shared RBAC rule). For IT/GA it is disabled only when the whole
             // stocktaking session is locked (Pending/Approved submission).
             const canAct = typeof window.canManageData === 'function' ? window.canManageData('ga') : true;
@@ -1335,10 +1309,8 @@
             if (pageData.length > 0) {
                 pageData.forEach(item => { tbody.innerHTML += renderRow(item); });
                 updateSummaryCards(filteredDataGa);
-                hideActionColumnForRole();
             } else {
                 tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No matching asset data found.', 'Adjust or clear the active filter to see more asset records.')}</td></tr>`;
-                hideActionColumnForRole();
             }
             renderPaginationGa();
         }
@@ -1381,7 +1353,7 @@
         }
 
         // ========== STOCKTAKING STATE MACHINE ==========
-        // UI helper — renders the current photo/attachment as a compact card
+        // UI helper â€” renders the current photo/attachment as a compact card
         // (small thumbnail/PDF icon + filename + type + Lihat) like Barang Masuk GA.
         function renderStocktakingAttachmentCard(path, emptyText) {
             const safe = typeof _escAttr === 'function' ? _escAttr(path || '') : (path || '');
@@ -1407,7 +1379,7 @@
             </div>`;
         }
 
-        // UI helper — fills the read-only asset info card in the Action modal.
+        // UI helper â€” fills the read-only asset info card in the Action modal.
         function renderStocktakingInfo(asset) {
             const get = (id) => document.getElementById(id);
             const put = (id, value) => {
@@ -1435,7 +1407,7 @@
         }
 
         function openStocktakingModal(id, assetName, serialNumber, tableType) {
-            // PHASE 4.15 — the whole stocktaking session is locked while a
+            // PHASE 4.15 â€” the whole stocktaking session is locked while a
             // submission is Pending or Approved; block opening the modal.
             if (window.assetLocked) {
                 if (typeof showToast === 'function') showToast('Stocktaking sedang terkunci. Menunggu persetujuan admin.', 'warning');
@@ -1448,7 +1420,7 @@
             document.getElementById('stAssetName').textContent = assetName;
             document.getElementById('stSerialNumber').textContent = serialNumber || '-';
             
-            // Condition — always visible and editable. Pre-fill the previously
+            // Condition â€” always visible and editable. Pre-fill the previously
             // saved stocktaking condition when one already exists; the user can
             // still change it on a later submit.
             const asset = allAsetData.find(item => String(item.id) === String(id));
@@ -1458,14 +1430,14 @@
 
             renderStocktakingInfo(asset);
             
-            // Current asset photo — preview only (reference, never replaced).
+            // Current asset photo â€” preview only (reference, never replaced).
             const assetPhoto = asset ? (asset.foto || asset.gambar || asset.attachment || '') : '';
             const assetPhotoPreview = document.getElementById('assetPhotoPreview');
             if (assetPhotoPreview) {
                 assetPhotoPreview.innerHTML = renderStocktakingAttachmentCard(assetPhoto, 'Tidak ada foto aset.');
             }
 
-            // Attachment — stocktaking evidence. Show the existing attachment,
+            // Attachment â€” stocktaking evidence. Show the existing attachment,
             // allow replacing it, and keep it when no new file is chosen.
             const attachmentInput = document.getElementById('stAttachment');
             const attachmentPreview = document.getElementById('stAttachmentPreview');
@@ -1475,7 +1447,7 @@
                 attachmentPreview.innerHTML = renderStocktakingAttachmentCard(stocktakingAttachmentPath);
             }
 
-            // Utilisasi — prefill the current asset value.
+            // Utilisasi â€” prefill the current asset value.
             const utilisasiSelect = document.getElementById('stUtilisasi');
             if (utilisasiSelect) {
                 utilisasiSelect.value = (asset && asset.utilisasi) ? asset.utilisasi : '';
@@ -1488,7 +1460,7 @@
             updateStocktakingGating();
         }
 
-        // ========== STOCKTAKING GATING — Submit enabled only when
+        // ========== STOCKTAKING GATING â€” Submit enabled only when
         // Condition + Attachment (old or new) + Utilisasi are all complete. ==========
         function getStocktakingAttachmentReady() {
             const attachmentInput = document.getElementById('stAttachment');
@@ -1550,7 +1522,7 @@
             updateStocktakingGating();
         }
 
-        // ========== PHASE 4.5 — TRANSFER WORKFLOW ==========
+        // ========== PHASE 4.5 â€” TRANSFER WORKFLOW ==========
         function handleConditionChange() {
             const isTransfer = document.getElementById('stCondition').value === 'Transfer';
             const transferGroup = document.getElementById('transferFormGroup');
@@ -1608,7 +1580,7 @@
             const condition = document.getElementById('stCondition').value;
             const utilisasi = document.getElementById('stUtilisasi').value;
 
-            // PHASE 4.5 — Transfer condition routes to the transfer workflow.
+            // PHASE 4.5 â€” Transfer condition routes to the transfer workflow.
             if (condition === 'Transfer') {
                 await submitTransferAction();
                 return;
@@ -1690,7 +1662,6 @@
                 } else {
                     updateSummaryCards([]);
                     tbody.innerHTML = `<tr><td colspan="12">${renderEmptyState('No asset data available.', 'Please add data using the Add Asset button.')}</td></tr>`;
-                    hideActionColumnForRole();
                 }
             } catch (error) {
                 console.error(error);
@@ -1699,7 +1670,7 @@
 
         // ========== MASTER AREA UI (PHASE 4.24) ==========
         // Summary cards + Area dropdowns are driven by master_area via
-        // get_areas.php (shared helpers in js/loader.js) — no hardcoded Areas.
+        // get_areas.php (shared helpers in js/loader.js) â€” no hardcoded Areas.
         const AREA_CARD_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path><path d="M2 8h20"></path></svg>';
 
         async function initMasterAreaUI() {

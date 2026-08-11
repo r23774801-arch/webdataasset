@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -17,9 +17,10 @@
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
+    <link rel="stylesheet" href="css/night-mode.css">
     <style>
         /* =============================================
-           PROFIL AKUN — ENTERPRISE PROFILE CARD
+           PROFIL AKUN â€” ENTERPRISE PROFILE CARD
            Built on the existing enterprise theme tokens
            (--ut-yellow, --ut-charcoal, --ut-border ...).
            ============================================= */
@@ -67,6 +68,73 @@
             font-weight: 900;
             letter-spacing: 0;
             box-shadow: 0 14px 30px rgba(255, 194, 14, 0.32);
+            overflow: hidden;
+        }
+
+        .profil-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profil-avatar-wrap {
+            position: relative;
+            flex: 0 0 92px;
+        }
+
+        .profil-avatar-edit {
+            position: absolute;
+            right: -6px;
+            bottom: -6px;
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            background: var(--ut-charcoal, #1F1F1F);
+            color: var(--ut-yellow, #FFC20E);
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(31, 31, 31, 0.24);
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+
+        .profil-avatar-edit:hover {
+            transform: translateY(-1px) scale(1.05);
+        }
+
+        .profil-avatar-edit svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+        }
+
+        .profil-avatar-remove {
+            position: absolute;
+            left: -6px;
+            bottom: -6px;
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            background: #d33;
+            color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(31, 31, 31, 0.24);
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+
+        .profil-avatar-remove:hover {
+            transform: translateY(-1px) scale(1.05);
+            background: #b32727;
+        }
+
+        .profil-avatar-remove svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
         }
 
         .profil-header-info { min-width: 0; flex: 1 1 260px; }
@@ -138,7 +206,7 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Respect users who disable motion — content must never stay hidden */
+        /* Respect users who disable motion â€” content must never stay hidden */
         @media (prefers-reduced-motion: reduce) {
             .profil-card,
             .profil-section {
@@ -354,12 +422,12 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="img/logo.png" alt="UT Logo">
+            <img src="img/logo_ut.jpeg" alt="UT Logo">
             <div class="sidebar-brand-text">UT Asset Dashboard</div>
         </div>
 
         <nav class="sidebar-nav">
-            <div class="sidebar-section-label">UTAMA</div>
+            <div class="sidebar-section-label">HOME</div>
             <a href="dashboard.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -368,7 +436,7 @@
                 <span class="nav-label">Home</span>
             </a>
 
-            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-section-label">ASSET MANAGEMENT</div>
             <div class="sidebar-dropdown">
                 <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
                     <div style="display: flex; align-items: center; gap: 14px;">
@@ -384,10 +452,10 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
-                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
-                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
-                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar GA</a>
                 </div>
             </div>
             <div class="sidebar-section-label">OTHERS</div>
@@ -425,24 +493,7 @@
             </a>
         </nav>
 
-        <div class="sidebar-user">
-            <a href="javascript:void(0)" class="sidebar-user-info" style="text-decoration: none; color: inherit; cursor: default;">
-                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
-                <div class="sidebar-user-details">
-                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
-                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
-                </div>
-            </a>
-            <button onclick="logout()" class="sidebar-logout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+        </aside>
 
     <!-- Top Header Bar -->
     <header class="top-header">
@@ -498,7 +549,16 @@
 
                     <!-- Profile header -->
                     <div class="profil-header">
-                        <div class="profil-avatar" id="profilAvatar">U</div>
+                        <div class="profil-avatar-wrap" id="profilAvatarWrap">
+                            <div class="profil-avatar" id="profilAvatar">U</div>
+                            <button type="button" class="profil-avatar-edit" id="profilAvatarEdit" title="Ganti Foto Profil" aria-label="Ganti Foto Profil">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            </button>
+                            <button type="button" class="profil-avatar-remove" id="profilAvatarRemove" title="Hapus Foto Profil" aria-label="Hapus Foto Profil" style="display:none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
+                            <input type="file" id="profilFotoInput" accept=".jpg,.jpeg,.png,.webp" style="display:none;">
+                        </div>
                         <div class="profil-header-info">
                             <h1 class="profil-name" id="profilDisplayName">Pengguna</h1>
                             <div class="profil-badges">
@@ -571,6 +631,21 @@
         </section>
     </div>
 
+    <!-- Hapus Foto Profil Modal -->
+    <div id="hapusFotoModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 460px; width: 95%;">
+            <span class="close-btn" onclick="tutupHapusFotoModal()">&times;</span>
+            <h3>Hapus Foto Profil</h3>
+            <div class="delete-warning">
+                Foto profil akan dihapus dan kembali ke inisial nama. Aksi ini tidak dapat dibatalkan.
+            </div>
+            <div class="modal-actions">
+                <button class="btn-back" onclick="tutupHapusFotoModal()">Batal</button>
+                <button class="btn-reject" onclick="konfirmasiHapusFoto()">Ya, Hapus Foto</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/loader.js"></script>
     <script>
         // ==========================================
@@ -617,15 +692,16 @@
             document.getElementById('profilRole').textContent = role.toUpperCase();
 
             // UI-only: populate the profile header (avatar initial, name, role badge).
+            var initial = (username.trim().charAt(0) || 'U').toUpperCase();
             const avatarEl = document.getElementById('profilAvatar');
-            if (avatarEl) avatarEl.textContent = (username.trim().charAt(0) || 'U').toUpperCase();
+            if (avatarEl) avatarEl.textContent = initial;
             const displayNameEl = document.getElementById('profilDisplayName');
             if (displayNameEl) displayNameEl.textContent = username;
             const roleBadgeEl = document.getElementById('profilRoleBadge');
             if (roleBadgeEl) roleBadgeEl.textContent = role.toUpperCase();
 
             // ==========================================
-            // E-MAIL (NOTIFIKASI) — prefill + save
+            // E-MAIL (NOTIFIKASI) â€” prefill + save
             // ==========================================
             const emailInput = document.getElementById('profilEmail');
             const saveBtn    = document.getElementById('saveEmailBtn');
@@ -634,19 +710,139 @@
 
             const emailReminder = document.getElementById('emailReminder');
 
-            // Pre-fill the e-mail from the server session record.
+            // Helper: render an avatar element with a photo (if set) or initial.
+            function renderAvatar(el, initial, photo) {
+                if (!el) return;
+                if (photo) {
+                    el.innerHTML = '';
+                    var img = document.createElement('img');
+                    img.src = photo;
+                    img.alt = 'Foto profil';
+                    img.onerror = function() { el.textContent = initial; };
+                    el.appendChild(img);
+                } else {
+                    el.innerHTML = '';
+                    el.textContent = initial;
+                }
+            }
+
+            // Helper: show/hide the remove-photo button based on photo presence.
+            var fotoRemoveBtn = document.getElementById('profilAvatarRemove');
+            function setRemoveBtn(hasPhoto) {
+                if (fotoRemoveBtn) fotoRemoveBtn.style.display = hasPhoto ? 'grid' : 'none';
+            }
+
+            // Pre-fill the e-mail + profile photo from the server session record.
             // Users without an e-mail still work everywhere; the Profile page
             // reminds them to complete it so notifications can be delivered.
             fetch('get_session_info.php')
                 .then(function(r) { return r.json(); })
                 .then(function(res) {
-                    if (res.status === 'success' && res.data && res.data.email) {
-                        emailInput.value = res.data.email;
-                    } else if (emailReminder) {
-                        emailReminder.style.display = 'block';
+                    if (res.status === 'success' && res.data) {
+                        if (res.data.email) {
+                            emailInput.value = res.data.email;
+                        } else if (emailReminder) {
+                            emailReminder.style.display = 'block';
+                        }
+                        if (res.data.photo) {
+                            renderAvatar(avatarEl, initial, res.data.photo);
+                            renderAvatar(document.getElementById('topAvatar'), initial, res.data.photo);
+                            renderAvatar(document.getElementById('sidebarAvatar'), initial, res.data.photo);
+                            setRemoveBtn(true);
+                        }
                     }
                 })
                 .catch(function() { /* session load is best-effort */ });
+
+            // ==========================================
+            // FOTO PROFIL â€” upload via the edit button
+            // ==========================================
+            var fotoBtn  = document.getElementById('profilAvatarEdit');
+            var fotoInput = document.getElementById('profilFotoInput');
+
+            if (fotoBtn && fotoInput) {
+                fotoBtn.addEventListener('click', function() { fotoInput.click(); });
+                fotoInput.addEventListener('change', function() {
+                    var file = fotoInput.files && fotoInput.files[0];
+                    if (!file) return;
+
+                    if (['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) === -1) {
+                        showToast('Tipe file tidak didukung. Pilih JPG, PNG, atau WEBP.', 'warning');
+                        fotoInput.value = '';
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('Ukuran file maksimal 5 MB.', 'warning');
+                        fotoInput.value = '';
+                        return;
+                    }
+
+                    var fd = new FormData();
+                    fd.append('photo', file);
+
+                    fotoBtn.disabled = true;
+                    var originalHtml = fotoBtn.innerHTML;
+
+                    fetch('update_foto_profil.php', {
+                        method: 'POST',
+                        body: fd
+                    })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data.status === 'success' && data.data && data.data.photo) {
+                                // Local preview + propagate to top/sidebar avatars.
+                                renderAvatar(avatarEl, initial, data.data.photo);
+                                renderAvatar(document.getElementById('topAvatar'), initial, data.data.photo);
+                                renderAvatar(document.getElementById('sidebarAvatar'), initial, data.data.photo);
+                                localStorage.setItem('userPhoto', data.data.photo);
+                                setRemoveBtn(true);
+                            } else {
+                                showToast(data.message || 'Gagal memperbarui foto profil.', 'error');
+                            }
+                        })
+                        .catch(function() { showToast('Gagal terhubung ke server.', 'error'); })
+                        .finally(function() {
+                            fotoBtn.disabled = false;
+                            fotoBtn.innerHTML = originalHtml;
+                            fotoInput.value = '';
+                        });
+                });
+            }
+
+            if (fotoRemoveBtn) {
+                fotoRemoveBtn.addEventListener('click', function() {
+                    const hapusFotoModal = document.getElementById('hapusFotoModal');
+                    if (hapusFotoModal) hapusFotoModal.style.display = 'flex';
+                });
+            }
+
+            function tutupHapusFotoModal() {
+                const hapusFotoModal = document.getElementById('hapusFotoModal');
+                if (hapusFotoModal) hapusFotoModal.style.display = 'none';
+            }
+
+            function konfirmasiHapusFoto() {
+                if (!fotoRemoveBtn) return;
+                tutupHapusFotoModal();
+
+                fotoRemoveBtn.disabled = true;
+                fetch('hapus_foto_profil.php', { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.status === 'success') {
+                            renderAvatar(avatarEl, initial, '');
+                            renderAvatar(document.getElementById('topAvatar'), initial, '');
+                            renderAvatar(document.getElementById('sidebarAvatar'), initial, '');
+                            localStorage.removeItem('userPhoto');
+                            setRemoveBtn(false);
+                            setMsg('\u2713 Foto profil dihapus.', '#2E7D32');
+                        } else {
+                            showToast(data.message || 'Gagal menghapus foto profil.', 'error');
+                        }
+                    })
+                    .catch(function() { showToast('Gagal terhubung ke server.', 'error'); })
+                    .finally(function() { fotoRemoveBtn.disabled = false; });
+            }
 
             function setMsg(text, color) {
                 msg.textContent = text;

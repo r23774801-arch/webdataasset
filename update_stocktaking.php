@@ -37,13 +37,9 @@ if ($userRole === 'ADMIN') {
     exit;
 }
 
-// RBAC: IT can only update aset_it, GA can only update aset_ga
-if ($userRole === 'IT' && $table !== 'aset_it') {
-    echo json_encode(["status" => "error", "message" => "Akses ditolak. Role IT hanya dapat melakukan stocktaking pada aset IT."]);
-    exit;
-}
-if ($userRole === 'GA' && $table !== 'aset_ga') {
-    echo json_encode(["status" => "error", "message" => "Akses ditolak. Role GA hanya dapat melakukan stocktaking pada aset GA."]);
+// RBAC: All non-ADMIN roles may perform stocktaking on either asset type.
+if ($table !== 'aset_it' && $table !== 'aset_ga') {
+    echo json_encode(["status" => "error", "message" => "Data tidak valid."]);
     exit;
 }
 

@@ -37,17 +37,13 @@
         return (localStorage.getItem('userRole') || '').toLowerCase();
     }
 
-    // Can this role create records of TYPE? (Add flow only — Action column removed)
-    // Delegates to the shared rule in js/loader.js (admin = monitoring only).
+    // Can this role create records of TYPE? Barang Masuk/Keluar is ADMIN-only:
+    // only the ADMIN role may manage these records (ordinary users never see
+    // the page). This overrides the shared asset rule in js/loader.js, where
+    // admin = monitoring only.
     function canManage() {
-        if (typeof window.canManageData === 'function') {
-            return window.canManageData(TYPE);
-        }
         const role = userRole();
-        if (role === 'admin') return false;
-        if (role === 'it') return TYPE === 'it';
-        if (role === 'ga') return TYPE === 'ga';
-        return false;
+        return role === 'admin';
     }
 
     // ---------- UI helpers ----------
@@ -122,7 +118,7 @@
     }
 
     // ---------- Table rendering + pagination ----------
-    function colSpan() { return HAS_SUPPLIER ? 12 : 11; }
+    function colSpan() { return HAS_SUPPLIER ? 13 : 12; }
 
     function renderPage() {
         const tbody = $(cfg.tbodyId);
@@ -144,6 +140,7 @@
                     <td>${rowNum}</td>
                     <td>${esc(item.asset_number) || '-'}</td>
                     <td class="td-wrap">${esc(item.nomor_tiket) || '-'}</td>
+                    <td class="td-wrap">${esc(item.submission_code) || '-'}</td>
                     <td class="td-wrap">${esc(item.asset_name) || '-'}</td>
                     <td>${esc(item.jumlah)}</td>
                     <td>${esc(item.unit) || '-'}</td>
@@ -260,6 +257,33 @@
         }
     }
 
+    // ---------- Approved submission codes (Phase 5.1) ----------
+    // Populate the "Kode Pengajuan (Approval)" select with the stocktaking
+    // submissions that were APPROVED for this asset type, newest first. The
+    // newest code is pre-selected so linking is the default, not an afterthought.
+    async function loadApprovedCodes() {
+        const sel = $('submissionCode');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">-- Tanpa Kode Pengajuan --</option>';
+        try {
+            const res = await fetch(`get_approved_submissions.php?type=${TYPE.toUpperCase()}`);
+            const result = await res.json();
+            if (result.status === 'success' && Array.isArray(result.data)) {
+                result.data.forEach(sub => {
+                    const code = sub.submission_code || ('BKJ-' + sub.id);
+                    const label = code + ' (' + (sub.submitted_by_name || sub.submitted_by || '') + ')';
+                    const opt = document.createElement('option');
+                    opt.value = code;
+                    opt.textContent = label;
+                    sel.appendChild(opt);
+                });
+                if (sel.options.length > 1) sel.value = sel.options[1].value;
+            }
+        } catch (err) {
+            console.error('Gagal memuat kode pengajuan:', err);
+        }
+    }
+
     // ---------- Add ----------
     function collectForm() {
         const g = id => { const el = $(id); return el ? el.value : ''; };
@@ -267,6 +291,7 @@
             module: MODULE,
             asset_number: g('assetNumber').trim(),
             nomor_tiket: g('nomorTiket').trim(),
+            submission_code: g('submissionCode').trim(),
             asset_name: g('assetName').trim(),
             jumlah: g('jumlah').trim(),
             unit: g('unit').trim(),
@@ -284,6 +309,10 @@
         });
         const area = $('area');
         if (area && area.options.length) area.value = area.options[0].value;
+        // Reset the submission_code select to the newest approved submission
+        // (the first real option), falling back to "tanpa kode" when empty.
+        const subSel = $('submissionCode');
+        if (subSel && subSel.options.length) subSel.value = subSel.options[1] ? subSel.options[1].value : '';
     }
 
     function setModalTitle(text) {
@@ -625,9 +654,16 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // Barang Masuk/Keluar is ADMIN-only: any non-admin user who opens the
+        // page directly is redirected to the dashboard instead.
+        if (!canManage()) {
+            window.location.replace('dashboard.html');
+            return;
+        }
         loadUserInfo();
         applyRbacUi();
         initMasterAreaUI();
         loadData();
+        loadApprovedCodes();
     });
 })();

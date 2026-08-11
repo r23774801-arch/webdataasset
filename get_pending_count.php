@@ -11,7 +11,8 @@ $counts = [
     'aset_ga' => 0,
     'barang_masuk' => 0,
     'barang_keluar' => 0,
-    'pending_approval' => 0
+    'pending_approval' => 0,
+    'pending_users' => 0
 ];
 
 // Count pending aset_it (where kondisi is still '-', meaning unverified)
@@ -48,6 +49,13 @@ if ($row = $result->fetch_assoc()) {
 $result = $conn->query("SELECT COUNT(*) as count FROM stocktaking_submissions WHERE status = 'Pending'");
 if ($row = $result->fetch_assoc()) {
     $counts['pending_approval'] = (int)$row['count'];
+}
+
+// Count pending user registrations (awaiting admin approval)
+$counts['pending_users'] = 0;
+$result = $conn->query("SELECT COUNT(*) as count FROM user_approvals WHERE status = 'Pending'");
+if ($row = $result->fetch_assoc()) {
+    $counts['pending_users'] = (int)$row['count'];
 }
 
 // Calculate total

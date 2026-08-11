@@ -2,6 +2,10 @@
 // GLOBAL AUTH GUARD — Runs BEFORE anything else
 // ==========================================
 (function() {
+    // Restore saved theme as early as possible to avoid flash of light mode.
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
     // If sessionStorage 'isLoggedIn' flag is missing, user is not authenticated
     if (!sessionStorage.getItem('isLoggedIn')) {
         // Get current page filename
@@ -13,6 +17,28 @@
         }
     }
 })();
+
+// ==========================================
+// NIGHT/LIGHT MODE TOGGLE
+// ==========================================
+function toggleTheme() {
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeToggleIcon();
+}
+
+function updateThemeToggleIcon() {
+    const isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) {
+        btn.innerHTML = isDark
+            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+        btn.title = isDark ? 'Mode Terang' : 'Mode Gelap';
+    }
+}
 
 // ==========================================
 // FUNGSI UNTUK MENYIAPKAN TOAST DAN LOADER GLOBAL
@@ -36,6 +62,24 @@ function initializeSharedUI() {
             </div>
         `;
         body.appendChild(loader);
+    }
+
+    // Inject the night/light theme toggle into the top header (right side).
+    if (!document.getElementById('themeToggleBtn')) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'themeToggleBtn';
+        btn.className = 'theme-toggle-btn';
+        btn.setAttribute('aria-label', 'Ganti tema');
+        btn.onclick = toggleTheme;
+        const headerRight = document.querySelector('.top-header-right');
+        if (headerRight) {
+            headerRight.prepend(btn);
+            updateThemeToggleIcon();
+        }
+    } else {
+        // Button already present in markup (e.g. login page): keep its icon in sync.
+        updateThemeToggleIcon();
     }
 }
 
@@ -181,6 +225,11 @@ function applyRoleNav() {
     if (navDataAkun) {
         navDataAkun.style.display = isAdmin ? 'flex' : 'none';
     }
+
+    // Barang Masuk/Keluar is ADMIN-only — hidden for every non-admin user.
+    document.querySelectorAll('.sidebar-dropdown-item[data-admin-only]').forEach(link => {
+        link.style.display = isAdmin ? '' : 'none';
+    });
 }
 
 // Run on DOM ready to show/hide role-gated nav items
@@ -245,31 +294,26 @@ if (document.readyState === 'loading') {
 // SHARED RBAC — ADD/MANAGE PERMISSION (Phase 4.5.3)
 // One rule used by every asset-management page:
 //   admin → false (monitoring/approval only — no add/edit/delete)
-//   it    → manage IT data only
-//   ga    → manage GA data only
+//   any other logged-in role → true (manages both IT and GA data)
 // ==========================================
 function canManageData(type) {
     const role = (localStorage.getItem('userRole') || '').toLowerCase();
     if (role === 'admin') return false;
-    if (role === 'it') return String(type || '').toLowerCase() === 'it';
-    if (role === 'ga') return String(type || '').toLowerCase() === 'ga';
-    return false;
+    return role !== '' && ['it', 'ga'].includes(String(type || '').toLowerCase());
 }
 window.canManageData = canManageData;
 
 // ==========================================
 // SHARED RBAC — FINISH STOCKTAKING PERMISSION
-// Fail-closed: only the owning role may finish a stocktaking session.
+// Fail-closed: non-ADMIN roles may finish a stocktaking session.
 //   admin → false (monitoring/approval/reporting only)
-//   it    → true for 'it' assets only
-//   ga    → true for 'ga' assets only
+//   any other logged-in role → true for 'it' and 'ga' assets
 //   unknown/missing role → false (button hidden, never shown)
 // ==========================================
 function canFinishStocktaking(type) {
     const role = (localStorage.getItem('userRole') || '').toLowerCase();
-    if (role === 'it') return String(type || '').toLowerCase() === 'it';
-    if (role === 'ga') return String(type || '').toLowerCase() === 'ga';
-    return false;
+    if (role === 'admin') return false;
+    return role !== '' && ['it', 'ga'].includes(String(type || '').toLowerCase());
 }
 window.canFinishStocktaking = canFinishStocktaking;
 
@@ -321,6 +365,59 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initUserMenu);
 } else {
     initUserMenu();
+}
+
+// ==========================================
+// PROFILE PHOTO — render the logged-in user's
+// photo on every page's topbar/sidebar avatar.
+// Runs after loadUserInfo() has set the initials,
+// then fetches the server copy to stay in sync.
+// ==========================================
+function _renderAvatarPhoto(el, photo, fallback) {
+    if (!el) return;
+    if (photo) {
+        el.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = photo;
+        img.alt = 'Foto profil';
+        img.onerror = function () {
+            el.innerHTML = '';
+            el.textContent = fallback;
+        };
+        el.appendChild(img);
+    } else {
+        el.innerHTML = '';
+        el.textContent = fallback;
+    }
+}
+
+function applyProfilePhoto() {
+    if (!sessionStorage.getItem('isLoggedIn')) return;
+
+    const username = localStorage.getItem('currentUser') || 'U';
+    const fallback = (String(username).charAt(0) || 'U').toUpperCase();
+    const saved = localStorage.getItem('userPhoto') || '';
+
+    if (saved) {
+        _renderAvatarPhoto(document.getElementById('topAvatar'), saved, fallback);
+        _renderAvatarPhoto(document.getElementById('sidebarAvatar'), saved, fallback);
+    }
+
+    fetch('get_session_info.php')
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+            const photo = res && res.status === 'success' && res.data ? (res.data.photo || '') : '';
+            localStorage.setItem('userPhoto', photo || '');
+            _renderAvatarPhoto(document.getElementById('topAvatar'), photo, fallback);
+            _renderAvatarPhoto(document.getElementById('sidebarAvatar'), photo, fallback);
+        })
+        .catch(function () { /* best-effort */ });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyProfilePhoto);
+} else {
+    applyProfilePhoto();
 }
 
 // ==========================================

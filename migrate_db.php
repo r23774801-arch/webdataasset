@@ -44,6 +44,18 @@ $queries = [
     // Add user account status (managed by the Admin "Data Akun" feature)
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS status ENUM('Aktif','Nonaktif') NOT NULL DEFAULT 'Aktif'",
 
+    // Add user profile photo (path relative to the project root, e.g. uploads/...)
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS photo VARCHAR(255) DEFAULT NULL",
+
+    // Full employee name, auto-filled from the master_employee directory when
+    // the user picks their NRP during registration. Stored separately from the
+    // (free-typed) username so the two fields stay independent.
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS nama_lengkap VARCHAR(100) DEFAULT NULL",
+    // Add the generic non-admin 'user' role (register/approval workflow). The
+    // original column is ENUM('admin','it','ga'); widening it to also accept
+    // 'user' keeps existing roles intact.
+    "ALTER TABLE users MODIFY COLUMN role ENUM('admin','it','ga','user') NOT NULL DEFAULT 'user'",
+
     // Approval workflow table
     "CREATE TABLE IF NOT EXISTS stocktaking_submissions (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -185,6 +197,17 @@ $queries = [
     "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS nomor_tiket VARCHAR(100) DEFAULT NULL",
 
     // ==========================================
+    // PHASE 5.1 — submission_code on the Barang
+    // tables (link each transaction to the
+    // approved stocktaking submission that drove
+    // the Inbound/Outbound movement).
+    // ==========================================
+    "ALTER TABLE barang_masuk_it ADD COLUMN IF NOT EXISTS submission_code VARCHAR(30) DEFAULT NULL",
+    "ALTER TABLE barang_masuk_ga ADD COLUMN IF NOT EXISTS submission_code VARCHAR(30) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_it ADD COLUMN IF NOT EXISTS submission_code VARCHAR(30) DEFAULT NULL",
+    "ALTER TABLE barang_keluar_ga ADD COLUMN IF NOT EXISTS submission_code VARCHAR(30) DEFAULT NULL",
+
+    // ==========================================
     // PHASE 4.16 — Unit (satuan) column on
     // the separated Barang tables
     // ==========================================
@@ -224,6 +247,34 @@ $queries = [
 
     // Seed the default Areas (INSERT IGNORE never duplicates existing rows).
     "INSERT IGNORE INTO master_area (area_name) VALUES ('Main Office'), ('Part BKJ'), ('Kel.'), ('BIU Service'), ('Part BIU'), ('Part BIU 3'), ('PTK'), ('Gudang')",
+
+    // ==========================================
+    // PHASE 4.25 — user registration approval:
+    // new accounts are queued here (status Pending)
+    // until an ADMIN approves them. Only approved
+    // rows are copied into the users table.
+    // ==========================================
+    "CREATE TABLE IF NOT EXISTS user_approvals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nrp VARCHAR(50) NOT NULL,
+        username VARCHAR(100) NOT NULL,
+        nama_lengkap VARCHAR(100) DEFAULT NULL,
+        email VARCHAR(100) DEFAULT NULL,
+        password VARCHAR(255) NOT NULL,
+        department VARCHAR(100) DEFAULT NULL,
+        status ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
+        requested_at DATETIME NOT NULL,
+        reviewed_by VARCHAR(20) DEFAULT NULL,
+        reviewed_by_name VARCHAR(100) DEFAULT NULL,
+        review_date DATETIME DEFAULT NULL,
+        rejection_reason TEXT DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_user_approvals_nrp (nrp)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+
+    // Allow existing user_approvals tables (created before nama_lengkap was
+    // introduced) to gain the column on a re-run.
+    "ALTER TABLE user_approvals ADD COLUMN IF NOT EXISTS nama_lengkap VARCHAR(100) DEFAULT NULL",
 ];
 
 $allSuccess = true;
@@ -307,6 +358,16 @@ $migrations = [
            AND t.pic          <=> l.pic
            AND t.area         <=> l.area
      )",
+
+    // ==========================================
+    // PHASE 5.1 — rename legacy STK- submission
+    // codes to the BKJ- prefix (new site code).
+    // NULL-safe: only touches codes that still
+    // carry the old site prefix; idempotent.
+    // ==========================================
+    "UPDATE stocktaking_submissions
+     SET submission_code = CONCAT('BKJ-', SUBSTRING(submission_code, 5))
+     WHERE submission_code LIKE 'STK-%'",
 ];
 
 foreach ($migrations as $sql) {

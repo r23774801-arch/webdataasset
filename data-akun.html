@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -7,8 +7,9 @@
     <link rel="icon" href="img/ikon.png" type="image/png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/enterprise-ui.css">
+    <link rel="stylesheet" href="css/night-mode.css">
     <style>
-        /* ===== User table (approval-table pattern — horizontal scroll only inside .table-responsive) ===== */
+        /* ===== User table (approval-table pattern â€” horizontal scroll only inside .table-responsive) ===== */
         .user-table {
             border-collapse: separate;
             border-spacing: 0;
@@ -54,9 +55,31 @@
             letter-spacing: 0.4px;
             display: inline-block;
         }
-        .role-admin { background-color: #fff4cc; color: #9A7300; }
+.role-admin { background-color: #fff4cc; color: #9A7300; }
         .role-it { background-color: #e3f2fd; color: #1565c0; }
         .role-ga { background-color: #e0f2f1; color: #0f766e; }
+        .role-user { background-color: #eef2ff; color: #4f46e5; }
+
+        .user-photo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.85rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .user-photo.fallback {
+            background: #eef2ff;
+            color: #6366f1;
+            border-color: #c7d2fe;
+        }
 
         .btn-soft {
             background: #ffffff;
@@ -161,12 +184,12 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="img/logo.png" alt="UT Logo">
+            <img src="img/logo_ut.jpeg" alt="UT Logo">
             <div class="sidebar-brand-text">UT Asset Dashboard</div>
         </div>
 
         <nav class="sidebar-nav">
-            <div class="sidebar-section-label">UTAMA</div>
+            <div class="sidebar-section-label">HOME</div>
             <a href="dashboard.html" class="sidebar-nav-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -175,7 +198,7 @@
                 <span class="nav-label">Home</span>
             </a>
 
-            <div class="sidebar-section-label">MANAJEMEN ASET</div>
+            <div class="sidebar-section-label">ASSET MANAGEMENT</div>
             <div class="sidebar-dropdown">
                 <a href="javascript:void(0)" class="sidebar-nav-item sidebar-dropdown-toggle" onclick="toggleSidebarDropdown()">
                     <div style="display: flex; align-items: center; gap: 14px;">
@@ -191,10 +214,10 @@
                 <div class="sidebar-dropdown-menu">
                     <a href="aset-it.html" class="sidebar-dropdown-item">Aset IT</a>
                     <a href="aset-ga.html" class="sidebar-dropdown-item">Aset GA</a>
-                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item">Barang Masuk IT</a>
-                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item">Barang Masuk GA</a>
-                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item">Barang Keluar IT</a>
-                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item">Barang Keluar GA</a>
+                    <a href="barang-masuk-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk IT</a>
+                    <a href="barang-masuk-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Masuk GA</a>
+                    <a href="barang-keluar-it.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar IT</a>
+                    <a href="barang-keluar-ga.html" class="sidebar-dropdown-item" data-admin-only>Barang Keluar GA</a>
                 </div>
             </div>
 
@@ -233,24 +256,7 @@
             </a>
         </nav>
 
-        <div class="sidebar-user">
-            <div class="sidebar-user-info">
-                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
-                <div class="sidebar-user-details">
-                    <div class="sidebar-user-nrp" id="sidebarNrp">User</div>
-                    <div class="sidebar-user-role-badge" id="sidebarRole">ADMIN</div>
-                </div>
-            </div>
-            <button onclick="logout()" class="sidebar-logout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span>Logout</span>
-            </button>
-        </div>
-    </aside>
+        </aside>
 
     <!-- Top Header Bar -->
     <header class="top-header">
@@ -307,29 +313,39 @@
                         &larr; Kembali ke Dashboard
                     </button>
                     <h2>Pengelolaan Akun User</h2>
-                    <p>Kelola akun user: ubah password, aktifkan/nonaktifkan, atau hapus akun.</p>
+                    <p>Kelola akun user: ubah password, aktifkan/nonaktifkan, hapus akun, dan setujui pendaftaran baru.</p>
+                    <div class="user-tabs" role="tablist" aria-label="Pengelolaan akun">
+                        <button id="tabAkunBtn" class="user-tab is-active" role="tab" aria-selected="true" onclick="switchTab('akun')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Kelola Akun
+                        </button>
+                        <button id="tabApprovalBtn" class="user-tab" role="tab" aria-selected="false" onclick="switchTab('approval')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Persetujuan User
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="table-container">
+            <div id="panelAkun" class="table-container">
                 <div class="table-responsive">
                 <table class="user-table">
                     <colgroup>
+                        <col style="min-width:70px">
                         <col style="min-width:180px">
                         <col style="min-width:140px">
                         <col style="min-width:160px">
                         <col style="min-width:100px">
-                        <col style="min-width:160px">
                         <col style="min-width:120px">
                         <col style="min-width:430px">
                     </colgroup>
                     <thead>
                         <tr>
-                            <th>Nama</th>
+                            <th>Foto</th>
+                            <th>Nama Lengkap</th>
                             <th>NRP / ID</th>
                             <th>Username</th>
                             <th>Role</th>
-                            <th>Departemen</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -338,6 +354,36 @@
                         <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
                     </tbody>
                 </table>
+                </div>
+            </div>
+
+            <div id="panelApproval" style="display:none;">
+                <div class="table-container">
+                    <div class="table-responsive">
+                    <table class="user-table">
+                        <colgroup>
+                            <col style="min-width:180px">
+                            <col style="min-width:140px">
+                            <col style="min-width:180px">
+                            <col style="min-width:120px">
+                            <col style="min-width:180px">
+                            <col style="min-width:340px">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Nama Lengkap</th>
+                                <th>NRP / ID</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Diminta</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelApproval">
+                            <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -395,6 +441,36 @@
         </div>
     </div>
 
+    <!-- Setujui Modal -->
+    <div id="setujuiModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 460px; width: 95%;">
+            <span class="close-btn" onclick="tutupSetujuiModal()">&times;</span>
+            <h3>Setujui Pendaftaran</h3>
+            <div class="modal-user-info" id="setujuiUserInfo"></div>
+            <div class="modal-actions">
+                <button class="btn-back" onclick="tutupSetujuiModal()">Batal</button>
+                <button class="btn-approve" onclick="konfirmasiSetujui()">Setujui Akun</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tolak Pendaftaran Modal -->
+    <div id="tolakModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 460px; width: 95%;">
+            <span class="close-btn" onclick="tutupTolakModal()">&times;</span>
+            <h3>Tolak Pendaftaran</h3>
+            <div class="modal-user-info" id="tolakUserInfo"></div>
+            <div class="input-group">
+                <label>Alasan Penolakan</label>
+                <textarea id="tolakAlasan" rows="3" style="width:100%; padding:10px; border:1px solid #E6E9EF; border-radius:10px; font-family:inherit; resize:vertical;" placeholder="Wajib diisi"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-back" onclick="tutupTolakModal()">Batal</button>
+                <button class="btn-reject" onclick="konfirmasiTolak()">Tolak Pendaftaran</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/loader.js"></script>
     <script>
         // ========== SIDEBAR & USER ==========
@@ -403,28 +479,11 @@
             if (dropdown) dropdown.classList.toggle('open');
         }
 
-        function toggleUserMenu(event) {
-            event.stopPropagation();
-            const dropdown = document.querySelector('.user-menu-dropdown');
-            if (dropdown) dropdown.classList.toggle('open');
-        }
-
-        document.addEventListener('click', function (e) {
-            const menu = document.querySelector('.user-menu-dropdown');
-            if (menu && menu.classList.contains('open') && !e.target.closest('.top-user-menu')) {
-                menu.classList.remove('open');
-            }
-        });
-
         function loadUserInfo() {
             const nrp = localStorage.getItem('currentNrp') || 'User';
             const username = localStorage.getItem('currentUser') || 'User';
             const role = localStorage.getItem('userRole') || 'admin';
             const initial = username.charAt(0).toUpperCase();
-
-            document.getElementById('sidebarNrp').textContent = nrp + ' (' + role.toUpperCase() + ')';
-            document.getElementById('sidebarRole').textContent = role.toUpperCase();
-            document.getElementById('sidebarAvatar').textContent = initial;
             document.getElementById('topAvatar').textContent = initial;
             document.getElementById('topUserName').textContent = username;
             document.getElementById('topUserRole').textContent = role.toUpperCase();
@@ -456,15 +515,23 @@
 
         function roleBadge(role) {
             const r = (role || '').toUpperCase();
-            const map = { ADMIN: 'role-admin', IT: 'role-it', GA: 'role-ga' };
+            const map = { ADMIN: 'role-admin', IT: 'role-it', GA: 'role-ga', USER: 'role-user' };
             const cls = map[r] || 'role-admin';
             const label = r || 'ADMIN';
             return `<span class="user-role-badge ${cls}">${label}</span>`;
         }
 
-        function statusBadge(status) {
+function statusBadge(status) {
             const aktif = String(status || '').toLowerCase() !== 'nonaktif';
             return `<span class="user-status-badge ${aktif ? 'usr-aktif' : 'usr-nonaktif'}">${aktif ? 'Aktif' : 'Nonaktif'}</span>`;
+        }
+
+        function profilePhotoCell(user) {
+            const initial = String(user.username || user.nama_lengkap || 'U').charAt(0).toUpperCase();
+            if (user.photo) {
+                return `<img src="${esc(user.photo)}" alt="Foto ${esc(user.nama_lengkap || user.username)}" class="user-photo" onerror="this.outerHTML='<span class=\\'user-photo fallback\\'>${esc(initial)}</span>'">`;
+            }
+            return `<span class="user-photo fallback">${esc(initial)}</span>`;
         }
 
         async function loadUsers() {
@@ -499,14 +566,14 @@
                         : `<button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>`;
                     const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
                     return `<tr${isSelf ? ' class="self-row"' : ''}>
-                        <td><strong>${esc(user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:#0f766e; font-weight:700;">(Anda)</div>' : ''}</td>
+                        <td>${profilePhotoCell(user)}</td>
+                        <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:#0f766e; font-weight:700;">(Anda)</div>' : ''}</td>
                         <td>${esc(user.nrp)}</td>
                         <td>${esc(user.username)}</td>
                         <td>${roleBadge(user.role)}</td>
-                        <td>${esc(user.department || '-')}</td>
                         <td>${statusBadge(user.status)}</td>
                         <td>${actionCell}</td>
-                    </tr>`;
+</tr>`;
                 }).join('');
             } catch (error) {
                 console.error(error);
@@ -670,6 +737,142 @@
         }
 
         loadUsers();
+        loadUserApprovals();
+
+        // ========== TAB SWITCH ==========
+        function switchTab(tab) {
+            const isAkun = tab === 'akun';
+            document.getElementById('panelAkun').style.display = isAkun ? 'block' : 'none';
+            document.getElementById('panelApproval').style.display = isAkun ? 'none' : 'block';
+            document.getElementById('tabAkunBtn').classList.toggle('is-active', isAkun);
+            document.getElementById('tabAkunBtn').setAttribute('aria-selected', isAkun ? 'true' : 'false');
+            document.getElementById('tabApprovalBtn').classList.toggle('is-active', !isAkun);
+            document.getElementById('tabApprovalBtn').setAttribute('aria-selected', !isAkun ? 'true' : 'false');
+            if (!isAkun) loadUserApprovals();
+        }
+
+        // ========== USER REGISTRATION APPROVAL ==========
+        async function loadUserApprovals() {
+            const tbody = document.getElementById('tabelApproval');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>';
+            try {
+                const response = await fetch('get_user_approvals.php');
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#c62828;">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    return;
+                }
+                const pending = (result.data || []).filter(a => a.status === 'Pending');
+                if (pending.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Tidak ada permintaan pendaftaran yang menunggu persetujuan.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = pending.map(a => {
+                    const actionCell = `
+                        <div class="user-actions">
+                            <button class="btn-soft btn-approve" onclick="bukaSetujuiModal(${a.id}, '${esc(a.username)}')">Setujui</button>
+                            <button class="btn-soft btn-reject" onclick="bukaTolakModal(${a.id}, '${esc(a.username)}')">Tolak</button>
+                        </div>`;
+                    return `<tr>
+                        <td><strong>${esc(a.nama_lengkap || a.username)}</strong></td>
+                        <td>${esc(a.nrp)}</td>
+                        <td>${esc(a.email) || '-'}</td>
+                        <td><span class="user-status-badge usr-aktif" style="background:#fff4cc; color:#9A7300;">Pending</span></td>
+                        <td>${esc(a.requested_at)}</td>
+                        <td>${actionCell}</td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #c62828;">Gagal memuat data dari server.</td></tr>';
+            }
+        }
+
+let setujuiTargetId = null;
+        let setujuiTargetUsername = '';
+
+        function bukaSetujuiModal(id, username) {
+            setujuiTargetId = id;
+            setujuiTargetUsername = username;
+            document.getElementById('setujuiUserInfo').innerHTML =
+                '<strong>User:</strong> ' + esc(username) + '<br><strong>ID Permintaan:</strong> ' + id;
+            document.getElementById('setujuiModal').style.display = 'flex';
+        }
+
+        function tutupSetujuiModal() {
+            document.getElementById('setujuiModal').style.display = 'none';
+            setujuiTargetId = null;
+        }
+
+        async function konfirmasiSetujui() {
+            const id = setujuiTargetId;
+            tutupSetujuiModal();
+            toggleLoader(true, 'Menyetujui pendaftaran...');
+            try {
+                const response = await fetch('approve_user.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id, status: 'Approved' })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                showToast(result.message, result.status === 'success' ? 'success' : 'error');
+                if (result.status === 'success') {
+                    loadUserApprovals();
+                    loadUsers();
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal menyetujui pendaftaran.', 'error');
+            }
+        }
+
+        let tolakTargetId = null;
+        let tolakTargetUsername = '';
+
+        function bukaTolakModal(id, username) {
+            tolakTargetId = id;
+            tolakTargetUsername = username;
+            document.getElementById('tolakUserInfo').innerHTML =
+                '<strong>User:</strong> ' + esc(username) + '<br><strong>ID Permintaan:</strong> ' + id;
+            document.getElementById('tolakAlasan').value = '';
+            document.getElementById('tolakModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('tolakAlasan').focus(), 60);
+        }
+
+        function tutupTolakModal() {
+            document.getElementById('tolakModal').style.display = 'none';
+            tolakTargetId = null;
+        }
+
+async function konfirmasiTolak() {
+            const reason = document.getElementById('tolakAlasan').value.trim();
+            if (!reason) {
+                showToast('Alasan penolakan wajib diisi.', 'warning');
+                return;
+            }
+            const id = tolakTargetId;
+            tutupTolakModal();
+            toggleLoader(true, 'Menolak pendaftaran...');
+            try {
+                const response = await fetch('approve_user.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id, status: 'Rejected', reason: reason })
+                });
+                const result = await response.json();
+                toggleLoader(false);
+                showToast(result.message, result.status === 'success' ? 'success' : 'error');
+                if (result.status === 'success') {
+                    loadUserApprovals();
+                }
+            } catch (error) {
+                toggleLoader(false);
+                console.error(error);
+                showToast('Gagal menolak pendaftaran.', 'error');
+            }
+        }
     </script>
 </body>
 </html>

@@ -210,14 +210,12 @@ function initializeNrpDropdown() {
                 if (!value) return;
                 const option = tomSelect.options[value];
                 if (!option) return;
-                // Auto-populate: Username = NRP, Email = employee email (if any),
-                // and keep the employee name in a hidden field.
-                const usernameInput = document.getElementById('regUsername');
+                // Auto-populate: Nama Lengkap = employee name (read-only field),
+                // and Email = employee email (if any). Username stays free-typed.
+                const nameInput = document.getElementById('regNamaLengkap');
                 const emailInput = document.getElementById('regEmail');
-                const nameInput = document.getElementById('regEmployeeName');
-                if (usernameInput) usernameInput.value = value;
-                if (emailInput && option.email) emailInput.value = option.email;
                 if (nameInput) nameInput.value = option.nama || '';
+                if (emailInput && option.email) emailInput.value = option.email;
             },
             onDropdownOpen: () => {
                 if (nrpCloseTimer) nrpReopened = true; // re-opened during the fade-out
@@ -284,7 +282,7 @@ function clearRegisterNrpValue() {
         nrpField.value = '';
     }
 
-    const nameInput = document.getElementById('regEmployeeName');
+    const nameInput = document.getElementById('regNamaLengkap');
     if (nameInput) nameInput.value = '';
 }
 
@@ -311,13 +309,12 @@ if (document.readyState === 'loading') {
 async function handleRegister() {
     const nrp = getRegisterNrpValue();
     const username = document.getElementById('regUsername').value.trim();
+    const namaLengkap = document.getElementById('regNamaLengkap').value.trim();
     const email = document.getElementById('regEmail').value.trim();
     const password = document.getElementById('regPassword').value.trim();
-    const role = document.getElementById('regRole').value;
-    const department = document.getElementById('regDepartment').value.trim();
     
-    if (!nrp || !username || !email || !password) {
-        showToast("Semua field (NRP, Nama, Email, Password) wajib diisi!", "info");
+    if (!nrp || !username || !namaLengkap || !email || !password) {
+        showToast("Semua field (Username, NRP, Nama Lengkap, Email, Password) wajib diisi!", "info");
         return;
     }
 
@@ -341,10 +338,9 @@ async function handleRegister() {
             body: JSON.stringify({ 
                 nrp: nrp, 
                 username: username, 
+                nama_lengkap: namaLengkap, 
                 email: email, 
-                password: password, 
-                role: role,
-                department: department
+                password: password
             })
         });
 
@@ -357,9 +353,9 @@ async function handleRegister() {
             // Reset Form & pindah ke tampilan login setelah 1.5 detik
             clearRegisterNrpValue();
             document.getElementById('regUsername').value = '';
+            document.getElementById('regNamaLengkap').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regPassword').value = '';
-            document.getElementById('regDepartment').value = '';
             updatePasswordValidation();
             setTimeout(() => { showLogin(); }, 1500);
         }

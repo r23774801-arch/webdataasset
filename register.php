@@ -59,24 +59,37 @@ if ($lockFp) {
 
 // Membersihkan input agar terhindar dari SQL Injection
 $nrp = $conn->real_escape_string($data['nrp']);
-$username = $conn->real_escape_string($data['username']);
-$role = strtolower(trim($data['role'] ?? ''));
 
-// HANYA IT dan GA yang boleh didaftarkan. Role admin tidak pernah diizinkan lewat registrasi.
-$allowedRoles = ['it', 'ga'];
-if (!in_array($role, $allowedRoles, true)) {
-    echo json_encode(["status" => "error", "message" => "Role tidak diizinkan! Hanya IT dan GA yang dapat mendaftar."]);
+// Username diketik bebas oleh pengguna (bukan lagi otomatis = NRP). Wajib
+// diisi dan dibatasi panjangnya agar muat di kolom VARCHAR(100).
+$username = trim((string)($data['username'] ?? ''));
+if ($username === '') {
+    echo json_encode(["status" => "error", "message" => "Username wajib diisi!"]);
     exit;
 }
-
-// Departemen bebas diketik oleh pengguna (IT, GA, Finance, HR, Accounting, Marketing, Procurement, dll).
-// Tidak dibatasi dan tidak otomatis mengikuti role.
-$department = trim((string)($data['department'] ?? ''));
-if ($department !== '' && strlen($department) > 100) {
-    echo json_encode(["status" => "error", "message" => "Departemen terlalu panjang (maksimal 100 karakter)!"]);
+if (strlen($username) > 100) {
+    echo json_encode(["status" => "error", "message" => "Username terlalu panjang (maksimal 100 karakter)!"]);
     exit;
 }
-$department = $conn->real_escape_string($department);
+$username = $conn->real_escape_string($username);
+
+// Role umum non-admin: semua user baru mendapat role 'user' (dapat mengelola
+// aset IT dan GA). Role admin tidak pernah diizinkan lewat registrasi.
+$role = 'user';
+
+// Departemen sudah tidak dipakai pada alur registrasi — field dihilangkan dari
+// form Daftar Akun (login.html). Nama lengkap diisi otomatis dari direktori
+// karyawan saat NRP dipilih; username diketik bebas oleh pengguna.
+$nama_lengkap = trim((string)($data['nama_lengkap'] ?? ''));
+if ($nama_lengkap === '') {
+    echo json_encode(["status" => "error", "message" => "Nama lengkap wajib diisi!"]);
+    exit;
+}
+if (strlen($nama_lengkap) > 100) {
+    echo json_encode(["status" => "error", "message" => "Nama lengkap terlalu panjang (maksimal 100 karakter)!"]);
+    exit;
+}
+$nama_lengkap = $conn->real_escape_string($nama_lengkap);
 
 // Email wajib diisi, format harus valid, dan tidak boleh sama dengan akun lain (case-insensitive).
 $email = trim((string)($data['email'] ?? ''));
@@ -165,15 +178,56 @@ if ($cek_nrp->num_rows > 0) {
     if ($cek_email && $cek_email->num_rows > 0) {
         echo json_encode(["status" => "error", "message" => "Email sudah terdaftar di sistem!"]);
     } else {
-        // 2. Jika NRP dan email belum ada, masukkan data ke database
-        $query = "INSERT INTO users (nrp, username, password, role, email, department) VALUES ('$nrp', '$username', '$password', '$role', '$email', '$department')";
-        
-        if ($conn->query($query) === TRUE) {
-            echo json_encode(["status" => "success", "message" => "Registrasi Berhasil! Silakan login."]);
+        // 1c. Cek apakah NRP masih mengantre persetujuan (Pending/Approved belum dipindah).
+        $cek_pending = $conn->query("SELECT id, status FROM user_approvals WHERE nrp = '$nrp' AND status IN ('Pending','Approved')");
+        if ($cek_pending && $cek_pending->num_rows > 0) {
+            $pendingRow = $cek_pending->fetch_assoc();
+            if ($pendingRow['status'] === 'Approved') {
+                echo json_encode(["status" => "error", "message" => "NRP sudah terdaftar di sistem!"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Permintaan pendaftaran dengan NRP ini masih menunggu persetujuan admin."]);
+            }
+            exit;
+        }
+
+        // 2. Antrekan registrasi ke tabel user_approvals (status Pending) —
+        //    akun baru hanya aktif setelah ADMIN menyetujuinya.
+        $checkApprovalsTable = $conn->query("SHOW TABLES LIKE 'user_approvals'");
+        $hasApprovalsTable = $checkApprovalsTable && $checkApprovalsTable->num_rows > 0;
+
+        if (!$hasApprovalsTable) {
+            echo json_encode(["status" => "error", "message" => "Sistem persetujuan akun belum tersedia. Jalankan migrate_db.php terlebih dahulu."]);
+            exit;
+        }
+
+        $stmt = $conn->prepare("INSERT INTO user_approvals (nrp, username, nama_lengkap, email, password, status, requested_at) VALUES (?, ?, ?, ?, ?, 'Pending', NOW())");
+        if (!$stmt) {
+            error_log('[register] prepare failed: ' . $conn->error);
+            echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
+            exit;
+        }
+        $stmt->bind_param('sssss', $nrp, $username, $nama_lengkap, $email, $password);
+
+        if ($stmt->execute()) {
+            // Beri tahu admin agar segera memproses permintaan pendaftaran.
+            // Kegagalan kirim email TIDAK mengubah hasil registrasi.
+            try {
+                require_once __DIR__ . '/app/bootstrap.php';
+                MailService::notifyAdminsUserRegistration($conn, [
+                    'nrp'         => $nrp,
+                    'username'    => $username,
+                    'nama_lengkap'=> $nama_lengkap,
+                    'email'       => $email,
+                ]);
+            } catch (\Throwable $t) {
+                error_log('[register] admin notification failed: ' . $t->getMessage());
+            }
+            echo json_encode(["status" => "success", "message" => "Permintaan pendaftaran dikirim. Silakan tunggu persetujuan admin sebelum dapat login."]);
         } else {
-            error_log('[register] insert failed: ' . $conn->error);
+            error_log('[register] insert failed: ' . $stmt->error);
             echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
         }
+        $stmt->close();
     }
 }
 

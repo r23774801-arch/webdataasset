@@ -4,10 +4,10 @@ header('Content-Type: application/json');
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-// RBAC: Only IT role can update IT assets. ADMIN is monitoring/approval only.
+// RBAC: All non-ADMIN roles may update assets (IT and GA). ADMIN is monitoring/approval only.
 deny_admin_transaction();
-if (!isset($_SESSION['role']) || strtoupper($_SESSION['role']) !== 'IT') {
-    echo json_encode(["status" => "error", "message" => "Akses ditolak. Hanya role IT yang dapat mengubah data aset IT."]);
+if (!isset($_SESSION['role']) || trim((string)$_SESSION['role']) === '') {
+    echo json_encode(["status" => "error", "message" => "Akses ditolak. Silakan login terlebih dahulu."]);
     exit;
 }
 

@@ -7,16 +7,8 @@ header('Content-Type: application/json');
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-require_login();
-$user = current_user();
-
-// RBAC: ADMIN is monitoring/approval only — never allowed to transact barang.
-deny_admin_transaction();
-
-// RBAC: only IT may manage IT barang.
-if (!BarangService::canManage($user['role'], 'it')) {
-    json_response(['status' => 'error', 'message' => 'Akses ditolak. Anda tidak memiliki izin untuk mengelola barang IT.']);
-}
+// Barang Masuk/Keluar is ADMIN-only: ordinary users never transact barang.
+require_admin();
 
 $input = read_json_input();
 $id = (int)($input['id'] ?? 0);

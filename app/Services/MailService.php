@@ -645,4 +645,40 @@ class MailService
         }
         return $sentCount;
     }
+
+    /**
+     * Send the "New User Registration Request" e-mail to every administrator.
+     *
+     * Recipients are resolved LIVE from the users table via adminEmails()
+     * (every row whose role is admin) — never from config or .env. This is
+     * called right after a registration lands in user_approvals, so admins can
+     * open Data Akun -> Persetujuan User and approve/reject the request.
+     *
+     * Never throws; per-recipient failures are caught and logged. Returns the
+     * number of successfully delivered notifications.
+     */
+    public static function notifyAdminsUserRegistration(mysqli $conn, array $user): int
+    {
+        $mailer     = self::instance();
+        $recipients = self::adminEmails($conn);
+        $sentCount  = 0;
+        $body       = $mailer->renderTemplate('user_registration.php', [
+            'user'   => $user,
+            'config' => mail_config(),
+        ]);
+        foreach ($recipients as $recipient) {
+            try {
+                $mail = $mailer->createMailer();
+                $mail->addAddress($recipient);
+                $mail->Subject = '[Web Data Aset] Permintaan Registrasi User Baru';
+                $mail->Body    = $body;
+                $mailer->attachLogo($mail);
+                $mail->send();
+                $sentCount++;
+            } catch (\Throwable $t) {
+                error_log('[MailService] notifyAdminsUserRegistration failed for ' . $recipient . ': ' . $t->getMessage());
+            }
+        }
+        return $sentCount;
+    }
 }

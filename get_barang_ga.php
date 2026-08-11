@@ -7,10 +7,8 @@ header('Content-Type: application/json');
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-require_login();
-$user = current_user();
-
-// All logged-in roles may view GA barang records.
+// Barang Masuk/Keluar is ADMIN-only: ordinary users never see these records.
+require_admin();
 $module = strtolower($_GET['module'] ?? '');
 if (!in_array($module, BarangService::MODULES, true)) {
     json_response(['status' => 'error', 'message' => 'Module tidak valid.']);

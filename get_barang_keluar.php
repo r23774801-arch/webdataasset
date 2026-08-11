@@ -2,7 +2,8 @@
 header('Content-Type: application/json');
 session_start();
 require_once __DIR__ . '/app/bootstrap.php';
-require_login();
+// Barang Masuk/Keluar is ADMIN-only: ordinary users never see these records.
+require_admin();
 include 'koneksi.php';
 
 $query = "SELECT id, asset_number, asset_name, jumlah, tanggal, pic, area, created_at FROM barang_keluar ORDER BY created_at DESC";

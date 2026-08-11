@@ -62,7 +62,7 @@ if ($format === 'excel') {
     header('Pragma: no-cache');
     header('Expires: 0');
 
-    $reviewTitle = $sub['submission_code'] ?? ('STK-' . $sub['id']);
+    $reviewTitle = $sub['submission_code'] ?? ('BKJ-' . $sub['id']);
     $generatedBy = $_SESSION['username'] ?? '';
 
     // ---- Enterprise palette ----
@@ -233,7 +233,7 @@ if ($format === 'excel') {
 // ==========================================
 $pdf = new PdfService(
     'REVIEW STOCKTAKING',
-    ($sub['submission_code'] ?? ('STK-' . $sub['id'])) . '  -  PT United Tractors Tbk  -  Dicetak ' . date('d F Y')
+    ($sub['submission_code'] ?? ('BKJ-' . $sub['id'])) . '  -  PT United Tractors Tbk  -  Dicetak ' . date('d F Y')
 );
 $pdf->addPage();
 

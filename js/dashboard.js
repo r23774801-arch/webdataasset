@@ -51,24 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 3. LOGIKA PROTEKSI AKSES (Gembok Role)
     // ==========================================
-    // --- LOGIKA PROTEKSI AKSES (Gembok Vektor Bersih) ---
-    const navAsetIt = document.getElementById('nav-aset-it');
-    const navAsetGa = document.getElementById('nav-aset-ga');
-
-    // Desain ikon gembok SVG datar (Flat Icon) dengan class CSS
-    const svgLock = `<svg class="padlock-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`;
-
-    if (userRole === 'it') {
-        if (navAsetGa) {
-            navAsetGa.innerHTML = `Data Aset GA ${svgLock}`;
-            navAsetGa.classList.add('locked');
-        }
-    } else if (userRole === 'ga') {
-        if (navAsetIt) {
-            navAsetIt.innerHTML = `Data Aset IT ${svgLock}`;
-            navAsetIt.classList.add('locked');
-        }
-    }
+    // All non-ADMIN roles manage both IT and GA assets — no lock icons needed.
 });
 
 // ==========================================
@@ -94,6 +77,7 @@ async function cekDataPending() {
                 if (details.aset_ga > 0) pendingItems.push(`Aset GA (${details.aset_ga})`);
                 if (details.barang_masuk > 0) pendingItems.push(`Barang Masuk (${details.barang_masuk})`);
                 if (details.barang_keluar > 0) pendingItems.push(`Barang Keluar (${details.barang_keluar})`);
+                if (details.pending_users > 0) pendingItems.push(`Registrasi User (${details.pending_users})`);
                 
                 message.textContent = `Ada ${result.total} data aset yang belum diverifikasi: ${pendingItems.join(', ')}`;
                 notification.style.display = 'flex';

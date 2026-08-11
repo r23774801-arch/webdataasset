@@ -24,7 +24,13 @@ $hasStatus   = $checkStatus && $checkStatus->num_rows > 0;
 
 $statusCol = $hasStatus ? 'status, ' : '';
 
-$stmt = $conn->prepare("SELECT id, nrp, username, role, email, area, department, $statusCol created_at FROM users ORDER BY role ASC, username ASC");
+// Defensive: the users.photo column may not exist yet (pre-migration).
+$checkPhoto = $conn->query("SHOW COLUMNS FROM users LIKE 'photo'");
+$hasPhoto   = $checkPhoto && $checkPhoto->num_rows > 0;
+
+$photoCol = $hasPhoto ? 'photo, ' : '';
+
+$stmt = $conn->prepare("SELECT id, nrp, username, nama_lengkap, role, email, area, department, $photoCol $statusCol created_at FROM users ORDER BY role ASC, username ASC");
 if (!$stmt) {
     json_response(['status' => 'error', 'message' => 'Terjadi kesalahan pada server.']);
 }
@@ -38,15 +44,17 @@ while ($row = $result->fetch_assoc()) {
         $row['status'] = 'Aktif';
     }
     $users[] = [
-        'id'         => (int)$row['id'],
-        'nrp'        => $row['nrp'],
-        'username'   => $row['username'],
-        'role'       => $row['role'],
-        'email'      => $row['email'] ?? '',
-        'area'       => $row['area'] ?? '',
-        'department' => $row['department'] ?? '',
-        'status'     => $row['status'] ?? 'Aktif',
-        'created_at' => $row['created_at'] ?? '',
+        'id'          => (int)$row['id'],
+        'nrp'         => $row['nrp'],
+        'username'    => $row['username'],
+        'nama_lengkap'=> $row['nama_lengkap'] ?? '',
+        'role'        => $row['role'],
+        'email'       => $row['email'] ?? '',
+        'area'        => $row['area'] ?? '',
+        'department'  => $row['department'] ?? '',
+        'photo'       => $row['photo'] ?? '',
+        'status'      => $row['status'] ?? 'Aktif',
+        'created_at'  => $row['created_at'] ?? '',
     ];
 }
 $stmt->close();

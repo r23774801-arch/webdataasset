@@ -181,16 +181,17 @@ class SpreadsheetService
             // Phase 4.23 — the database primary key ('id') is intentionally NOT
             // exported to the spreadsheet.
             $payload = [
-                'asset_number' => (string)($row['asset_number'] ?? ''),
-                'nomor_tiket'  => $nomorTiket,
-                'asset_name'   => (string)($row['asset_name'] ?? ''),
-                'jumlah'       => (int)($row['jumlah'] ?? 0),
-                'unit'         => (string)($row['unit'] ?? ''),
-                'supplier'     => array_key_exists('supplier', $row) ? (string)($row['supplier'] ?? '') : '',
-                'tanggal'      => (string)($row['tanggal'] ?? ''),
-                'pic'          => (string)($row['pic'] ?? ''),
-                'area'         => (string)($row['area'] ?? ''),
-                'attachment'   => (string)($row['attachment'] ?? ''),
+                'asset_number'    => (string)($row['asset_number'] ?? ''),
+                'nomor_tiket'     => $nomorTiket,
+                'submission_code' => (string)($row['submission_code'] ?? ''),
+                'asset_name'      => (string)($row['asset_name'] ?? ''),
+                'jumlah'          => (int)($row['jumlah'] ?? 0),
+                'unit'            => (string)($row['unit'] ?? ''),
+                'supplier'        => array_key_exists('supplier', $row) ? (string)($row['supplier'] ?? '') : '',
+                'tanggal'         => (string)($row['tanggal'] ?? ''),
+                'pic'             => (string)($row['pic'] ?? ''),
+                'area'            => (string)($row['area'] ?? ''),
+                'attachment'      => (string)($row['attachment'] ?? ''),
             ];
             if (array_key_exists('created_at', $row) && $row['created_at'] !== null) {
                 $payload['created_at'] = (string)$row['created_at'];
