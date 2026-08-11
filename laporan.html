@@ -274,6 +274,39 @@
             color: var(--ut-amber-deep);
         }
 
+        /* Distinct IT vs GA Card Theme Accents */
+        .asset-summary-it {
+            border-top: 4px solid var(--ut-blue) !important;
+            border-left: 1px solid rgba(30, 90, 168, 0.2) !important;
+            background: linear-gradient(180deg, rgba(30, 90, 168, 0.04) 0%, var(--ut-surface) 100%) !important;
+        }
+        .asset-summary-it .summary-card-title {
+            color: var(--ut-blue) !important;
+        }
+        .asset-summary-it .hero-stat-percent {
+            color: var(--ut-blue) !important;
+        }
+        .asset-summary-it .progress-fill {
+            background: linear-gradient(90deg, #1E5AA8, #3B82F6) !important;
+            box-shadow: 0 4px 12px rgba(30, 90, 168, 0.35) !important;
+        }
+
+        .asset-summary-ga {
+            border-top: 4px solid var(--ut-teal) !important;
+            border-left: 1px solid rgba(13, 148, 136, 0.2) !important;
+            background: linear-gradient(180deg, rgba(13, 148, 136, 0.04) 0%, var(--ut-surface) 100%) !important;
+        }
+        .asset-summary-ga .summary-card-title {
+            color: var(--ut-teal) !important;
+        }
+        .asset-summary-ga .hero-stat-percent {
+            color: var(--ut-teal) !important;
+        }
+        .asset-summary-ga .progress-fill {
+            background: linear-gradient(90deg, #0D9488, #10B981) !important;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35) !important;
+        }
+
         .table-container {
             background: var(--ut-white);
             border-radius: 22px;
@@ -639,12 +672,15 @@
 
                 <!-- IT & GA Asset Summary -->
                 <div class="asset-summary-grid">
-                    <section class="asset-summary-card">
+                    <section class="asset-summary-card asset-summary-it">
                         <div class="summary-card-header">
-                        <div>
-                            <div class="card-label">Ringkasan IT</div>
-                            <h3 class="summary-card-title">IT Asset Summary</h3>
-                        </div>
+                            <div>
+                                <div class="card-label" style="display:inline-flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                    <span style="background:var(--ut-blue); color:#fff; padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.72rem; letter-spacing:0.05em;">IT ASSET</span>
+                                    <span>Ringkasan IT</span>
+                                </div>
+                                <h3 class="summary-card-title">IT Asset Summary</h3>
+                            </div>
                         </div>
                         <div class="asset-progress-block">
                             <span class="hero-stat-label">Stocktaked</span>
@@ -656,12 +692,15 @@
                         </div>
                         <div class="condition-cards" id="itConditionCards"></div>
                     </section>
-                    <section class="asset-summary-card">
+                    <section class="asset-summary-card asset-summary-ga">
                         <div class="summary-card-header">
-                        <div>
-                            <div class="card-label">Ringkasan GA</div>
-                            <h3 class="summary-card-title">GA Asset Summary</h3>
-                        </div>
+                            <div>
+                                <div class="card-label" style="display:inline-flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                    <span style="background:var(--ut-teal); color:#fff; padding:2px 8px; border-radius:6px; font-weight:800; font-size:0.72rem; letter-spacing:0.05em;">GA ASSET</span>
+                                    <span>Ringkasan GA</span>
+                                </div>
+                                <h3 class="summary-card-title">GA Asset Summary</h3>
+                            </div>
                         </div>
                         <div class="asset-progress-block">
                             <span class="hero-stat-label">Stocktaked</span>
@@ -683,55 +722,67 @@
                             <h3 class="summary-card-title">Barang Summary (IT & GA)</h3>
                         </div>
                     </div>
-                    <div class="condition-cards">
-                        <div class="condition-card">
+                    <div class="condition-cards" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+                        <div class="condition-card" style="border-left: 4px solid var(--ut-blue);">
                             <div class="condition-card-top">
                                 <span class="condition-card-dot" style="background:var(--ut-blue);"></span>
-                                <span class="condition-card-label">Barang Masuk IT</span>
+                                <span class="condition-card-label" style="color:var(--ut-blue);">Barang Masuk IT</span>
                             </div>
                             <div class="condition-card-count" id="barangMasukItCount">0</div>
                             <div class="condition-card-percent">records</div>
                         </div>
-                        <div class="condition-card">
+                        <div class="condition-card" style="border-left: 4px solid var(--ut-teal);">
                             <div class="condition-card-top">
                                 <span class="condition-card-dot" style="background:var(--ut-teal);"></span>
-                                <span class="condition-card-label">Barang Masuk GA</span>
+                                <span class="condition-card-label" style="color:var(--ut-teal);">Barang Masuk GA</span>
                             </div>
                             <div class="condition-card-count" id="barangMasukGaCount">0</div>
                             <div class="condition-card-percent">records</div>
                         </div>
-                        <div class="condition-card">
+                        <div class="condition-card" style="border-left: 4px solid #6366F1;">
                             <div class="condition-card-top">
-                                <span class="condition-card-dot" style="background:var(--ut-green);"></span>
-                                <span class="condition-card-label">Barang Keluar IT</span>
+                                <span class="condition-card-dot" style="background:#6366F1;"></span>
+                                <span class="condition-card-label" style="color:#6366F1;">Barang Keluar IT</span>
                             </div>
                             <div class="condition-card-count" id="barangKeluarItCount">0</div>
                             <div class="condition-card-percent">records</div>
                         </div>
-                        <div class="condition-card">
+                        <div class="condition-card" style="border-left: 4px solid #D97706;">
                             <div class="condition-card-top">
-                                <span class="condition-card-dot" style="background:var(--ut-yellow);"></span>
-                                <span class="condition-card-label">Barang Keluar GA</span>
+                                <span class="condition-card-dot" style="background:#D97706;"></span>
+                                <span class="condition-card-label" style="color:#D97706;">Barang Keluar GA</span>
                             </div>
                             <div class="condition-card-count" id="barangKeluarGaCount">0</div>
                             <div class="condition-card-percent">records</div>
                         </div>
                     </div>
                     <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px; margin-top:16px;" class="barang-report-grid">
-                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-blue); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk IT â€” Terbaru</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-top:3px solid var(--ut-blue); border-radius:18px; padding:16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div style="font-size:0.8rem; font-weight:800; color:var(--ut-blue); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                                <span style="background:var(--ut-blue); color:#fff; padding:2px 8px; border-radius:4px; font-size:0.7rem;">IT</span>
+                                Barang Masuk IT &mdash; Terbaru
+                            </div>
                             <div id="barangMasukItRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
-                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk GA â€” Terbaru</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-top:3px solid var(--ut-teal); border-radius:18px; padding:16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div style="font-size:0.8rem; font-weight:800; color:var(--ut-teal); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                                <span style="background:var(--ut-teal); color:#fff; padding:2px 8px; border-radius:4px; font-size:0.7rem;">GA</span>
+                                Barang Masuk GA &mdash; Terbaru
+                            </div>
                             <div id="barangMasukGaRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
-                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-green); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar IT â€” Terbaru</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-top:3px solid #6366F1; border-radius:18px; padding:16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div style="font-size:0.8rem; font-weight:800; color:#6366F1; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                                <span style="background:#6366F1; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.7rem;">IT</span>
+                                Barang Keluar IT &mdash; Terbaru
+                            </div>
                             <div id="barangKeluarItRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
-                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-amber-deep); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar GA â€” Terbaru</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-top:3px solid #D97706; border-radius:18px; padding:16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                            <div style="font-size:0.8rem; font-weight:800; color:#D97706; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                                <span style="background:#D97706; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.7rem;">GA</span>
+                                Barang Keluar GA &mdash; Terbaru
+                            </div>
                             <div id="barangKeluarGaRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
                     </div>
@@ -1491,20 +1542,32 @@
                     const el = document.getElementById(elId);
                     if (!el) return;
                     if (!rows || rows.length === 0) {
-                        el.innerHTML = '<span style="color:var(--ut-muted-2);">Belum ada data.</span>';
+                        el.innerHTML = '<div style="padding:12px 0; text-align:center; color:var(--ut-muted-2); font-size:0.82rem;">Belum ada data.</div>';
                         return;
                     }
-                    el.innerHTML = rows.slice(0, 6).map(r => {
-                        const parts = [
-                            '<strong>' + esc(r.asset_name) + '</strong>',
-                            esc(r.asset_number) || '-',
-                            'Jml: ' + esc(r.jumlah ?? 0),
-                            hasSupplier ? ('Sup: ' + (esc(r.supplier) || '-')) : null,
-                            esc(r.tanggal) || '-',
-                            esc(r.pic) || '-',
-                            esc(r.area) || '-'
-                        ].filter(Boolean);
-                        return '<div style="padding:6px 0; border-bottom:1px solid var(--ut-border); display:flex; flex-wrap:wrap; gap:6px 12px;">' + parts.map(p => '<span>' + p + '</span>').join('') + '</div>';
+                    el.innerHTML = rows.slice(0, 5).map(r => {
+                        const name = esc(r.asset_name || '-');
+                        const num = esc(r.asset_number || '-');
+                        const qty = esc(r.jumlah ?? 0);
+                        const sup = hasSupplier ? esc(r.supplier || '-') : null;
+                        const date = esc(r.tanggal || '-');
+                        const pic = esc(r.pic || '-');
+                        const area = esc(r.area || '-');
+
+                        return `
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:10px; padding:10px 12px; margin-bottom:8px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                                <span style="font-weight:800; color:var(--ut-charcoal); font-size:0.88rem;">${name}</span>
+                                <span style="background:var(--ut-surface-2); color:var(--ut-text); font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:6px; font-family:monospace; border:1px solid var(--ut-border);">${num}</span>
+                            </div>
+                            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:0.78rem; color:var(--ut-muted);">
+                                <span style="background:rgba(255,194,14,0.18); color:var(--ut-amber-deep); font-weight:800; padding:2px 6px; border-radius:4px;">Jml: ${qty}</span>
+                                ${hasSupplier ? `<span style="color:var(--ut-text); display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> <strong>Sup:</strong> ${sup}</span>` : ''}
+                                <span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> ${date}</span>
+                                <span style="display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> ${pic}</span>
+                                <span style="background:var(--ut-surface-2); padding:2px 6px; border-radius:4px; font-weight:600; color:var(--ut-text); display:inline-flex; align-items:center; gap:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.85;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${area}</span>
+                            </div>
+                        </div>`;
                     }).join('');
                 };
 
