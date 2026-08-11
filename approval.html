@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -16,9 +16,9 @@
             margin-bottom: 20px;
         }
         .approval-tab {
-            border: 1px solid #e9ecef;
-            background: #ffffff;
-            color: #4B5563;
+            border: 1px solid var(--ut-border);
+            background: var(--ut-white);
+            color: var(--ut-text);
             padding: 8px 18px;
             border-radius: 20px;
             font-weight: 700;
@@ -27,13 +27,13 @@
             transition: all 0.2s ease;
         }
         .approval-tab:hover {
-            border-color: #FFC20E;
-            color: #1F1F1F;
+            border-color: var(--ut-yellow);
+            color: var(--ut-charcoal);
         }
         .approval-tab.active {
-            background: #FFC20E;
-            border-color: #FFC20E;
-            color: #1F1F1F;
+            background: var(--ut-yellow);
+            border-color: var(--ut-yellow);
+            color: var(--ut-charcoal);
         }
         .approval-status-badge {
             padding: 6px 14px;
@@ -43,9 +43,9 @@
             text-transform: uppercase;
             display: inline-block;
         }
-        .stk-pending { background-color: #fff4cc; color: #9A7300; }
-        .stk-approved { background-color: #e8f5e9; color: #2e7d32; }
-        .stk-rejected { background-color: #ffebee; color: #c62828; }
+        .stk-pending { background-color: var(--ut-yellow-soft); color: var(--ut-yellow-deep); }
+        .stk-approved { background-color: var(--ut-green-soft); color: var(--ut-green-deep); }
+        .stk-rejected { background-color: var(--ut-red-soft); color: var(--ut-red-deep); }
 
         .approval-meta-grid {
             display: grid;
@@ -54,8 +54,8 @@
             margin: 16px 0;
         }
         .approval-meta-item {
-            background: #F5F6F8;
-            border: 1px solid #e9ecef;
+            background: var(--ut-surface);
+            border: 1px solid var(--ut-border);
             border-radius: 8px;
             padding: 12px 14px;
         }
@@ -63,7 +63,7 @@
             display: block;
             font-size: 0.68rem;
             font-weight: 800;
-            color: #9A7300;
+            color: var(--ut-yellow-deep);
             text-transform: uppercase;
             letter-spacing: 0.6px;
         }
@@ -71,7 +71,7 @@
             display: block;
             font-size: 0.92rem;
             font-weight: 700;
-            color: #1F1F1F;
+            color: var(--ut-charcoal);
             margin-top: 4px;
         }
 
@@ -85,7 +85,7 @@
             border-radius: 10px;
             padding: 14px;
             text-align: center;
-            color: #fff;
+            color: var(--ut-white);
         }
         .approval-summary-value {
             font-size: 1.6rem;
@@ -105,8 +105,8 @@
             overflow-y: auto;
         }
         .btn-approve {
-            background-color: #4caf50;
-            color: #fff;
+            background-color: var(--ut-green);
+            color: var(--ut-white);
             border: none;
             padding: 10px 24px;
             border-radius: 6px;
@@ -114,14 +114,14 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-approve:hover { background-color: #43a047; }
+        .btn-approve:hover { background-color: var(--ut-green); }
         .btn-approve:disabled {
-            background-color: #bdbdbd;
+            background-color: var(--ut-muted-2);
             cursor: not-allowed;
         }
         .btn-reject {
-            background-color: #dc3545;
-            color: #fff;
+            background-color: var(--ut-red);
+            color: var(--ut-white);
             border: none;
             padding: 10px 24px;
             border-radius: 6px;
@@ -129,11 +129,11 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-reject:hover { background-color: #c62828; }
+        .btn-reject:hover { background-color: var(--ut-red-deep); }
         .btn-export {
-            background: #ffffff;
-            color: #1E5AA8;
-            border: 1px solid #1E5AA8;
+            background: var(--ut-white);
+            color: var(--ut-blue);
+            border: 1px solid var(--ut-blue);
             padding: 10px 18px;
             border-radius: 6px;
             font-weight: 700;
@@ -144,7 +144,7 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-export:hover { background: #1E5AA8; color: #ffffff; }
+        .btn-export:hover { background: var(--ut-blue); color: var(--ut-white); }
         .review-actions {
             display: flex;
             gap: 10px;
@@ -156,17 +156,17 @@
             width: 100%;
             min-height: 96px;
             padding: 12px 14px;
-            border: 1px solid #D8DEE8;
+            border: 1px solid var(--ut-border-strong);
             border-radius: 10px;
             font-family: inherit;
             font-size: 0.95rem;
-            color: #1F1F1F;
+            color: var(--ut-charcoal);
             resize: vertical;
             margin-top: 8px;
         }
         .reject-reason-input:focus {
             outline: none;
-            border-color: #FFC20E;
+            border-color: var(--ut-yellow);
             box-shadow: 0 0 0 3px rgba(255, 194, 14, 0.18);
         }
 
@@ -387,7 +387,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelApproval">
-                        <tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        <tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -401,7 +401,7 @@
             <span class="close-btn" onclick="tutupReviewModal()">&times;</span>
             <h3 id="reviewModalTitle">Review Stocktaking</h3>
             <div id="reviewBody" class="review-modal-body">
-                <p style="color:#777;">Memuat detail...</p>
+                <p style="color:var(--ut-muted);">Memuat detail...</p>
             </div>
         </div>
     </div>
@@ -410,9 +410,9 @@
     <div id="rejectModal" class="modal" style="display: none;">
         <div class="modal-content" style="max-width: 480px; width: 95%;">
             <span class="close-btn" onclick="tutupRejectModal()">&times;</span>
-            <h3 style="margin: 0 0 6px; color: #C62828;">Tolak Pengajuan</h3>
-            <p style="color: #6B7280; font-size: 0.9rem; margin: 0 0 14px;">Alasan penolakan wajib diisi sebelum pengajuan dapat ditolak.</p>
-            <label style="font-size: 0.8rem; font-weight: 800; color: #1F1F1F; text-transform: uppercase; letter-spacing: 0.4px;">Rejection Reason</label>
+            <h3 style="margin: 0 0 6px; color: var(--ut-red-deep);">Tolak Pengajuan</h3>
+            <p style="color: var(--ut-muted); font-size: 0.9rem; margin: 0 0 14px;">Alasan penolakan wajib diisi sebelum pengajuan dapat ditolak.</p>
+            <label style="font-size: 0.8rem; font-weight: 800; color: var(--ut-charcoal); text-transform: uppercase; letter-spacing: 0.4px;">Rejection Reason</label>
             <textarea id="rejectReasonInput" class="reject-reason-input" placeholder="Contoh: Foto aset tidak jelas, data aset belum lengkap..."></textarea>
             <div class="review-actions">
                 <button class="btn-back" onclick="tutupRejectModal()">Batal</button>
@@ -480,18 +480,18 @@
             });
 
             const tbody = document.getElementById('tabelApproval');
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
 
             try {
                 const query = status ? `?status=${encodeURIComponent(status)}` : '';
                 const response = await fetch('get_stocktaking_submissions.php' + query);
                 const result = await response.json();
                 if (result.status !== 'success') {
-                    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px; color:#c62828;">${result.message || 'Gagal memuat data.'}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${result.message || 'Gagal memuat data.'}</td></tr>`;
                     return;
                 }
                 if (!result.data || result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Tidak ada pengajuan stocktaking.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada pengajuan stocktaking.</td></tr>';
                     return;
                 }
 
@@ -499,21 +499,21 @@
                     const assetType = item.asset_type === 'IT' ? '<span class="badge-stocktaked" style="padding:4px 12px;">IT</span>' : '<span class="badge-pending" style="padding:4px 12px;">GA</span>';
                     return `<tr>
                         <td><strong>${esc(item.submission_code || 'BKJ-' + item.id)}</strong></td>
-                        <td>${esc(item.submitted_by_name)}<div style="font-size:11px; color:#6B7280;">${esc(item.submitted_by)}</div></td>
+                        <td>${esc(item.submitted_by_name)}<div style="font-size:11px; color:var(--ut-muted);">${esc(item.submitted_by)}</div></td>
                         <td>${assetType}</td>
                         <td>${esc(item.area) || '-'}</td>
                         <td>${esc(item.submission_date)}</td>
                         <td>${esc(item.approved_by_name || '-')}</td>
                         <td>${esc(item.rejected_by_name || '-')}</td>
                         <td>${esc(item.approval_date || '-')}</td>
-                        <td class="reason-cell"><span style="color:${item.rejection_reason ? '#7F1D1D' : '#6B7280'};">${esc(item.rejection_reason || '-')}</span></td>
+                        <td class="reason-cell"><span style="color:${item.rejection_reason ? 'var(--ut-red-deep)' : 'var(--ut-muted)'};">${esc(item.rejection_reason || '-')}</span></td>
                         <td>${statusBadge(item.status)}</td>
                         <td><button class="btn-warning" onclick="openReview(${esc(item.id)})">Review</button></td>
                     </tr>`;
                 }).join('');
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #c62828;">Gagal memuat data dari server.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-red-deep);">Gagal memuat data dari server.</td></tr>';
             }
         }
 
@@ -527,19 +527,19 @@
             const modal = document.getElementById('reviewModal');
             const body = document.getElementById('reviewBody');
             modal.style.display = 'flex';
-            body.innerHTML = '<p style="color:#777;">Memuat detail...</p>';
+            body.innerHTML = '<p style="color:var(--ut-muted);">Memuat detail...</p>';
 
             try {
                 const response = await fetch('get_stocktaking_submissions.php?id=' + id);
                 const result = await response.json();
                 if (result.status !== 'success' || !result.data) {
-                    body.innerHTML = `<p style="color:#c62828;">${result.message || 'Gagal memuat detail.'}</p>`;
+                    body.innerHTML = `<p style="color:var(--ut-red-deep);">${result.message || 'Gagal memuat detail.'}</p>`;
                     return;
                 }
                 renderReview(result.data);
             } catch (error) {
                 console.error(error);
-                body.innerHTML = '<p style="color:#c62828;">Gagal memuat detail pengajuan.</p>';
+                body.innerHTML = '<p style="color:var(--ut-red-deep);">Gagal memuat detail pengajuan.</p>';
             }
         }
 
@@ -550,11 +550,11 @@
             currentReviewId = sub.id;
 
             const summaryItems = [
-                { label: 'Total Assets', value: sub.total_assets, bg: '#1F1F1F' },
-                { label: 'Normal', value: sub.normal_count, bg: '#1E5AA8' },
-                { label: 'Broken', value: sub.broken_count, bg: '#0D9488' },
-                { label: 'Lost', value: sub.lost_count, bg: '#DC3545' },
-                { label: 'Pending', value: sub.pending_count, bg: '#FFC20E' }
+                { label: 'Total Assets', value: sub.total_assets, bg: 'var(--ut-charcoal)' },
+                { label: 'Normal', value: sub.normal_count, bg: 'var(--ut-blue)' },
+                { label: 'Broken', value: sub.broken_count, bg: 'var(--ut-teal)' },
+                { label: 'Lost', value: sub.lost_count, bg: 'var(--ut-red)' },
+                { label: 'Pending', value: sub.pending_count, bg: 'var(--ut-yellow)' }
             ];
 
             const metaItems = [
@@ -573,7 +573,7 @@
             const assets = sub.assets || [];
             let rowsHtml = '';
             if (assets.length === 0) {
-                rowsHtml = '<tr><td colspan="7" style="text-align:center; padding:14px; color:#777;">Tidak ada data aset.</td></tr>';
+                rowsHtml = '<tr><td colspan="7" style="text-align:center; padding:14px; color:var(--ut-muted);">Tidak ada data aset.</td></tr>';
             } else {
                 rowsHtml = assets.map((a, i) => {
                     const cond = a.condition || '-';
@@ -609,7 +609,7 @@
             body.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                     <div>${statusBadge(sub.status)}</div>
-                    <div style="font-size:12px; color:#6B7280;">Asset Type: <strong>${esc(sub.asset_type)}</strong></div>
+                    <div style="font-size:12px; color:var(--ut-muted);">Asset Type: <strong>${esc(sub.asset_type)}</strong></div>
                 </div>
 
                 <div class="approval-meta-grid">
@@ -622,16 +622,16 @@
 
                 <div class="approval-summary-grid">
                     ${summaryItems.map(item => `
-                        <div class="approval-summary-item" style="background-color:${item.bg}; color:${item.bg === '#FFC20E' ? '#1F1F1F' : '#FFFFFF'};">
+                        <div class="approval-summary-item" style="background-color:${item.bg}; color:${item.bg === 'var(--ut-yellow)' ? 'var(--ut-charcoal)' : 'var(--ut-white)'};">
                             <div class="approval-summary-value">${esc(item.value)}</div>
                             <div class="approval-summary-label">${esc(item.label)}</div>
                         </div>`).join('')}
                 </div>
 
                 ${sub.status === 'Rejected' && sub.rejection_reason ? `
-                <div style="background-color:#FFEBEE; border:1px solid #F5C6CB; border-radius:10px; padding:14px 16px; margin-bottom:16px;">
-                    <div style="font-size:11px; font-weight:800; color:#C62828; text-transform:uppercase; letter-spacing:0.5px;">Rejection Reason</div>
-                    <div style="font-size:0.95rem; color:#7F1D1D; margin-top:4px; line-height:1.6;">${esc(sub.rejection_reason)}</div>
+                <div style="background-color:var(--ut-red-soft); border:1px solid var(--ut-red); border-radius:var(--ut-radius); padding:14px 16px; margin-bottom:16px;">
+                    <div style="font-size:11px; font-weight:800; color:var(--ut-red-deep); text-transform:uppercase; letter-spacing:0.5px;">Rejection Reason</div>
+                    <div style="font-size:0.95rem; color:var(--ut-red-deep); margin-top:4px; line-height:1.6;">${esc(sub.rejection_reason)}</div>
                 </div>` : ''}
 
                 <div class="table-responsive" style="overflow-x:auto;">

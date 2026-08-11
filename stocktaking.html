@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -134,7 +134,7 @@
             <div class="table-container" id="submissionStatusPanel" style="margin-bottom: 20px; padding: 18px; display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <div style="font-size: 0.78rem; font-weight: 800; color: #9A7300; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;">Status Pengajuan Stocktaking</div>
+                        <div style="font-size: 0.78rem; font-weight: 800; color: var(--ut-yellow-deep); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;">Status Pengajuan Stocktaking</div>
                         <div id="submissionStatusBadge"></div>
                     </div>
                     <div style="display: flex; gap: 16px; flex-wrap: wrap;" id="submissionStatusMeta"></div>
@@ -146,7 +146,7 @@
             <div class="table-container" style="margin-bottom: 20px; padding: 15px;">
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <input type="text" id="searchInput" placeholder="Cari berdasarkan Asset Name, Serial Number, atau PIC..." 
-                           style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                           style="flex: 1; padding: 10px; border: 1px solid var(--ut-border); border-radius: 4px; font-size: 14px;"
                            onkeyup="searchStocktaking()">
                     <button onclick="searchStocktaking()" class="btn-warning" style="padding: 10px 20px;">Search</button>
                     <button onclick="resetSearch()" class="btn-back" style="padding: 10px 20px;">Reset</button>
@@ -168,7 +168,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelStocktaking">
-                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -230,7 +230,7 @@
                     displayPage(currentPage);
                 } else {
                     document.getElementById('tabelStocktaking').innerHTML = 
-                        '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Belum ada data.</td></tr>';
+                        '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Belum ada data.</td></tr>';
                 }
             } catch (error) {
                 toggleLoader(false);
@@ -273,7 +273,7 @@
                 // Generate pagination buttons
                 generatePaginationButtons();
             } else {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Tidak ada data yang ditemukan.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada data yang ditemukan.</td></tr>';
                 document.getElementById('paginationInfo').textContent = 'Menampilkan 0-0 dari 0 data';
                 document.getElementById('paginationButtons').innerHTML = '';
             }
@@ -379,16 +379,16 @@
                     items.push(['Rejection Date', sub.rejection_date || '-']);
                 }
                 meta.innerHTML = items.map(function (pair) {
-                    return '<div><span style="display:block; font-size:0.68rem; font-weight:800; color:#9A7300; text-transform:uppercase; letter-spacing:0.6px;">' + esc(pair[0]) + '</span>' +
-                           '<span style="font-size:0.92rem; font-weight:700; color:#1F1F1F;">' + esc(pair[1]) + '</span></div>';
+                    return '<div><span style="display:block; font-size:0.68rem; font-weight:800; color:var(--ut-yellow-deep); text-transform:uppercase; letter-spacing:0.6px;">' + esc(pair[0]) + '</span>' +
+                           '<span style="font-size:0.92rem; font-weight:700; color:var(--ut-charcoal);">' + esc(pair[1]) + '</span></div>';
                 }).join('');
 
                 if (sub.status === 'Rejected' && sub.rejection_reason) {
                     reasonBox.style.display = 'block';
-                    reasonBox.innerHTML = '<div style="font-size:0.7rem; font-weight:800; color:#C62828; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Rejection Reason</div>' +
-                        '<div style="font-size:0.95rem; color:#7F1D1D; line-height:1.6;">' + esc(sub.rejection_reason) + '</div>';
-                    reasonBox.style.background = '#FFEBEE';
-                    reasonBox.style.border = '1px solid #F5C6CB';
+                    reasonBox.innerHTML = '<div style="font-size:0.7rem; font-weight:800; color:var(--ut-red-deep); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Rejection Reason</div>' +
+                        '<div style="font-size:0.95rem; color:var(--ut-red-deep); line-height:1.6;">' + esc(sub.rejection_reason) + '</div>';
+                    reasonBox.style.background = 'var(--ut-red-soft)';
+                    reasonBox.style.border = '1px solid var(--ut-red)';
                     reasonBox.style.borderRadius = '10px';
                     reasonBox.style.padding = '12px 14px';
                 } else {

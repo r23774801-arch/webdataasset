@@ -2,11 +2,14 @@
 header('Content-Type: application/json');
 
 // Authentication: uploads are only allowed for authenticated, non-ADMIN
-// (transaction) roles. Admin is monitoring/approval only.
+// transaction roles. Admin is monitoring/approval only.
 session_start();
 require_once __DIR__ . '/app/bootstrap.php';
 require_login();
 deny_admin_transaction();
+require_once __DIR__ . '/config/upload.php';
+
+$cfg = upload_config();
 
 // Create uploads directory if it doesn't exist
 $uploadDir = 'uploads/';
@@ -24,18 +27,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
     }
     
     // Check file type �?" images (JPG/JPEG/PNG/GIF/WEBP) and PDF documents
-    $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     $fileType = function_exists('mime_content_type') ? mime_content_type($file['tmp_name']) : ($file['type'] ?? '');
     
-    if (!in_array($fileType, $allowedTypes)) {
-        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, GIF, WebP, dan PDF yang diizinkan."]);
+    if (!in_array($fileType, $allowedTypes, true)) {
+        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, WEBP, dan PDF yang diizinkan."]);
         exit;
     }
     
-    // Check file size (max 5MB)
-    $maxSize = 5 * 1024 * 1024; // 5MB
-    if ($file['size'] > $maxSize) {
-        echo json_encode(["status" => "error", "message" => "File size must be less than 5MB"]);
+    // Configurable maximum size.
+    if ($file['size'] > $cfg['max_size']) {
+        $maxMb = round($cfg['max_size'] / 1024 / 1024, 1);
+        echo json_encode(["status" => "error", "message" => "Ukuran file melebihi batas maksimum ({$maxMb} MB)."]);
         exit;
     }
     
@@ -43,13 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
     // client-supplied filename) so a stored file can never claim a PHP ext.
     $mimeToExt = [
         'image/jpeg' => 'jpg',
-        'image/jpg'  => 'jpg',
         'image/png'  => 'png',
-        'image/gif'  => 'gif',
         'image/webp' => 'webp',
         'application/pdf' => 'pdf',
     ];
-    $extension = $mimeToExt[$fileType] ?? 'jpg';
+    $extension = $mimeToExt[$fileType] ?? '';
+    if ($extension === '' || !in_array($extension, $cfg['allowed_extensions'], true)) {
+        echo json_encode(["status" => "error", "message" => "Tipe file tidak didukung. Hanya JPG, JPEG, PNG, WEBP, dan PDF yang diizinkan."]);
+        exit;
+    }
     $filename = uniqid() . '.' . $extension;
     $destination = $uploadDir . $filename;
     

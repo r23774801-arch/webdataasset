@@ -6,12 +6,8 @@ header('Content-Type: application/json');
 include 'koneksi.php';
 require_once __DIR__ . '/app/bootstrap.php';
 
-// RBAC: All non-ADMIN roles may add assets (IT and GA). ADMIN is monitoring/approval only.
+// RBAC + CSRF: All non-ADMIN roles may add assets. ADMIN is monitoring/approval only.
 deny_admin_transaction();
-if (!isset($_SESSION['role']) || trim((string)$_SESSION['role']) === '') {
-    echo json_encode(["status" => "error", "message" => "Akses ditolak. Silakan login terlebih dahulu."]);
-    exit;
-}
 
 // Phase 4.11 — asset-type-wide lock: no new GA assets while a GA stocktaking
 // cycle is Pending or Approved (single source of truth: stocktaking_submissions.status).

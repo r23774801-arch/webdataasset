@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -19,11 +19,11 @@
         }
 
         .summary-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border-radius: 8px;
             padding: 24px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--ut-border);
             text-align: left;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -38,7 +38,7 @@
         .card-title {
             font-size: 0.8rem;
             text-transform: uppercase;
-            color: #6c757d;
+            color: var(--ut-muted);
             font-weight: 700;
             margin-bottom: 12px;
             letter-spacing: 0.5px;
@@ -47,21 +47,21 @@
         .card-value {
             font-size: 2.2rem;
             font-weight: 800;
-            color: #1e1e1e;
+            color: var(--ut-text);
             line-height: 1;
             margin-bottom: 6px;
         }
 
         .card-subtitle {
             font-size: 0.85rem;
-            color: #888888;
+            color: var(--ut-muted-2);
         }
 
         /* =========================================
            STYLE UNTUK TABEL UTAMA
            ========================================= */
         .table-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -76,14 +76,14 @@
         }
 
         .custom-table th {
-            background-color: #1e1e1e !important;
-            color: #ffc107 !important;
+            background-color: var(--ut-table-header-bg) !important;
+            color: var(--ut-table-header-text) !important;
             padding: 18px 16px;
             font-size: 0.85rem;
             text-transform: uppercase;
             font-weight: 700;
             text-align: left;
-            border-bottom: 4px solid #ffc107 !important;
+            border-bottom: 4px solid var(--ut-table-header-border) !important;
             vertical-align: middle;
             letter-spacing: 0.5px;
         }
@@ -91,8 +91,8 @@
         .custom-table td {
             padding: 16px;
             font-size: 0.9rem;
-            color: #333;
-            border-bottom: 1px solid #f1f3f5;
+            color: var(--ut-text);
+            border-bottom: 1px solid var(--ut-surface-2);
             vertical-align: middle;
         }
 
@@ -102,7 +102,7 @@
             align-items: center;
             margin-top: 20px;
             padding-top: 15px;
-            border-top: 1px solid #f1f3f5;
+            border-top: 1px solid var(--ut-surface-2);
         }
 
         .table-toolbar {
@@ -161,14 +161,14 @@
             position: absolute;
             top: 20px;
             right: 35px;
-            color: #f1f1f1;
+            color: var(--ut-white);
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
         }
         .image-preview-close:hover {
-            color: #bbb;
+            color: var(--ut-muted-2);
         }
     </style>
 </head>
@@ -355,7 +355,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelBarang">
-                        <tr><td colspan="12" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        <tr><td colspan="12" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -369,7 +369,7 @@
         <div id="modalTambah" class="modal">
             <div class="modal-content">
                 <span class="close-btn" onclick="tutupModal()">&times;</span>
-                <h3 id="modalTitle" style="margin-bottom: 20px; color: #333;">Tambah Barang Masuk</h3>
+                <h3 id="modalTitle" style="margin-bottom: 20px; color: var(--ut-text);">Tambah Barang Masuk</h3>
                 <div class="input-group"><label>Asset Number</label><input type="text" id="assetNumber" placeholder="Contoh: AST-001"></div>
                 <div class="input-group"><label>Nomor Tiket / Resi</label><input type="text" id="nomorTiket" placeholder="Contoh: TKT-2024-001"></div>
                 <div class="input-group"><label>Kode Pengajuan (Approval)</label>
@@ -397,7 +397,7 @@
         <div id="actionModal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" onclick="tutupActionBarang()">&times;</span>
-                <h3 style="margin-bottom: 20px; color: #333;">Action Attachment</h3>
+                <h3 style="margin-bottom: 20px; color: var(--ut-text);">Action Attachment</h3>
                 <div class="input-group" style="margin-bottom: 18px;">
                     <label>Informasi Barang</label>
                     <div id="actionInfo"></div>
@@ -413,7 +413,7 @@
                     <span class="text-muted" style="font-size:12px;">Jenis file: JPG, JPEG, PNG, WEBP, PDF. Maksimal 5MB. Attachment lama tetap dipertahankan jika tidak memilih file baru.</span>
                 </div>
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
-                    <button type="button" onclick="tutupActionBarang()" style="background:#6c757d; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Batal</button>
+                    <button type="button" onclick="tutupActionBarang()" style="background:var(--ut-muted); color:var(--ut-white); border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Batal</button>
                     <button class="btn-warning" onclick="simpanAttachmentBarang()">Simpan Attachment</button>
                 </div>
             </div>

@@ -9,33 +9,33 @@
     <link rel="stylesheet" href="css/night-mode.css">
     <style>
         /* Standalone admin import page — minimal, scoped styles only */
-        .emp-body { background: #f4f6f9; display: flex; justify-content: center; padding: 48px 20px; min-height: 100vh; }
+        .emp-body { background: var(--ut-bg); display: flex; justify-content: center; padding: 48px 20px; min-height: 100vh; }
         .emp-shell { width: 100%; max-width: 720px; }
         .emp-head { margin-bottom: 20px; }
-        .emp-head h1 { font-size: 1.35rem; font-weight: 700; color: #111111; margin: 0 0 4px; }
-        .emp-head p { font-size: 0.85rem; color: #777777; margin: 0; }
-        .emp-card { background: #ffffff; border: 1px solid #eeeeee; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); padding: 26px; }
+        .emp-head h1 { font-size: 1.35rem; font-weight: 700; color: var(--ut-charcoal); margin: 0 0 4px; }
+        .emp-head p { font-size: 0.85rem; color: var(--ut-muted); margin: 0; }
+        .emp-card { background: var(--ut-white); border: 1px solid var(--ut-border); border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); padding: 26px; }
         .emp-section { margin-bottom: 22px; }
         .emp-section:last-child { margin-bottom: 0; }
-        .emp-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #999999; margin-bottom: 8px; }
-        .emp-file { border: 1.5px dashed #dddddd; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: #fafbfc; }
-        .emp-file:hover { border-color: #FFCC00; background: #fffdf5; }
-        .emp-file strong { color: #B38F00; }
+        .emp-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ut-muted-2); margin-bottom: 8px; }
+        .emp-file { border: 1.5px dashed var(--ut-border-strong); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--ut-surface); }
+        .emp-file:hover { border-color: var(--ut-yellow); background: var(--ut-yellow-soft); }
+        .emp-file strong { color: var(--ut-yellow-deep); }
         .emp-file input[type="file"] { display: none; }
-        .emp-file-name { font-size: 0.85rem; color: #333333; margin-top: 6px; word-break: break-all; }
-        .emp-or { text-align: center; font-size: 0.75rem; color: #aaaaaa; text-transform: uppercase; letter-spacing: 1px; margin: 12px 0; }
-        .emp-paste { width: 100%; min-height: 110px; border: 1px solid #dddddd; border-radius: 10px; padding: 12px; font-family: 'Consolas', 'Menlo', monospace; font-size: 0.82rem; resize: vertical; color: #333333; }
-        .emp-paste:focus { outline: none; border-color: #FFCC00; box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.15); }
+        .emp-file-name { font-size: 0.85rem; color: var(--ut-text); margin-top: 6px; word-break: break-all; }
+        .emp-or { text-align: center; font-size: 0.75rem; color: var(--ut-muted-2); text-transform: uppercase; letter-spacing: 1px; margin: 12px 0; }
+        .emp-paste { width: 100%; min-height: 110px; border: 1px solid var(--ut-border-strong); border-radius: 10px; padding: 12px; font-family: 'Consolas', 'Menlo', monospace; font-size: 0.82rem; resize: vertical; color: var(--ut-text); }
+        .emp-paste:focus { outline: none; border-color: var(--ut-yellow); box-shadow: 0 0 0 3px var(--ut-yellow-soft); }
         .emp-actions { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
         .emp-result { margin-top: 18px; border-radius: 10px; padding: 14px 16px; display: none; font-size: 0.88rem; }
-        .emp-result.ok { display: block; background: #f0faf3; border: 1px solid #cdeeda; color: #1c7a3d; }
-        .emp-result.err { display: block; background: #fff5f5; border: 1px solid #f3cccc; color: #b02a2a; }
+        .emp-result.ok { display: block; background: var(--ut-green-soft); border: 1px solid var(--ut-green); color: var(--ut-green-deep); }
+        .emp-result.err { display: block; background: var(--ut-red-soft); border: 1px solid var(--ut-red); color: var(--ut-red-deep); }
         .emp-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
-        .emp-stat { background: #f8f9fb; border: 1px solid #eeeeee; border-radius: 10px; padding: 12px; text-align: center; }
-        .emp-stat b { display: block; font-size: 1.25rem; color: #111111; }
-        .emp-stat span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #999999; font-weight: 700; }
+        .emp-stat { background: var(--ut-surface); border: 1px solid var(--ut-border); border-radius: 10px; padding: 12px; text-align: center; }
+        .emp-stat b { display: block; font-size: 1.25rem; color: var(--ut-charcoal); }
+        .emp-stat span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ut-muted-2); font-weight: 700; }
         .btn-ut-primary { margin-top: 0; }
-        .emp-note { font-size: 0.75rem; color: #999999; margin-top: 14px; line-height: 1.5; }
+        .emp-note { font-size: 0.75rem; color: var(--ut-muted-2); margin-top: 14px; line-height: 1.5; }
     </style>
 </head>
 <body class="emp-body">
@@ -50,7 +50,7 @@
                 <div class="emp-label">Pilih File</div>
                 <label class="emp-file" id="empFileDrop">
                     <strong>Klik untuk memilih file</strong>
-                    <div style="font-size:0.78rem; color:#999999; margin-top:4px;">Format: .csv, .tsv, .txt, .xlsx (kolom: NRP, Nama, Email opsional)</div>
+                    <div style="font-size:0.78rem; color:var(--ut-muted-2); margin-top:4px;">Format: .csv, .tsv, .txt, .xlsx (kolom: NRP, Nama, Email opsional)</div>
                     <input type="file" id="empFile" accept=".csv,.tsv,.txt,.xlsx">
                     <div class="emp-file-name" id="empFileName"></div>
                 </label>
@@ -65,7 +65,7 @@
 
             <div class="emp-actions">
                 <button class="btn-ut-primary" type="button" onclick="runImport()">Import Karyawan</button>
-                <a href="dashboard.html" class="btn-outline-link" style="font-size:0.85rem; color:#B38F00; text-decoration:none; font-weight:600;">Kembali ke Dashboard</a>
+                <a href="dashboard.html" class="btn-outline-link" style="font-size:0.85rem; color:var(--ut-yellow-deep); text-decoration:none; font-weight:600;">Kembali ke Dashboard</a>
             </div>
 
             <div class="emp-result" id="empResult"></div>

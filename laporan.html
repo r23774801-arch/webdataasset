@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -10,10 +10,10 @@
     <style>
         :root {
             --ut-yellow: #FFC20E;
-            --ut-gold: #E8B500;
+            --ut-gold: var(--ut-yellow-strong);
             --ut-charcoal: #111827;
             --ut-slate: #2C2C2C;
-            --ut-surface: #ffffff;
+            --ut-surface: var(--ut-white);
             --ut-surface-soft: #f8f5ea;
             --ut-border: rgba(17, 24, 39, 0.08);
         }
@@ -46,7 +46,7 @@
 
         .report-description p {
             margin: 0;
-            color: #475569;
+            color: var(--ut-muted);
             font-size: 1rem;
             line-height: 1.8;
             max-width: 720px;
@@ -57,8 +57,8 @@
             align-items: center;
             padding: 12px 16px;
             border-radius: 999px;
-            background: rgba(255, 194, 14, 0.14);
-            color: #92400e;
+            background: var(--ut-yellow-soft);
+            color: var(--ut-amber-deep);
             font-weight: 700;
             font-size: 0.9rem;
             letter-spacing: 0.02em;
@@ -92,7 +92,7 @@
         }
 
         .card-label {
-            color: #64748b;
+            color: var(--ut-muted);
             font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -147,7 +147,7 @@
         }
 
         .overall-hero {
-            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            background: linear-gradient(180deg, var(--ut-surface) 0%, var(--ut-white) 100%);
             border: 1px solid rgba(17, 24, 39, 0.08);
             border-radius: 22px;
             padding: 18px 20px;
@@ -163,7 +163,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: #64748b;
+            color: var(--ut-muted);
         }
 
         .hero-stat-value {
@@ -176,13 +176,13 @@
         .hero-stat-percent {
             font-size: 1.1rem;
             font-weight: 800;
-            color: #b88600;
+            color: var(--ut-amber-deep);
         }
 
         .progress-track {
             height: 12px;
             border-radius: 999px;
-            background: #eef1f5;
+            background: var(--ut-surface-2);
             overflow: hidden;
             margin-top: 4px;
         }
@@ -190,7 +190,7 @@
         .progress-fill {
             height: 100%;
             border-radius: 999px;
-            background: linear-gradient(90deg, var(--ut-yellow), #e8b500);
+            background: linear-gradient(90deg, var(--ut-yellow), var(--ut-yellow-strong));
             width: 0%;
             transition: width 0.8s ease;
             box-shadow: 0 4px 12px rgba(255, 194, 14, 0.35);
@@ -222,7 +222,7 @@
         }
 
         .condition-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border: 1px solid rgba(17, 24, 39, 0.08);
             border-radius: 18px;
             padding: 14px 16px;
@@ -258,7 +258,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #64748b;
+            color: var(--ut-muted);
         }
 
         .condition-card-count {
@@ -271,11 +271,11 @@
         .condition-card-percent {
             font-size: 0.95rem;
             font-weight: 800;
-            color: #b88600;
+            color: var(--ut-amber-deep);
         }
 
         .table-container {
-            background: #ffffff;
+            background: var(--ut-white);
             border-radius: 22px;
             padding: 18px;
             box-shadow: 0 20px 56px rgba(17, 24, 39, 0.08);
@@ -285,7 +285,7 @@
         }
 
         .report-section-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border-radius: 22px;
             padding: 24px;
             box-shadow: 0 20px 56px rgba(17, 24, 39, 0.08);
@@ -339,14 +339,14 @@
         }
 
         .table-container th {
-            background-color: #0f172a !important;
-            color: #facc15 !important;
+            background-color: var(--ut-table-header-bg) !important;
+            color: var(--ut-table-header-text) !important;
             padding: 14px 12px;
             font-size: 0.82rem;
             text-transform: uppercase;
             font-weight: 700;
             text-align: left;
-            border-bottom: 4px solid #facc15 !important;
+            border-bottom: 4px solid var(--ut-table-header-border) !important;
             vertical-align: middle;
             letter-spacing: 0.4px;
         }
@@ -354,8 +354,8 @@
         .table-container td {
             padding: 12px 10px;
             font-size: 0.88rem;
-            color: #334155;
-            border-bottom: 1px solid #e2e8f0;
+            color: var(--ut-text);
+            border-bottom: 1px solid var(--ut-border);
             vertical-align: middle;
         }
 
@@ -365,7 +365,7 @@
             align-items: center;
             margin-top: 20px;
             padding: 15px 0 0 0;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--ut-border);
         }
 
         .report-title-line {
@@ -394,7 +394,7 @@
             position: sticky;
             top: 0;
             z-index: 3;
-            background: #0f172a !important;
+            background: var(--ut-table-header-bg) !important;
         }
 
         @media (max-width: 1080px) {
@@ -686,7 +686,7 @@
                     <div class="condition-cards">
                         <div class="condition-card">
                             <div class="condition-card-top">
-                                <span class="condition-card-dot" style="background:#1E5AA8;"></span>
+                                <span class="condition-card-dot" style="background:var(--ut-blue);"></span>
                                 <span class="condition-card-label">Barang Masuk IT</span>
                             </div>
                             <div class="condition-card-count" id="barangMasukItCount">0</div>
@@ -694,7 +694,7 @@
                         </div>
                         <div class="condition-card">
                             <div class="condition-card-top">
-                                <span class="condition-card-dot" style="background:#0D9488;"></span>
+                                <span class="condition-card-dot" style="background:var(--ut-teal);"></span>
                                 <span class="condition-card-label">Barang Masuk GA</span>
                             </div>
                             <div class="condition-card-count" id="barangMasukGaCount">0</div>
@@ -702,7 +702,7 @@
                         </div>
                         <div class="condition-card">
                             <div class="condition-card-top">
-                                <span class="condition-card-dot" style="background:#16A34A;"></span>
+                                <span class="condition-card-dot" style="background:var(--ut-green);"></span>
                                 <span class="condition-card-label">Barang Keluar IT</span>
                             </div>
                             <div class="condition-card-count" id="barangKeluarItCount">0</div>
@@ -710,7 +710,7 @@
                         </div>
                         <div class="condition-card">
                             <div class="condition-card-top">
-                                <span class="condition-card-dot" style="background:#FFCC00;"></span>
+                                <span class="condition-card-dot" style="background:var(--ut-yellow);"></span>
                                 <span class="condition-card-label">Barang Keluar GA</span>
                             </div>
                             <div class="condition-card-count" id="barangKeluarGaCount">0</div>
@@ -718,21 +718,21 @@
                         </div>
                     </div>
                     <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px; margin-top:16px;" class="barang-report-grid">
-                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:#1E5AA8; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk IT â€” Terbaru</div>
-                            <div id="barangMasukItRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-blue); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk IT â€” Terbaru</div>
+                            <div id="barangMasukItRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
-                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:#0D9488; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk GA â€” Terbaru</div>
-                            <div id="barangMasukGaRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-teal); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Masuk GA â€” Terbaru</div>
+                            <div id="barangMasukGaRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
-                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:#16A34A; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar IT â€” Terbaru</div>
-                            <div id="barangKeluarItRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-green); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar IT â€” Terbaru</div>
+                            <div id="barangKeluarItRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
-                        <div style="background:#ffffff; border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
-                            <div style="font-size:0.78rem; font-weight:800; color:#B88600; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar GA â€” Terbaru</div>
-                            <div id="barangKeluarGaRows" style="font-size:0.85rem; color:#475569;">Memuat...</div>
+                        <div style="background:var(--ut-white); border:1px solid rgba(17,24,39,0.08); border-radius:18px; padding:14px;">
+                            <div style="font-size:0.78rem; font-weight:800; color:var(--ut-amber-deep); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:10px;">Barang Keluar GA â€” Terbaru</div>
+                            <div id="barangKeluarGaRows" style="font-size:0.85rem; color:var(--ut-muted);">Memuat...</div>
                         </div>
                     </div>
                 </section>
@@ -740,7 +740,7 @@
                 <!-- Transfer History -->
                 <div class="report-section-card">
                     <div class="report-header" style="margin-bottom: 16px;">
-                        <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0;">Transfer History</h3>
+                        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ut-charcoal); margin: 0;">Transfer History</h3>
                         <div class="report-title-line"></div>
                     </div>
                     <div class="table-responsive">
@@ -761,7 +761,7 @@
                                 </tr>
                             </thead>
                             <tbody id="transferHistoryBody">
-                                <tr><td colspan="11" style="text-align:center; padding:20px; color:#777;">Memuat data...</td></tr>
+                                <tr><td colspan="11" style="text-align:center; padding:20px; color: var(--ut-muted);">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -770,11 +770,11 @@
                 <!-- Asset Master Data -->
                 <div class="report-section-card">
                     <div class="report-header" style="margin-bottom: 16px;">
-                        <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0;">Asset Master Data</h3>
+                        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ut-charcoal); margin: 0;">Asset Master Data</h3>
                         <div class="report-title-line"></div>
                     </div>
                     <div class="report-toolbar-row">
-                        <input type="text" id="assetMasterSearch" style="width: 380px; max-width: 100%; height: 42px; box-sizing: border-box; padding: 0 14px; border: 1.5px solid rgba(17, 24, 39, 0.16); border-radius: 10px; font-size: 0.9rem; background: #f8fafc; color: #1e293b;" placeholder="Cari asset (nomor, nama, serial, PIC, area, dept)...">
+                        <input type="text" id="assetMasterSearch" style="width: 380px; max-width: 100%; height: 42px; box-sizing: border-box; padding: 0 14px; border: 1.5px solid rgba(17, 24, 39, 0.16); border-radius: 10px; font-size: 0.9rem; background: var(--ut-surface); color: var(--ut-text);" placeholder="Cari asset (nomor, nama, serial, PIC, area, dept)...">
                         <div class="report-export-btns">
                             <button onclick="exportAssetMasterExcel()" class="btn-warning report-btn-export">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -815,7 +815,7 @@
                                 </tr>
                             </thead>
                             <tbody id="assetMasterBody">
-                                <tr><td colspan="14" style="text-align:center; padding:20px; color:#777;">Memuat data...</td></tr>
+                                <tr><td colspan="14" style="text-align:center; padding:20px; color: var(--ut-muted);">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -828,7 +828,7 @@
                 <!-- Asset Report Summary Table -->
                 <div class="report-section-card">
                     <div class="report-header" style="margin-bottom: 16px;">
-                        <h3 style="font-size: 1.2rem; font-weight: 700; color: #1a1a1a; margin: 0;">Ringkasan Aset per Lokasi (Area)</h3>
+                        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ut-charcoal); margin: 0;">Ringkasan Aset per Lokasi (Area)</h3>
                         <div class="report-title-line"></div>
                     </div>
                     <div class="report-toolbar-row justify-end">
@@ -867,7 +867,7 @@
                                 </tr>
                             </thead>
                             <tbody id="summaryTableBody">
-                                <tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                                <tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -999,9 +999,9 @@
                 data: {
                     labels: ['Main Office', 'Part BKJ', 'Part BIU', 'Part BIU 3', 'BIU Service', 'Kel.', 'PTK', 'Gudang'],
                     datasets: [
-                        { label: 'Normal', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#1E5AA8', borderColor: '#1E5AA8', borderWidth: 1 },
-                        { label: 'Pending', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#FFCC00', borderColor: '#FFCC00', borderWidth: 1 },
-                        { label: 'Broken', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#0D9488', borderColor: '#0D9488', borderWidth: 1 },
+                        { label: 'Normal', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: 'var(--ut-blue)', borderColor: 'var(--ut-blue)', borderWidth: 1 },
+                        { label: 'Pending', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: 'var(--ut-yellow)', borderColor: 'var(--ut-yellow)', borderWidth: 1 },
+                        { label: 'Broken', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: 'var(--ut-teal)', borderColor: 'var(--ut-teal)', borderWidth: 1 },
                         { label: 'Lost', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#dc3545', borderColor: '#dc3545', borderWidth: 1 },
                         { label: 'Transfer', data: [0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#8B5CF6', borderColor: '#8B5CF6', borderWidth: 1 }
                     ]
@@ -1025,11 +1025,11 @@
         // DASHBOARD SUMMARY (Overall / IT / GA)
         // ==========================================
         const CONDITION_CARD_META = [
-            { key: 'total', label: 'Total Asset', color: '#1E5AA8' },
-            { key: 'normal', label: 'Normal', color: '#16A34A' },
-            { key: 'broken', label: 'Broken', color: '#0D9488' },
+            { key: 'total', label: 'Total Asset', color: 'var(--ut-blue)' },
+            { key: 'normal', label: 'Normal', color: 'var(--ut-green)' },
+            { key: 'broken', label: 'Broken', color: 'var(--ut-teal)' },
             { key: 'lost', label: 'Lost', color: '#DC2626' },
-            { key: 'pending', label: 'Pending', color: '#FFCC00' },
+            { key: 'pending', label: 'Pending', color: 'var(--ut-yellow)' },
             { key: 'transfer', label: 'Transfer', color: '#8B5CF6' }
         ];
 
@@ -1110,7 +1110,7 @@
                     sourceSummaryData = [];
                     allSummaryData = [];
                     document.getElementById('summaryTableBody').innerHTML = 
-                        '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Belum ada data.</td></tr>';
+                        '<tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--ut-muted);">Belum ada data.</td></tr>';
                     renderPaginationLaporan();
                 }
             } catch (err) {
@@ -1118,7 +1118,7 @@
                 sourceSummaryData = [];
                 allSummaryData = [];
                 document.getElementById('summaryTableBody').innerHTML = 
-                    '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Gagal memuat data.</td></tr>';
+                    '<tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--ut-muted);">Gagal memuat data.</td></tr>';
                 renderPaginationLaporan();
             } finally {
                 if (typeof toggleLoader === 'function') {
@@ -1133,7 +1133,7 @@
 
             const total = allSummaryData.length;
             if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #777;">Tidak ada data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada data.</td></tr>';
                 renderPaginationLaporan();
                 return;
             }
@@ -1162,8 +1162,8 @@
                         <td style="color: ${percentageColor}; font-weight: 600;">${percentageNormal}%</td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="flex: 1; background: #e0e0e0; height: 8px; border-radius: 4px; overflow: hidden; min-width: 80px;">
-                                    <div style="width: ${progressStocktaking}%; background: #1E5AA8; height: 100%; transition: width 0.3s;"></div>
+                                <div style="flex: 1; background: var(--ut-surface-2); height: 8px; border-radius: 4px; overflow: hidden; min-width: 80px;">
+                                    <div style="width: ${progressStocktaking}%; background: var(--ut-blue); height: 100%; transition: width 0.3s;"></div>
                                 </div>
                                 <span style="font-weight: 600; min-width: 45px;">${progressStocktaking}%</span>
                             </div>
@@ -1335,14 +1335,14 @@
                 renderAssetMasterPagination();
             } catch (err) {
                 console.error('Failed to load asset master data:', err);
-                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px; color:#777;">Gagal memuat data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px; color: var(--ut-muted);">Gagal memuat data.</td></tr>';
             }
         }
 
         function renderAssetMasterTable(rows) {
             const tbody = document.getElementById('assetMasterBody');
             if (!rows.length) {
-                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px; color:#777;">Tidak ada data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="14" style="text-align:center; padding:20px; color: var(--ut-muted);">Tidak ada data.</td></tr>';
                 return;
             }
             const startNo = (assetMasterState.page - 1) * ASSET_MASTER_PAGE_SIZE;
@@ -1491,7 +1491,7 @@
                     const el = document.getElementById(elId);
                     if (!el) return;
                     if (!rows || rows.length === 0) {
-                        el.innerHTML = '<span style="color:#94a3b8;">Belum ada data.</span>';
+                        el.innerHTML = '<span style="color:var(--ut-muted-2);">Belum ada data.</span>';
                         return;
                     }
                     el.innerHTML = rows.slice(0, 6).map(r => {
@@ -1504,7 +1504,7 @@
                             esc(r.pic) || '-',
                             esc(r.area) || '-'
                         ].filter(Boolean);
-                        return '<div style="padding:6px 0; border-bottom:1px solid #f1f5f9; display:flex; flex-wrap:wrap; gap:6px 12px;">' + parts.map(p => '<span>' + p + '</span>').join('') + '</div>';
+                        return '<div style="padding:6px 0; border-bottom:1px solid var(--ut-border); display:flex; flex-wrap:wrap; gap:6px 12px;">' + parts.map(p => '<span>' + p + '</span>').join('') + '</div>';
                     }).join('');
                 };
 
@@ -1527,7 +1527,7 @@
                 const tbody = document.getElementById('transferHistoryBody');
                 if (!tbody) return;
                 if (result.status !== 'success' || !result.data || result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px; color:#777;">Belum ada riwayat transfer.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px; color: var(--ut-muted);">Belum ada riwayat transfer.</td></tr>';
                     return;
                 }
                 tbody.innerHTML = result.data.map(t => `

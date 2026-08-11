@@ -26,6 +26,12 @@ function toggleTheme() {
     const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) {
+        btn.classList.remove('theme-spin');
+        void btn.offsetWidth;
+        btn.classList.add('theme-spin');
+    }
     updateThemeToggleIcon();
 }
 
@@ -302,6 +308,17 @@ function canManageData(type) {
     return role !== '' && ['it', 'ga'].includes(String(type || '').toLowerCase());
 }
 window.canManageData = canManageData;
+
+// ==========================================
+// SHARED RBAC — CREATE-ONLY PERMISSION (Phase 4.x)
+// Admin may ADD new assets (IT and GA), but stays read-only for
+// editing / action / stocktaking (that is still canManageData=false).
+// ==========================================
+function canAddAsset(type) {
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
+    return role !== '' && ['it', 'ga'].includes(String(type || '').toLowerCase());
+}
+window.canAddAsset = canAddAsset;
 
 // ==========================================
 // SHARED RBAC — FINISH STOCKTAKING PERMISSION

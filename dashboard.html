@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -17,18 +17,18 @@
             margin-top: 18px;
         }
         .welcome-meta-item {
-            background: #ffffff;
-            border: 1px solid #e9ecef;
+            background: var(--ut-white);
+            border: 1px solid var(--ut-border);
             border-radius: 8px;
             padding: 10px 16px;
             min-width: 130px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: var(--ut-shadow-sm);
         }
         .welcome-meta-label {
             display: block;
             font-size: 0.68rem;
             font-weight: 800;
-            color: #9A7300;
+            color: var(--ut-yellow-deep);
             text-transform: uppercase;
             letter-spacing: 0.8px;
             margin-bottom: 4px;
@@ -37,57 +37,60 @@
             display: block;
             font-size: 0.95rem;
             font-weight: 700;
-            color: #1F1F1F;
+            color: var(--ut-charcoal);
         }
+        /* ===== Fallback: base icon color inside cards ===== */
+        .summary-card .card-icon svg { stroke: var(--ut-charcoal); }
+
         /* ===== Summary card colors by division / approval status =====
            IT division  -> Bootstrap Primary (blue)
            GA division  -> teal/cyan (professional, distinct from IT)
            Pending      -> warning (amber)
            Approved     -> success (green)
            Rejected     -> danger (red) */
-        .summary-card.card-division-it { border-top-color: #0d6efd !important; }
+        .summary-card.card-division-it { border-top-color: var(--ut-blue) !important; }
         .summary-card.card-division-it .card-icon {
-            background: rgba(13, 110, 253, 0.12) !important;
-            color: #0d6efd !important;
+            background: var(--ut-blue-soft) !important;
+            color: var(--ut-blue) !important;
         }
-        .summary-card.card-division-it .card-icon svg { stroke: #0d6efd !important; }
-        .summary-card.card-division-it .card-value { color: #0d6efd !important; }
+        .summary-card.card-division-it .card-icon svg { stroke: var(--ut-blue) !important; }
+        .summary-card.card-division-it .card-value { color: var(--ut-blue) !important; }
 
 
-        .summary-card.card-division-ga { border-top-color: #0F766E !important; }
+        .summary-card.card-division-ga { border-top-color: var(--ut-teal) !important; }
         .summary-card.card-division-ga .card-icon {
-            background: #CCFBF1 !important;
-            color: #0F766E !important;
+            background: var(--ut-teal-soft) !important;
+            color: var(--ut-teal) !important;
         }
-        .summary-card.card-division-ga .card-icon svg { stroke: #0F766E !important; }
-        .summary-card.card-division-ga .card-value { color: #0F766E !important; }
+        .summary-card.card-division-ga .card-icon svg { stroke: var(--ut-teal) !important; }
+        .summary-card.card-division-ga .card-value { color: var(--ut-teal) !important; }
 
 
-        .summary-card.card-status-pending { border-top-color: #ffc107 !important; }
+        .summary-card.card-status-pending { border-top-color: var(--ut-yellow) !important; }
         .summary-card.card-status-pending .card-icon {
-            background: rgba(255, 193, 7, 0.18) !important;
-            color: #b8860b !important;
+            background: var(--ut-yellow-soft) !important;
+            color: var(--ut-amber-deep) !important;
         }
-        .summary-card.card-status-pending .card-icon svg { stroke: #b8860b !important; }
-        .summary-card.card-status-pending .card-value { color: #b8860b !important; }
+        .summary-card.card-status-pending .card-icon svg { stroke: var(--ut-amber-deep) !important; }
+        .summary-card.card-status-pending .card-value { color: var(--ut-amber-deep) !important; }
 
 
-        .summary-card.card-status-approved { border-top-color: #198754 !important; }
+        .summary-card.card-status-approved { border-top-color: var(--ut-green) !important; }
         .summary-card.card-status-approved .card-icon {
-            background: rgba(25, 135, 84, 0.12) !important;
-            color: #198754 !important;
+            background: var(--ut-green-soft) !important;
+            color: var(--ut-green) !important;
         }
-        .summary-card.card-status-approved .card-icon svg { stroke: #198754 !important; }
-        .summary-card.card-status-approved .card-value { color: #198754 !important; }
+        .summary-card.card-status-approved .card-icon svg { stroke: var(--ut-green) !important; }
+        .summary-card.card-status-approved .card-value { color: var(--ut-green) !important; }
 
 
-        .summary-card.card-status-rejected { border-top-color: #dc3545 !important; }
+        .summary-card.card-status-rejected { border-top-color: var(--ut-red) !important; }
         .summary-card.card-status-rejected .card-icon {
-            background: rgba(220, 53, 69, 0.12) !important;
-            color: #dc3545 !important;
+            background: var(--ut-red-soft) !important;
+            color: var(--ut-red) !important;
         }
-        .summary-card.card-status-rejected .card-icon svg { stroke: #dc3545 !important; }
-        .summary-card.card-status-rejected .card-value { color: #dc3545 !important; }
+        .summary-card.card-status-rejected .card-icon svg { stroke: var(--ut-red) !important; }
+        .summary-card.card-status-rejected .card-value { color: var(--ut-red) !important; }
 
     </style>
 </head>
@@ -260,7 +263,7 @@
                                 <span class="welcome-meta-value" id="welcomeRole">-</span>
                             </div>
                             <div class="welcome-meta-item">
-                                <span class="welcome-meta-label">Assigned Area</span>
+                                <span class="welcome-meta-label">Area</span>
                                 <span class="welcome-meta-value" id="welcomeArea">-</span>
                             </div>
                         </div>
@@ -272,7 +275,7 @@
                 <div class="summary-cards-container">
                     <div class="summary-card card-division-it">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
                                 <line x1="9" y1="6" x2="9" y2="6.01"></line>
                                 <line x1="15" y1="6" x2="15" y2="6.01"></line>
@@ -290,7 +293,7 @@
                     </div>
                     <div class="summary-card card-division-ga">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path>
                                 <line x1="17" y1="18" x2="17" y2="18.01"></line>
                                 <line x1="12" y1="18" x2="12" y2="18.01"></line>
@@ -303,7 +306,7 @@
                     </div>
                     <div class="summary-card card-division-it">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="9 11 12 14 22 4"></polyline>
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                             </svg>
@@ -314,7 +317,7 @@
                     </div>
                     <div class="summary-card card-division-ga">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
                         </div>
@@ -324,7 +327,7 @@
                     </div>
                     <div class="summary-card card-division-it">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="15 3 21 3 21 9"></polyline>
                                 <polyline points="9 21 3 21 3 15"></polyline>
                                 <line x1="21" y1="3" x2="14" y2="10"></line>
@@ -337,7 +340,7 @@
                     </div>
                     <div class="summary-card card-division-ga">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M17 8l4 4-4 4"></path>
                                 <path d="M3 12h18"></path>
                             </svg>
@@ -348,7 +351,7 @@
                     </div>
                     <div class="summary-card card-status-pending">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b8860b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-amber-deep)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
@@ -359,7 +362,7 @@
                     </div>
                     <div class="summary-card card-status-approved">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#198754" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
                             </svg>
@@ -370,7 +373,7 @@
                     </div>
                     <div class="summary-card card-status-rejected">
                         <div class="card-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ut-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <line x1="15" y1="9" x2="9" y2="15"></line>
                                 <line x1="9" y1="9" x2="15" y2="15"></line>

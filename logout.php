@@ -1,6 +1,9 @@
 <?php
 header("Content-Type: application/json");
 session_start();
+require_once __DIR__ . '/app/helpers.php';
+
+require_valid_origin();
 
 // Destroy all session data
 $_SESSION = array();

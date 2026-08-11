@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -37,28 +37,28 @@
 
         .user-status-badge {
             padding: 6px 14px;
-            border-radius: 20px;
+            border-radius: 999px;
             font-weight: 700;
             font-size: 0.78rem;
             text-transform: uppercase;
             display: inline-block;
         }
-        .usr-aktif { background-color: #e8f5e9; color: #2e7d32; }
-        .usr-nonaktif { background-color: #ffebee; color: #c62828; }
+        .usr-aktif { background-color: var(--ut-green-soft); color: var(--ut-green-deep); }
+        .usr-nonaktif { background-color: var(--ut-red-soft); color: var(--ut-red-deep); }
 
         .user-role-badge {
             padding: 4px 12px;
-            border-radius: 6px;
+            border-radius: var(--ut-radius-sm);
             font-weight: 700;
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.4px;
             display: inline-block;
         }
-.role-admin { background-color: #fff4cc; color: #9A7300; }
-        .role-it { background-color: #e3f2fd; color: #1565c0; }
-        .role-ga { background-color: #e0f2f1; color: #0f766e; }
-        .role-user { background-color: #eef2ff; color: #4f46e5; }
+.role-admin { background-color: var(--ut-yellow-soft); color: var(--ut-yellow-deep); }
+        .role-it { background-color: var(--ut-blue-soft); color: var(--ut-blue); }
+        .role-ga { background-color: var(--ut-teal-soft); color: var(--ut-teal); }
+        .role-user { background-color: var(--ut-purple-soft); color: var(--ut-purple); }
 
         .user-photo {
             width: 42px;
@@ -68,25 +68,25 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            color: #475569;
+            background: var(--ut-surface);
+            border: 1px solid var(--ut-border);
+            color: var(--ut-muted);
             font-size: 0.85rem;
             font-weight: 800;
             flex-shrink: 0;
         }
         .user-photo.fallback {
-            background: #eef2ff;
-            color: #6366f1;
-            border-color: #c7d2fe;
+            background: var(--ut-purple-soft);
+            color: var(--ut-purple);
+            border-color: var(--ut-border-strong);
         }
 
         .btn-soft {
-            background: #ffffff;
-            color: #1E5AA8;
-            border: 1px solid #1E5AA8;
+            background: var(--ut-white);
+            color: var(--ut-blue);
+            border: 1px solid var(--ut-blue);
             padding: 7px 14px;
-            border-radius: 6px;
+            border-radius: var(--ut-radius-sm);
             font-weight: 700;
             font-size: 0.78rem;
             cursor: pointer;
@@ -95,22 +95,22 @@
             align-items: center;
             gap: 5px;
         }
-        .btn-soft:hover { background: #1E5AA8; color: #ffffff; }
+        .btn-soft:hover { background: var(--ut-blue); color: var(--ut-white); }
         .btn-soft.btn-danger {
-            color: #c62828;
-            border-color: #c62828;
+            color: var(--ut-red-deep);
+            border-color: var(--ut-red-deep);
         }
-        .btn-soft.btn-danger:hover { background: #c62828; color: #ffffff; }
+        .btn-soft.btn-danger:hover { background: var(--ut-red-deep); color: var(--ut-white); }
         .btn-soft.btn-toggle {
-            color: #0f766e;
-            border-color: #0f766e;
+            color: var(--ut-teal);
+            border-color: var(--ut-teal);
         }
-        .btn-soft.btn-toggle:hover { background: #0f766e; color: #ffffff; }
+        .btn-soft.btn-toggle:hover { background: var(--ut-teal); color: var(--ut-white); }
         .btn-soft:disabled,
         .btn-soft[disabled] {
-            background: #f1f1f1;
-            color: #bdbdbd;
-            border-color: #e0e0e0;
+            background: var(--ut-surface-2);
+            color: var(--ut-muted-2);
+            border-color: var(--ut-border-strong);
             cursor: not-allowed;
         }
 
@@ -120,9 +120,9 @@
             flex-wrap: nowrap;
             gap: 8px;
             padding: 4px 8px;
-            background: #F5F6F8;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
+            background: var(--ut-surface);
+            border: 1px solid var(--ut-border);
+            border-radius: var(--ut-radius);
             white-space: nowrap;
         }
         .user-actions .btn-soft {
@@ -133,15 +133,15 @@
 
         .modal-user-info {
             padding: 10px 12px;
-            background: #F5F6F8;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
+            background: var(--ut-surface);
+            border: 1px solid var(--ut-border);
+            border-radius: var(--ut-radius);
             margin: 10px 0 16px;
             font-size: 0.9rem;
-            color: #1F1F1F;
+            color: var(--ut-charcoal);
             line-height: 1.6;
         }
-        .modal-user-info strong { color: #1F1F1F; }
+        .modal-user-info strong { color: var(--ut-charcoal); }
 
         .change-pw-form {
             display: flex;
@@ -153,7 +153,7 @@
         }
         .pw-hint {
             font-size: 0.75rem;
-            color: #6B7280;
+            color: var(--ut-muted);
             margin-top: 2px;
         }
         .modal-actions {
@@ -164,13 +164,13 @@
             flex-wrap: wrap;
         }
         .delete-warning {
-            background-color: #ffebee;
-            border: 1px solid #f5c6cb;
-            border-radius: 10px;
+            background-color: var(--ut-red-soft);
+            border: 1px solid var(--ut-red);
+            border-radius: var(--ut-radius);
             padding: 14px 16px;
             margin-bottom: 6px;
             font-size: 0.9rem;
-            color: #7F1D1D;
+            color: var(--ut-red-deep);
             line-height: 1.6;
         }
         .self-row .btn-self-disabled {
@@ -351,7 +351,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelAkun">
-                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -380,7 +380,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabelApproval">
-                            <tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                            <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                         </tbody>
                     </table>
                     </div>
@@ -462,7 +462,7 @@
             <div class="modal-user-info" id="tolakUserInfo"></div>
             <div class="input-group">
                 <label>Alasan Penolakan</label>
-                <textarea id="tolakAlasan" rows="3" style="width:100%; padding:10px; border:1px solid #E6E9EF; border-radius:10px; font-family:inherit; resize:vertical;" placeholder="Wajib diisi"></textarea>
+                <textarea id="tolakAlasan" rows="3" style="width:100%; padding:10px; border:1px solid var(--ut-border); border-radius:10px; font-family:inherit; resize:vertical;" placeholder="Wajib diisi"></textarea>
             </div>
             <div class="modal-actions">
                 <button class="btn-back" onclick="tutupTolakModal()">Batal</button>
@@ -536,17 +536,17 @@ function statusBadge(status) {
 
         async function loadUsers() {
             const tbody = document.getElementById('tabelAkun');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
 
             try {
                 const response = await fetch('get_users.php');
                 const result = await response.json();
                 if (result.status !== 'success') {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#c62828;">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
                     return;
                 }
                 if (!result.data || result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #777;">Tidak ada akun user.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada akun user.</td></tr>';
                     return;
                 }
 
@@ -567,7 +567,7 @@ function statusBadge(status) {
                     const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
                     return `<tr${isSelf ? ' class="self-row"' : ''}>
                         <td>${profilePhotoCell(user)}</td>
-                        <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:#0f766e; font-weight:700;">(Anda)</div>' : ''}</td>
+                        <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:var(--ut-teal); font-weight:700;">(Anda)</div>' : ''}</td>
                         <td>${esc(user.nrp)}</td>
                         <td>${esc(user.username)}</td>
                         <td>${roleBadge(user.role)}</td>
@@ -577,7 +577,7 @@ function statusBadge(status) {
                 }).join('');
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: #c62828;">Gagal memuat data dari server.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-red-deep);">Gagal memuat data dari server.</td></tr>';
             }
         }
 
@@ -754,17 +754,17 @@ function statusBadge(status) {
         // ========== USER REGISTRATION APPROVAL ==========
         async function loadUserApprovals() {
             const tbody = document.getElementById('tabelApproval');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
             try {
                 const response = await fetch('get_user_approvals.php');
                 const result = await response.json();
                 if (result.status !== 'success') {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#c62828;">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
                     return;
                 }
                 const pending = (result.data || []).filter(a => a.status === 'Pending');
                 if (pending.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #777;">Tidak ada permintaan pendaftaran yang menunggu persetujuan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada permintaan pendaftaran yang menunggu persetujuan.</td></tr>';
                     return;
                 }
                 tbody.innerHTML = pending.map(a => {
@@ -777,14 +777,14 @@ function statusBadge(status) {
                         <td><strong>${esc(a.nama_lengkap || a.username)}</strong></td>
                         <td>${esc(a.nrp)}</td>
                         <td>${esc(a.email) || '-'}</td>
-                        <td><span class="user-status-badge usr-aktif" style="background:#fff4cc; color:#9A7300;">Pending</span></td>
+                        <td><span class="user-status-badge usr-aktif" style="background:var(--ut-yellow-soft); color:var(--ut-yellow-deep);">Pending</span></td>
                         <td>${esc(a.requested_at)}</td>
                         <td>${actionCell}</td>
                     </tr>`;
                 }).join('');
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #c62828;">Gagal memuat data dari server.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-red-deep);">Gagal memuat data dari server.</td></tr>';
             }
         }
 

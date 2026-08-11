@@ -3,6 +3,9 @@ header("Content-Type: application/json");
 ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 require 'koneksi.php';
+require_once __DIR__ . '/app/helpers.php';
+
+require_valid_origin();
 
 // Start session for RBAC with hardened cookies (HttpOnly + SameSite=Lax,
 // Secure when served over HTTPS). Must run before session_start().
@@ -24,7 +27,7 @@ if (!$data || !isset($data['nrp']) || !isset($data['password'])) {
     exit;
 }
 
-$nrp = $conn->real_escape_string($data['nrp']);
+$nrp = trim((string)$data['nrp']);
 $password = $data['password']; 
 
 // ---- Rate limiting: max 10 attempts per IP per 5 minutes ----
@@ -69,8 +72,15 @@ if ($lockFp) {
 }
 
 // 1. Cari user berdasarkan NRP
-$query = "SELECT * FROM users WHERE nrp = '$nrp'";
-$result = $conn->query($query);
+$stmt = $conn->prepare("SELECT * FROM users WHERE nrp = ? LIMIT 1");
+if (!$stmt) {
+    error_log('[login] prepare failed: ' . $conn->error);
+    echo json_encode(["status" => "error", "message" => "Terjadi kesalahan pada server."]);
+    exit;
+}
+$stmt->bind_param('s', $nrp);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     // Generic message — never reveals whether the NRP exists (anti-enumeration).
@@ -79,6 +89,7 @@ if ($result->num_rows === 0) {
 }
 
 $user = $result->fetch_assoc();
+$stmt->close();
 
 // 2. Verifikasi Password
 if (!password_verify($password, $user['password'])) {

@@ -6,6 +6,9 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 // Memanggil file koneksi
 require 'koneksi.php';
+require_once __DIR__ . '/app/helpers.php';
+
+require_valid_origin();
 
 // Menangkap data JSON yang dikirim oleh JavaScript (Fetch API)
 $data = json_decode(file_get_contents("php://input"), true);
@@ -57,8 +60,11 @@ if ($lockFp) {
     fclose($lockFp);
 }
 
-// Membersihkan input agar terhindar dari SQL Injection
-$nrp = $conn->real_escape_string($data['nrp']);
+$nrp = trim((string)($data['nrp'] ?? ''));
+if ($nrp === '' || strlen($nrp) > 50) {
+    echo json_encode(["status" => "error", "message" => "NRP tidak valid!"]);
+    exit;
+}
 
 // Username diketik bebas oleh pengguna (bukan lagi otomatis = NRP). Wajib
 // diisi dan dibatasi panjangnya agar muat di kolom VARCHAR(100).
@@ -71,7 +77,6 @@ if (strlen($username) > 100) {
     echo json_encode(["status" => "error", "message" => "Username terlalu panjang (maksimal 100 karakter)!"]);
     exit;
 }
-$username = $conn->real_escape_string($username);
 
 // Role umum non-admin: semua user baru mendapat role 'user' (dapat mengelola
 // aset IT dan GA). Role admin tidak pernah diizinkan lewat registrasi.
@@ -89,7 +94,6 @@ if (strlen($nama_lengkap) > 100) {
     echo json_encode(["status" => "error", "message" => "Nama lengkap terlalu panjang (maksimal 100 karakter)!"]);
     exit;
 }
-$nama_lengkap = $conn->real_escape_string($nama_lengkap);
 
 // Email wajib diisi, format harus valid, dan tidak boleh sama dengan akun lain (case-insensitive).
 $email = trim((string)($data['email'] ?? ''));
@@ -112,8 +116,6 @@ if (!$check_email_col || $check_email_col->num_rows === 0) {
     echo json_encode(["status" => "error", "message" => "Fitur email belum tersedia. Jalankan migrate_db.php terlebih dahulu."]);
     exit;
 }
-
-$email = $conn->real_escape_string($email);
 
 // Password policy: min 8, huruf besar, huruf kecil, angka, dan simbol.
 // Diterapkan di server (authoritative), sama dengan validasi client.
@@ -143,11 +145,22 @@ if (!preg_match('/[^A-Za-z0-9]/', $password)) {
 $password = password_hash($password, PASSWORD_DEFAULT); 
 
 // 1. Cek apakah NRP sudah terdaftar di database
-$cek_nrp = $conn->query("SELECT id FROM users WHERE nrp = '$nrp'");
+$cek_nrp = $conn->prepare("SELECT id FROM users WHERE nrp = ? LIMIT 1");
+if (!$cek_nrp) {
+    error_log('[register] cek_nrp prepare failed: ' . $conn->error);
+    echo json_encode(["status" => "error", "message" => "Gagal memeriksa data. Silakan coba lagi."]);
+    exit;
+}
+$cek_nrp->bind_param('s', $nrp);
+$cek_nrp->execute();
+$cek_nrp->store_result();
 
 if ($cek_nrp->num_rows > 0) {
+    $cek_nrp->close();
     echo json_encode(["status" => "error", "message" => "NRP sudah terdaftar di sistem!"]);
+    exit;
 } else {
+    $cek_nrp->close();
     // ==========================================
     // PHASE 4.22 — Master employee validation:
     // the NRP must belong to a known employee
@@ -159,36 +172,61 @@ if ($cek_nrp->num_rows > 0) {
     $hasMasterTable = $checkMasterTable && $checkMasterTable->num_rows > 0;
 
     if ($hasMasterTable) {
-        $rawNrp = trim((string)$data['nrp']);
+        $rawNrp = $nrp;
         $cekMaster = $conn->prepare("SELECT id FROM master_employee WHERE nrp = ? LIMIT 1");
-        if ($cekMaster) {
-            $cekMaster->bind_param('s', $rawNrp);
-            $cekMaster->execute();
-            $cekMaster->store_result();
-            if ($cekMaster->num_rows === 0) {
-                echo json_encode(["status" => "error", "message" => "NRP tidak terdaftar sebagai karyawan. Silakan pilih karyawan dari direktori."]);
-                exit;
-            }
-            $cekMaster->close();
+        if (!$cekMaster) {
+            error_log('[register] cekMaster prepare failed: ' . $conn->error);
+            echo json_encode(["status" => "error", "message" => "Gagal memvalidasi data karyawan. Silakan coba lagi."]);
+            exit;
         }
+        $cekMaster->bind_param('s', $rawNrp);
+        $cekMaster->execute();
+        $cekMaster->store_result();
+        if ($cekMaster->num_rows === 0) {
+            $cekMaster->close();
+            echo json_encode(["status" => "error", "message" => "NRP tidak terdaftar sebagai karyawan. Silakan pilih karyawan dari direktori."]);
+            exit;
+        }
+        $cekMaster->close();
     }
 
     // 1b. Cek apakah email sudah dipakai akun lain (LOWER() = case-insensitive)
-    $cek_email = $conn->query("SELECT id FROM users WHERE LOWER(email) = LOWER('$email')");
-    if ($cek_email && $cek_email->num_rows > 0) {
+    $cek_email = $conn->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1");
+    if (!$cek_email) {
+        error_log('[register] cek_email prepare failed: ' . $conn->error);
+        echo json_encode(["status" => "error", "message" => "Gagal memeriksa data. Silakan coba lagi."]);
+        exit;
+    }
+    $cek_email->bind_param('s', $email);
+    $cek_email->execute();
+    $cek_email->store_result();
+    if ($cek_email->num_rows > 0) {
+        $cek_email->close();
         echo json_encode(["status" => "error", "message" => "Email sudah terdaftar di sistem!"]);
+        exit;
     } else {
+        $cek_email->close();
         // 1c. Cek apakah NRP masih mengantre persetujuan (Pending/Approved belum dipindah).
-        $cek_pending = $conn->query("SELECT id, status FROM user_approvals WHERE nrp = '$nrp' AND status IN ('Pending','Approved')");
-        if ($cek_pending && $cek_pending->num_rows > 0) {
-            $pendingRow = $cek_pending->fetch_assoc();
-            if ($pendingRow['status'] === 'Approved') {
+        $cek_pending = $conn->prepare("SELECT id, status FROM user_approvals WHERE nrp = ? AND status IN ('Pending','Approved') LIMIT 1");
+        if (!$cek_pending) {
+            error_log('[register] cek_pending prepare failed: ' . $conn->error);
+            echo json_encode(["status" => "error", "message" => "Gagal memeriksa data. Silakan coba lagi."]);
+            exit;
+        }
+        $cek_pending->bind_param('s', $nrp);
+        $cek_pending->execute();
+        $pendingResult = $cek_pending->get_result();
+        if ($pendingResult && $pendingResult->num_rows > 0) {
+            $pendingRow = $pendingResult->fetch_assoc();
+            $cek_pending->close();
+            if (($pendingRow['status'] ?? '') === 'Approved') {
                 echo json_encode(["status" => "error", "message" => "NRP sudah terdaftar di sistem!"]);
             } else {
                 echo json_encode(["status" => "error", "message" => "Permintaan pendaftaran dengan NRP ini masih menunggu persetujuan admin."]);
             }
             exit;
         }
+        $cek_pending->close();
 
         // 2. Antrekan registrasi ke tabel user_approvals (status Pending) —
         //    akun baru hanya aktif setelah ADMIN menyetujuinya.
@@ -222,12 +260,15 @@ if ($cek_nrp->num_rows > 0) {
             } catch (\Throwable $t) {
                 error_log('[register] admin notification failed: ' . $t->getMessage());
             }
+            $stmt->close();
             echo json_encode(["status" => "success", "message" => "Permintaan pendaftaran dikirim. Silakan tunggu persetujuan admin sebelum dapat login."]);
+            exit;
         } else {
             error_log('[register] insert failed: ' . $stmt->error);
+            $stmt->close();
             echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
+            exit;
         }
-        $stmt->close();
     }
 }
 

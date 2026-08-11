@@ -22,11 +22,16 @@ if (!$input || !isset($input['id']) || !isset($input['table_type']) || !isset($i
 }
 
 $id = (int)$input['id'];
-$table_type = $input['table_type']; // 'it' or 'ga'
+$table_type = strtolower((string)$input['table_type']); // 'it' or 'ga'
 $action = $input['action']; // 'submit_action' or 'create_document'
 $condition = $input['condition'] ?? '';
 $photo_path = $input['photo_path'] ?? '';
 $utilisasi = trim((string)($input['utilisasi'] ?? ''));
+
+if (!in_array($table_type, ['it', 'ga'], true)) {
+    echo json_encode(["status" => "error", "message" => "Data tidak valid."]);
+    exit;
+}
 
 // Determine table name
 $table = ($table_type === 'it') ? 'aset_it' : 'aset_ga';
@@ -34,12 +39,6 @@ $table = ($table_type === 'it') ? 'aset_it' : 'aset_ga';
 // RBAC: Admin cannot change stocktaking data (admin only approves).
 if ($userRole === 'ADMIN') {
     echo json_encode(["status" => "error", "message" => "Akses ditolak. Admin hanya dapat menyetujui stocktaking, tidak dapat mengubah data stocktaking."]);
-    exit;
-}
-
-// RBAC: All non-ADMIN roles may perform stocktaking on either asset type.
-if ($table !== 'aset_it' && $table !== 'aset_ga') {
-    echo json_encode(["status" => "error", "message" => "Data tidak valid."]);
     exit;
 }
 

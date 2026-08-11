@@ -1,12 +1,11 @@
 <?php
 header('Content-Type: application/json');
 
-// Authentication: uploads are only allowed for authenticated, non-ADMIN
-// (transaction) roles. Admin is monitoring/approval only.
+// Authentication: uploads are only allowed for authenticated roles.
+// ADMIN is allowed to upload photos (required when creating a new asset).
 session_start();
 require_once __DIR__ . '/app/bootstrap.php';
 require_login();
-deny_admin_transaction();
 
 require_once __DIR__ . '/config/upload.php';
 

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -31,7 +31,7 @@
 
         /* Card container */
         .profil-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border: 1px solid var(--ut-border, #E6E9EF);
             border-radius: 16px;
             box-shadow: 0 16px 42px rgba(31, 31, 31, 0.08);
@@ -62,7 +62,7 @@
             display: grid;
             place-items: center;
             border-radius: 24px;
-            background: linear-gradient(135deg, #FFC20E 0%, #e5ad00 100%);
+            background: linear-gradient(135deg, var(--ut-yellow) 0%, var(--ut-yellow-strong) 100%);
             color: var(--ut-charcoal, #1F1F1F);
             font-size: 2.2rem;
             font-weight: 900;
@@ -91,7 +91,7 @@
             display: grid;
             place-items: center;
             border-radius: 50%;
-            border: 2px solid #ffffff;
+            border: 2px solid var(--ut-white);
             background: var(--ut-charcoal, #1F1F1F);
             color: var(--ut-yellow, #FFC20E);
             cursor: pointer;
@@ -118,9 +118,9 @@
             display: grid;
             place-items: center;
             border-radius: 50%;
-            border: 2px solid #ffffff;
-            background: #d33;
-            color: #ffffff;
+            border: 2px solid var(--ut-white);
+            background: var(--ut-red);
+            color: var(--ut-white);
             cursor: pointer;
             box-shadow: 0 6px 14px rgba(31, 31, 31, 0.24);
             transition: transform 0.18s ease, background 0.18s ease;
@@ -128,7 +128,7 @@
 
         .profil-avatar-remove:hover {
             transform: translateY(-1px) scale(1.05);
-            background: #b32727;
+            background: var(--ut-red-deep);
         }
 
         .profil-avatar-remove svg {
@@ -174,8 +174,8 @@
         }
 
         .profil-badge-status {
-            background: #E7F6EC;
-            color: #167A3A;
+            background: var(--ut-green-soft);
+            color: var(--ut-green-deep);
         }
 
         .profil-badge-status::before {
@@ -227,7 +227,7 @@
         .profil-section-title svg {
             width: 20px;
             height: 20px;
-            stroke: #9A7300;
+            stroke: var(--ut-yellow-deep);
         }
 
         /* Readonly info fields */
@@ -257,10 +257,10 @@
             gap: 12px;
             min-height: 50px;
             padding: 12px 16px;
-            background: #F8FAFC;
+            background: var(--ut-surface);
             border: 1px solid var(--ut-border, #E6E9EF);
             border-radius: 12px;
-            color: #343841;
+            color: var(--ut-text);
             font-size: 1rem;
             font-weight: 700;
             word-break: break-word;
@@ -270,15 +270,15 @@
             width: 20px;
             height: 20px;
             flex: 0 0 20px;
-            stroke: #9A7300;
+            stroke: var(--ut-yellow-deep);
         }
 
         /* Email (contact) section */
         .profil-email-reminder {
             display: none;
-            background: #FFF4CC;
-            border: 1px solid #E6C75E;
-            color: #7A5B00;
+            background: var(--ut-yellow-soft);
+            border: 1px solid var(--ut-yellow);
+            color: var(--ut-yellow-deep);
             font-size: 0.85rem;
             padding: 12px 14px;
             border-radius: 12px;
@@ -290,8 +290,8 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            background: #ffffff;
-            border: 1px solid #D8DEE8;
+            background: var(--ut-white);
+            border: 1px solid var(--ut-border-strong);
             border-radius: 12px;
             padding: 0 16px;
             min-height: 50px;
@@ -307,7 +307,7 @@
             width: 20px;
             height: 20px;
             flex: 0 0 20px;
-            stroke: #9A7300;
+            stroke: var(--ut-yellow-deep);
         }
 
         .profil-email-field input {
@@ -317,14 +317,14 @@
             outline: none;
             background: transparent;
             font-size: 1rem;
-            color: #222222;
+            color: var(--ut-charcoal);
             font-family: inherit;
             padding: 14px 0;
         }
 
         .profil-email-hint {
             font-size: 0.78rem;
-            color: #999999;
+            color: var(--ut-muted-2);
             margin-top: 8px;
             line-height: 1.5;
         }
@@ -356,7 +356,7 @@
         }
 
         .profil-save-btn:hover {
-            background: #e5ad00;
+            background: var(--ut-yellow-strong);
             transform: translateY(-2px);
             box-shadow: 0 12px 26px rgba(255, 194, 14, 0.34);
         }
@@ -835,7 +835,7 @@
                             renderAvatar(document.getElementById('sidebarAvatar'), initial, '');
                             localStorage.removeItem('userPhoto');
                             setRemoveBtn(false);
-                            setMsg('\u2713 Foto profil dihapus.', '#2E7D32');
+                            setMsg('\u2713 Foto profil dihapus.', 'var(--ut-green-deep)');
                         } else {
                             showToast(data.message || 'Gagal menghapus foto profil.', 'error');
                         }
@@ -851,11 +851,11 @@
 
             function saveEmail() {
                 const email = emailInput.value.trim();
-                if (!email) { setMsg('Email wajib diisi.', '#d9534f'); return; }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Format email tidak valid.', '#d9534f'); return; }
+                if (!email) { setMsg('Email wajib diisi.', 'var(--ut-red)'); return; }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Format email tidak valid.', 'var(--ut-red)'); return; }
 
                 saveBtn.disabled = true;
-                setMsg('Menyimpan...', '#777777');
+                setMsg('Menyimpan...', 'var(--ut-muted-2)');
                 fetch('update_profil.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -864,13 +864,13 @@
                     .then(function(r) { return r.json(); })
                     .then(function(data) {
                         if (data.status === 'success') {
-                            setMsg('\u2713 Email tersimpan.', '#2E7D32');
+                            setMsg('\u2713 Email tersimpan.', 'var(--ut-green-deep)');
                             if (emailReminder) emailReminder.style.display = 'none';
                         } else {
-                            setMsg('\u2717 ' + (data.message || 'Gagal menyimpan email.'), '#d9534f');
+                            setMsg('\u2717 ' + (data.message || 'Gagal menyimpan email.'), 'var(--ut-red)');
                         }
                     })
-                    .catch(function() { setMsg('\u2717 Gagal terhubung ke server.', '#d9534f'); })
+                    .catch(function() { setMsg('\u2717 Gagal terhubung ke server.', 'var(--ut-red)'); })
                     .finally(function() { saveBtn.disabled = false; });
             }
 

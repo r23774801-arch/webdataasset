@@ -15,7 +15,7 @@ Options -Indexes
 </IfModule>
 
 # Block sensitive file types at any depth.
-<FilesMatch "\.(?i:env|bak|old|orig|save|swp|tmp|log|sql|ini|pem|key|lock)$">
+<FilesMatch "\.(?i:env|bak|old|orig|save|swp|tmp|log|sql|ini|pem|key|lock|md)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

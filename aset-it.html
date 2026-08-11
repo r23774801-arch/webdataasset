@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -9,10 +9,10 @@
     <style>
         /* Efek saat Kartu Ringkasan di-klik / Filter Aktif */
         .card-stat.active-card {
-            background-color: #fffdf2;
-            border-color: #ffc107;
+            background-color: var(--ut-yellow-soft);
+            border-color: var(--ut-yellow);
             transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(255, 193, 7, 0.15);
+            box-shadow: var(--ut-shadow-md);
             transition: all 0.2s ease;
         }
 
@@ -23,14 +23,8 @@
             align-items: center;
             margin-top: 20px;
             padding-top: 15px;
-            border-top: 1px solid #f1f3f5;
+            border-top: 1px solid var(--ut-border);
         }
-        .pagination-btn {
-            background: #f8f9fa; border: 1px solid #dee2e6; padding: 6px 12px; margin: 0 2px;
-            border-radius: 4px; cursor: pointer; color: #1e1e1e; font-weight: 600;
-        }
-        .pagination-btn:hover { background: #e2e6ea; }
-        .pagination-active { background: #ffc107; border-color: #ffc107; }
 
         .image-preview-modal {
             display: none;
@@ -53,38 +47,38 @@
             position: absolute;
             top: 20px;
             right: 35px;
-            color: #f1f1f1;
+            color: var(--ut-white);
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
         }
         .image-preview-close:hover {
-            color: #bbb;
+            color: var(--ut-muted-2);
         }
         .stocktaking-photo-preview {
             max-width: 200px;
             max-height: 200px;
             margin-top: 10px;
-            border-radius: 4px;
+            border-radius: var(--ut-radius-sm);
             display: none;
         }
         .stocktaking-asset-photo {
             max-width: 200px;
             max-height: 200px;
             margin-top: 10px;
-            border-radius: 4px;
+            border-radius: var(--ut-radius-sm);
         }
         .attachment-file-note {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             padding: 8px 12px;
-            border: 1px dashed #dc3545;
-            color: #dc3545;
+            border: 1px dashed var(--ut-red);
+            color: var(--ut-red);
             border-radius: 6px;
             font-size: 13px;
-            background: #fff;
+            background: var(--ut-white);
             margin-top: 10px;
         }
         
@@ -100,11 +94,11 @@
         }
 
         .summary-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border-radius: 8px;
             padding: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e9ecef;
+            box-shadow: var(--ut-shadow-sm);
+            border: 1px solid var(--ut-border);
             text-align: left; /* Teks rata kiri sesuai screenshot */
             cursor: pointer;
             transition: all 0.2s ease;
@@ -114,8 +108,8 @@
 
         .summary-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(255, 193, 7, 0.15);
-            border-color: #ffc107;
+            box-shadow: var(--ut-shadow-md);
+            border-color: var(--ut-yellow);
         }
 
         .card-icon {
@@ -125,7 +119,7 @@
         .card-title {
             font-size: 0.8rem;
             text-transform: uppercase;
-            color: #6c757d;
+            color: var(--ut-muted);
             font-weight: 700;
             margin-bottom: 12px;
             letter-spacing: 0.5px;
@@ -134,30 +128,30 @@
         .card-value {
             font-size: 2.2rem;
             font-weight: 800;
-            color: #1e1e1e;
+            color: var(--ut-charcoal);
             line-height: 1;
             margin-bottom: 6px;
         }
 
         .card-subtitle {
             font-size: 0.85rem;
-            color: #888888;
+            color: var(--ut-muted);
         }
 
         /* Saat kartu di-klik (Filter aktif) */
         .summary-card.active-card {
-            background-color: #fffdf2; /* Warna kuning sangat pudar */
-            border-color: #ffc107;
+            background-color: var(--ut-yellow-soft); /* Warna kuning sangat pudar */
+            border-color: var(--ut-yellow);
         }
 
         /* =========================================
            STYLE UNTUK TABEL UTAMA (SESUAI SCREENSHOT)
            ========================================= */
         .table-card {
-            background: #ffffff;
+            background: var(--ut-white);
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--ut-shadow-sm);
             width: 100%;
             margin-top: 24px;
         }
@@ -173,15 +167,15 @@
             height: 10px;
         }
         .table-responsive::-webkit-scrollbar-track {
-            background: #f1f3f5;
+            background: var(--ut-surface-2);
             border-radius: 10px;
         }
         .table-responsive::-webkit-scrollbar-thumb {
-            background: #444; /* Warna scrollbar gelap */
+            background: var(--ut-scrollbar); /* Warna scrollbar gelap */
             border-radius: 10px;
         }
         .table-responsive::-webkit-scrollbar-thumb:hover {
-            background: #1e1e1e;
+            background: var(--ut-charcoal);
         }
 
         .custom-table {
@@ -192,26 +186,26 @@
 
         /* HEADER TABEL: GELAP DENGAN GARIS BAWAH KUNING TEBAL */
         .custom-table thead {
-            background-color: #1e1e1e; 
+            background-color: var(--ut-table-header-bg); 
         }
 
        /* HEADER TABEL: GELAP DENGAN GARIS BAWAH KUNING TEBAL */
         .custom-table th {
-            background-color: #1e1e1e !important; /* Paksa warna gelap */
-            color: #ffc107 !important; /* Paksa teks kuning */
+            background-color: var(--ut-table-header-bg) !important; /* Paksa warna gelap */
+            color: var(--ut-table-header-text) !important; /* Paksa teks kuning */
             padding: 18px 16px;
             font-size: 0.85rem;
             text-transform: uppercase;
             font-weight: 700;
             text-align: left;
-            border-bottom: 4px solid #ffc107 !important;
+            border-bottom: 4px solid var(--ut-yellow) !important;
             vertical-align: middle;
             letter-spacing: 0.5px;
             position: relative; /* Wajib agar popup filter nempel di bawahnya */
         }
         /* Mewarnai ikon filter (corong) menjadi kuning */
         .custom-table th .filter-icon {
-            stroke: #ffc107;
+            stroke: var(--ut-yellow);
             opacity: 0.9 !important;
         }
 
@@ -219,8 +213,8 @@
         .custom-table td {
             padding: 16px;
             font-size: 0.9rem;
-            color: #333;
-            border-bottom: 1px solid #f1f3f5;
+            color: var(--ut-text);
+            border-bottom: 1px solid var(--ut-border);
             vertical-align: middle;
             white-space: nowrap;
         }
@@ -243,12 +237,12 @@
             transition: 0.2s;
         }
         .utilisasi-yes {
-            background-color: #e8f5e9; /* Background hijau sangat muda */
-            color: #2e7d32; /* Teks hijau gelap */
+            background-color: var(--ut-green-soft); /* Background hijau sangat muda */
+            color: var(--ut-green-deep); /* Teks hijau gelap */
         }
         .utilisasi-no {
-            background-color: #ffebee; /* Background merah sangat muda */
-            color: #c62828; /* Teks merah gelap */
+            background-color: var(--ut-red-soft); /* Background merah sangat muda */
+            color: var(--ut-red-deep); /* Teks merah gelap */
         }
 
         /* Status Kondisi (Normal/Broken/dll) */
@@ -263,11 +257,11 @@
         }
         
         /* Pewarnaan Badge spesifik */
-        .badge-pending { background-color: #ffc107; color: #1e1e1e; } /* Kuning utk "-" dan "Pending" */
-        .badge-rejected { background-color: #dc3545; color: #fff; } /* Merah utk "Broken" */
-        .badge-document-needed { background-color: #ff9800; color: #fff; } /* Oranye */
-        .badge-stocktaked { background-color: #4caf50; color: #fff; } /* Hijau tua */
-        .badge-transfer { background-color: #8B5CF6; color: #fff; } /* Ungu utk "Transfer" */
+        .badge-pending { background-color: var(--ut-yellow); color: var(--ut-charcoal); } /* Kuning utk "-" dan "Pending" */
+        .badge-rejected { background-color: var(--ut-red); color: var(--ut-white); } /* Merah utk "Broken" */
+        .badge-document-needed { background-color: var(--ut-amber); color: var(--ut-white); } /* Oranye */
+        .badge-stocktaked { background-color: var(--ut-green); color: var(--ut-white); } /* Hijau tua */
+        .badge-transfer { background-color: var(--ut-purple); color: var(--ut-white); } /* Ungu utk "Transfer" */
 
         /* Tombol Action */
         .btn-stocktaking {
@@ -283,15 +277,15 @@
             transition: 0.2s;
         }
         .btn-stocktaking-action, .btn-stocktaking-document {
-            background-color: #ffc107;
-            color: #1e1e1e;
+            background-color: var(--ut-yellow);
+            color: var(--ut-charcoal);
         }
         .btn-stocktaking-action:hover, .btn-stocktaking-document:hover {
-            background-color: #e0a800;
+            background-color: var(--ut-yellow-strong);
         }
         .btn-stocktaking-complete {
-            background-color: #6B7280; /* Neutral gray */
-            color: #fff;
+            background-color: var(--ut-muted); /* Neutral gray */
+            color: var(--ut-white);
             cursor: not-allowed;
         }
 
@@ -301,8 +295,8 @@
             align-items: center;
         }
         .btn-finish-stocktaking.submitted {
-            background-color: #9CA3AF !important;
-            color: #fff !important;
+            background-color: var(--ut-muted-2) !important;
+            color: var(--ut-white) !important;
             cursor: not-allowed !important;
             opacity: 0.9;
         }
@@ -637,7 +631,7 @@
                             </tr>
                         </thead>
                         <tbody id="tabelAsetIt">
-                            <tr><td colspan="11" style="text-align: center; padding: 20px; color: #777;">Memuat data...</td></tr>
+                            <tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -679,38 +673,38 @@
     <div id="stocktakingModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="tutupStocktakingModal()">&times;</span>
-            <h3 style="margin-bottom: 20px; color: #333;">Laporkan Kondisi Asset</h3>
+            <h3 style="margin-bottom: 20px; color: var(--ut-text);">Laporkan Kondisi Asset</h3>
             <div class="input-group" style="margin-bottom: 18px;">
                 <label>Informasi Asset</label>
                 <div id="stocktakingInfo">
                     <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; font-size:0.9rem;">
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Asset Number</div>
-                            <div id="stInfoAssetNumber" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">Asset Number</div>
+                            <div id="stInfoAssetNumber" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Nama Barang</div>
-                            <div id="stAssetName" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">Nama Barang</div>
+                            <div id="stAssetName" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Serial Number</div>
-                            <div id="stSerialNumber" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">Serial Number</div>
+                            <div id="stSerialNumber" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Asset Class</div>
-                            <div id="stInfoAssetClass" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">Asset Class</div>
+                            <div id="stInfoAssetClass" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">PIC</div>
-                            <div id="stInfoPic" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">PIC</div>
+                            <div id="stInfoPic" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Area</div>
-                            <div id="stInfoArea" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">Area</div>
+                            <div id="stInfoArea" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
-                        <div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                            <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">Tanggal</div>
-                            <div id="stInfoTanggal" style="color:#1e1e1e; font-weight:600; word-break:break-word;">-</div>
+                        <div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:var(--ut-radius); padding:8px 12px;">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">Tanggal</div>
+                            <div id="stInfoTanggal" style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">-</div>
                         </div>
                     </div>
                 </div>
@@ -730,7 +724,7 @@
                 </select>
             </div>
             <!-- PHASE 4.5 â€” Transfer Form (shown when Transfer is selected) -->
-            <div id="transferFormGroup" style="display:none; margin-bottom:18px; padding:12px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:8px;">
+            <div id="transferFormGroup" style="display:none; margin-bottom:18px; padding:12px; background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:8px;">
                 <div class="input-group">
                     <label>Destination Area</label>
                     <select id="transferArea">
@@ -767,9 +761,9 @@
                     <option value="No">No</option>
                 </select>
             </div>
-            <div id="stocktakingValidationNote" style="margin-top:10px; font-size:13px; color:#b8860b; display:none;"></div>
+            <div id="stocktakingValidationNote" style="margin-top:10px; font-size:13px; color:var(--ut-amber-deep); display:none;"></div>
             <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
-                <button type="button" onclick="tutupStocktakingModal()" style="background:#6c757d; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Batal</button>
+                <button type="button" onclick="tutupStocktakingModal()" style="background:var(--ut-muted); color:var(--ut-white); border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Batal</button>
                 <button class="btn-warning" id="submitStocktakingBtn" onclick="submitStocktakingAction()" disabled>Submit Stocktaking</button>
             </div>
         </div>
@@ -834,8 +828,10 @@
         syncStocktakingSubmissionState();
         syncAssetCreationLock();
 
-        // RBAC: Add button visible only to roles that manage IT data (shared rule in js/loader.js)
-        if (typeof window.canManageData === 'function' && !window.canManageData('it')) {
+        // RBAC: Add button visible to roles that may create IT assets.
+        // Admin is also allowed to add (see canAddAsset in js/loader.js); the
+        // Action/edit buttons remain hidden for Admin via canManageData.
+        if (typeof window.canAddAsset === 'function' && !window.canAddAsset('it')) {
             const btnTambah = document.querySelector('button[onclick="bukaModalTambah()"]');
             if (btnTambah) btnTambah.style.display = 'none';
         }
@@ -876,7 +872,7 @@
                 window.assetLocked = locked;
                 const btnTambah = document.querySelector('button[onclick="bukaModalTambah()"]');
                 if (btnTambah) {
-                    const can = typeof window.canManageData === 'function' ? window.canManageData('it') : true;
+                    const can = typeof window.canAddAsset === 'function' ? window.canAddAsset('it') : true;
                     btnTambah.style.display = (can && !locked) ? 'inline-flex' : 'none';
                 }
                 // Re-render the submission state (which re-renders the table) so the
@@ -1149,7 +1145,7 @@
             const attachmentHtml = typeof renderAttachmentPreview === 'function'
                 ? renderAttachmentPreview(imgPath)
                 : (imgPath
-                    ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
+                    ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: var(--ut-radius-sm); cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
                     : '<span class="text-muted" style="font-size:12px;">No Image</span>');
 
             // Action button â€” hidden for ADMIN (monitoring/approval only, per the
@@ -1270,15 +1266,15 @@
             const fileName = String(safe).split('/').pop();
             const fileType = isPdf ? 'PDF' : 'Gambar';
             const thumb = isPdf
-                ? `<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#dc3545" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`
+                ? `<svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="var(--ut-red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`
                 : `<img src="${safe}" alt="Attachment" style="width:64px; height:64px; object-fit:cover; border-radius:8px; flex-shrink:0;">`;
             const lihatBtn = isPdf
                 ? `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewPdfAttachment(this.dataset.path)" data-path="${safe}">Lihat</button>`
                 : `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewImage(this.dataset.src)" data-src="${safe}">Lihat</button>`;
-            return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #e9ecef; border-radius:8px; background:#f8f9fa; flex-wrap:wrap;">
+            return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--ut-border); border-radius:8px; background:var(--ut-surface); flex-wrap:wrap;">
                 ${thumb}
                 <div style="min-width:0; flex:1;">
-                    <div style="font-weight:600; color:#333; font-size:0.9rem; word-break:break-all;">${fileName}</div>
+                    <div style="font-weight:600; color:var(--ut-text); font-size:0.9rem; word-break:break-all;">${fileName}</div>
                     <div class="text-muted" style="font-size:12px;">${fileType}</div>
                 </div>
                 ${lihatBtn}

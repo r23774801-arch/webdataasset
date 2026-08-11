@@ -21,7 +21,6 @@ public_html/
 ├── .htaccess              ← WAJIB (proteksi keamanan)
 ├── .env                   ← GANTI sesuai hosting (lihat langkah 3)
 ├── .env.example           ← boleh ikut
-├── .gitignore
 ├── *.html                 ← semua halaman
 ├── *.php                  ← semua endpoint
 ├── app/                   ← seluruh isi
@@ -29,7 +28,6 @@ public_html/
 ├── css/                   ← seluruh isi
 ├── img/                   ← seluruh isi
 ├── js/                    ← seluruh isi
-├── google_apps_script/    ← seluruh isi
 ├── uploads/               ← wajib + chmod 755
 └── vendor/                ← seluruh isi (jangan di-upload ulang dari git)
 ```
@@ -38,6 +36,8 @@ public_html/
 - Folder `.git/`
 - Folder `.vscode/`
 - File `.env` lama (buat yang baru)
+- File `DEPLOY.md`
+- File `schema.sql` setelah import database selesai
 - File test/sampah apapun di root
 
 > Tips: kalau upload via File Manager cPanel, zip isi folder (BUKAN folder induknya)
@@ -51,13 +51,13 @@ Buat file `.env` baru di public_html (copy dari .env.example), isi:
 # --- SMTP Server (Gmail — pakai App Password, bukan password akun) ---
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USERNAME=zalssxkon@gmail.com
-SMTP_PASSWORD=xxxx xxxx xxxx xxxx          # App Password Gmail (16 karakter)
+SMTP_USERNAME=nama-akun-smtp@example.com
+SMTP_PASSWORD=app-password-smtp
 SMTP_ENCRYPTION=tls
 
 # --- Sender identity ---
 MAIL_FROM_NAME=UT Asset Management System
-MAIL_FROM_ADDRESS=zalssxkon@gmail.com
+MAIL_FROM_ADDRESS=noreply@example.com
 
 # --- Application base URL (WAJIB diisi URL hosting Anda) ---
 APP_URL=https://nama-domain-anda.com/
@@ -65,25 +65,27 @@ APP_URL=https://nama-domain-anda.com/
 # --- Database (isi sesuai cPanel → MySQL Databases) ---
 DB_HOST=localhost
 DB_USER=u1234567_nama_user
-DB_PASS=password-database-hosting
+DB_PASS=password-database
 DB_NAME=u1234567_nama_db
 
 # --- Google Spreadsheet Sync ---
-SPREADSHEET_WEB_APP_URL=https://script.google.com/macros/s/.../exec
-SPREADSHEET_TOKEN=utasset2026
+SPREADSHEET_WEB_APP_URL=https://script.google.com/macros/s/ID_DEPLOYMENT/exec
+SPREADSHEET_TOKEN=random-token-panjang
 SPREADSHEET_TIMEOUT=3
+UPLOAD_MAX_SIZE=5242880
 ```
 
 ## 4. Langkah setelah upload
 
 1. **Buat database** di cPanel → MySQL Databases, buat user + assign ke DB.
-2. **Isi `.env`** sesuai langkah 3 dengan kredensial hosting.
-3. **Chmod folder** `uploads/` = 755 (cPanel → File Manager → kanan → Change Permissions).
-4. **Set PHP 8.1/8.2** di cPanel → Select PHP Version (MultiPHP Manager).
-5. **Install SSL** (Let's Encrypt) dan pastikan akses lewat `https://`.
-6. **Jalankan migrasi DB sekali**: login sebagai admin → buka `https://domain/migrate_db.php`
-   (admin-only, aman). Setelah sukses, tutup.
-7. **Tes**: login, buat data, cek email terkirim.
+2. **Import `schema.sql`** lewat phpMyAdmin untuk database baru.
+3. **Isi `.env`** sesuai langkah 3 dengan kredensial hosting.
+4. **Chmod folder** `uploads/` = 755 (cPanel → File Manager → kanan → Change Permissions).
+5. **Set PHP 8.1/8.2** di cPanel → Select PHP Version (MultiPHP Manager).
+6. **Install SSL** (Let's Encrypt) dan pastikan akses lewat `https://`.
+7. **Jalankan migrasi DB sekali**: login sebagai admin → buka `https://domain/migrate_db.php`.
+8. **Hapus atau pindahkan `migrate_db.php` dan `schema.sql` dari public_html** setelah sukses.
+9. **Tes**: login, buat data, cek email terkirim.
 
 ## 5. Yang perlu diperiksa kalau ada masalah
 
