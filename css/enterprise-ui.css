@@ -1519,9 +1519,6 @@ button[onclick*="save"]:hover,
 }
 
 .pw-toggle svg {
-    position: absolute;
-    inset: 0;
-    margin: auto;
     width: 20px;
     height: 20px;
     display: block;
@@ -1530,16 +1527,24 @@ button[onclick*="save"]:hover,
 
 /* Default: eye visible, eye-off hidden. */
 .pw-toggle .pw-eye-off {
-    opacity: 0;
+    display: none;
 }
 
 /* When password is shown: eye hides, eye-off shows. */
 .pw-toggle.is-visible .pw-eye {
-    opacity: 0;
+    display: none;
 }
 
 .pw-toggle.is-visible .pw-eye-off {
-    opacity: 1;
+    display: block;
+}
+
+/* Force instant toggle — no animation/transition from any other rule. */
+.pw-toggle,
+.pw-toggle *,
+.pw-toggle svg {
+    animation: none !important;
+    transition: none !important;
 }
 
 /* For inputs NOT wrapped in .field-control (e.g. password modal) */
