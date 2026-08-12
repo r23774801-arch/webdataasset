@@ -377,13 +377,13 @@
             }
             info.innerHTML = DETAILED_ACTION
                 ? `<div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px 16px; font-size:0.9rem;">
-                    ${rows.map(([label, value]) => `<div style="background:#f8f9fa; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px;">
-                        <div style="font-size:0.7rem; text-transform:uppercase; color:#6c757d; letter-spacing:0.4px; font-weight:600;">${esc(label)}</div>
-                        <div style="color:#1e1e1e; font-weight:600; word-break:break-word;">${esc(value) || '-'}</div>
+                    ${rows.map(([label, value]) => `<div style="background:var(--ut-surface); border:1px solid var(--ut-border); border-radius:6px; padding:8px 12px;">
+                        <div style="font-size:0.7rem; text-transform:uppercase; color:var(--ut-muted); letter-spacing:0.4px; font-weight:600;">${esc(label)}</div>
+                        <div style="color:var(--ut-charcoal); font-weight:600; word-break:break-word;">${esc(value) || '-'}</div>
                     </div>`).join('')}
                 </div>`
                 : `<div style="display:grid; grid-template-columns:minmax(130px,220px) 1fr; gap:6px 12px; font-size:0.9rem;">
-                    ${rows.map(([label, value]) => `<span style="color:#6c757d; font-weight:600;">${label}</span><span>${esc(value) || '-'}</span>`).join('')}
+                    ${rows.map(([label, value]) => `<span style="color:var(--ut-muted); font-weight:600;">${label}</span><span>${esc(value) || '-'}</span>`).join('')}
                 </div>`;
         }
 
@@ -421,10 +421,10 @@
         const lihatBtn = isPdf
             ? `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewPdfAttachment(this.dataset.path)" data-path="${_escAttr(existingPath)}">Lihat</button>`
             : `<button type="button" class="btn-stocktaking btn-stocktaking-action" onclick="previewImage(this.dataset.src)" data-src="${_escAttr(existingPath)}">Lihat</button>`;
-        return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid #e9ecef; border-radius:8px; background:#f8f9fa; flex-wrap:wrap;">
+        return `<div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--ut-border); border-radius:8px; background:var(--ut-surface); flex-wrap:wrap;">
             ${thumb}
             <div style="min-width:0; flex:1;">
-                <div style="font-weight:600; color:#333; font-size:0.9rem; word-break:break-all;">${_escAttr(fileName)}</div>
+                <div style="font-weight:600; color:var(--ut-charcoal); font-size:0.9rem; word-break:break-all;">${_escAttr(fileName)}</div>
                 <div class="text-muted" style="font-size:12px;">${fileType}</div>
             </div>
             ${lihatBtn}
@@ -451,7 +451,7 @@
         const sizeText = file.size >= 1048576
             ? ((file.size / 1048576).toFixed(2) + ' MB')
             : ((file.size / 1024).toFixed(1) + ' KB');
-        const nameBlock = `<div style="font-weight:600; color:#333; font-size:0.85rem; word-break:break-all;">${_escAttr(file.name)}</div>
+        const nameBlock = `<div style="font-weight:600; color:var(--ut-charcoal); font-size:0.85rem; word-break:break-all;">${_escAttr(file.name)}</div>
             <div class="text-muted" style="font-size:12px;">${isPdf ? 'PDF' : 'Gambar'} &middot; ${sizeText}</div>`;
         if (isPdf) {
             container.innerHTML = `<div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
