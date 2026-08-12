@@ -178,7 +178,7 @@
         function logout() {
             if (typeof toggleLoader === 'function') toggleLoader(true, "Keluar dari sesi...");
             setTimeout(() => {
-                localStorage.clear();
+                clearAuthLocalStorage();
                 window.location.replace('login.html');
             }, 500);
         }

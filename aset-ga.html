@@ -837,7 +837,7 @@
         async function logout() {
             try { await fetch('api/auth/logout.php', { method: 'POST' }); } catch (err) {}
             sessionStorage.removeItem('isLoggedIn');
-            localStorage.clear();
+            clearAuthLocalStorage();
             window.location.replace('login.html');
         }
 

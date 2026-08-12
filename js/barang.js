@@ -91,7 +91,7 @@
 
     function logout() {
         sessionStorage.removeItem('isLoggedIn');
-        localStorage.clear();
+        clearAuthLocalStorage();
         window.location.replace('login.html');
     }
 

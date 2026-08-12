@@ -884,7 +884,7 @@
             if (typeof toggleLoader === 'function') toggleLoader(true, "Keluar dari sesi...");
             setTimeout(function() {
                 sessionStorage.removeItem('isLoggedIn');
-                localStorage.clear();
+                clearAuthLocalStorage();
                 window.location.replace('login.html');
             }, 500);
         }

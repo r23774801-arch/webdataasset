@@ -35,6 +35,15 @@ function toggleTheme() {
     updateThemeToggleIcon();
 }
 
+// Clear all auth/session localStorage keys on logout, but keep the user's
+// theme preference so they don't get thrown back to light mode after logging
+// back in.
+function clearAuthLocalStorage() {
+    const theme = localStorage.getItem('theme');
+    localStorage.clear();
+    if (theme) localStorage.setItem('theme', theme);
+}
+
 function updateThemeToggleIcon() {
     const isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
     const btn = document.getElementById('themeToggleBtn');

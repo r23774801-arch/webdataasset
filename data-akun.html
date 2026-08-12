@@ -492,8 +492,8 @@
 
         function logout() {
             try { fetch('api/auth/logout.php', { method: 'POST' }); } catch (err) {}
-            sessionStorage.removeItem('isLoggedIn');
-            localStorage.clear();
+sessionStorage.removeItem('isLoggedIn');
+            clearAuthLocalStorage();
             window.location.replace('login.html');
         }
 

@@ -95,7 +95,7 @@ function logout() {
     toggleLoader(true, "Keluar dari sesi...");
     setTimeout(() => {
         sessionStorage.removeItem('isLoggedIn');
-        localStorage.clear();
+        clearAuthLocalStorage();
         window.location.replace('login.html'); 
     }, 800);
 }
