@@ -745,6 +745,7 @@
                             emailReminder.style.display = 'block';
                         }
                         if (res.data.photo) {
+                            savedPhoto = res.data.photo;
                             renderAvatar(avatarEl, initial, res.data.photo);
                             renderAvatar(document.getElementById('topAvatar'), initial, res.data.photo);
                             renderAvatar(document.getElementById('sidebarAvatar'), initial, res.data.photo);
@@ -760,6 +761,8 @@
             var fotoBtn  = document.getElementById('profilAvatarEdit');
             var fotoInput = document.getElementById('profilFotoInput');
             var pendingFotoFile = null;
+            // The photo currently persisted on the server (URL path or '').
+            var savedPhoto = '';
 
             if (fotoBtn && fotoInput) {
                 fotoBtn.addEventListener('click', function() { fotoInput.click(); });
@@ -785,15 +788,41 @@
                     renderAvatar(avatarEl, initial, previewUrl);
                     renderAvatar(document.getElementById('topAvatar'), initial, previewUrl);
                     renderAvatar(document.getElementById('sidebarAvatar'), initial, previewUrl);
+                    // Show the remove (X) button so the new photo can be cleared
+                    // right away without saving it first.
+                    setRemoveBtn(true);
                     setMsg('\u2713 Foto baru siap. Klik Simpan untuk menyimpan.', 'var(--ut-green-deep)');
                 });
             }
 
             if (fotoRemoveBtn) {
                 fotoRemoveBtn.addEventListener('click', function() {
+                    // Only a new (unsaved) photo was picked: discard it right away,
+                    // no confirmation modal and no "Simpan" needed.
+                    if (pendingFotoFile && !savedPhoto) {
+                        discardPendingFoto();
+                        return;
+                    }
                     const hapusFotoModal = document.getElementById('hapusFotoModal');
                     if (hapusFotoModal) hapusFotoModal.style.display = 'flex';
                 });
+            }
+
+            function discardPendingFoto() {
+                pendingFotoFile = null;
+                var frontInput = document.getElementById('profilFotoInput');
+                if (frontInput) frontInput.value = '';
+                if (savedPhoto) {
+                    renderAvatar(avatarEl, initial, savedPhoto);
+                    renderAvatar(document.getElementById('topAvatar'), initial, savedPhoto);
+                    renderAvatar(document.getElementById('sidebarAvatar'), initial, savedPhoto);
+                } else {
+                    renderAvatar(avatarEl, initial, '');
+                    renderAvatar(document.getElementById('topAvatar'), initial, '');
+                    renderAvatar(document.getElementById('sidebarAvatar'), initial, '');
+                }
+                setRemoveBtn(!!savedPhoto);
+                setMsg('', '');
             }
 
             window.tutupHapusFotoModal = function () {
@@ -811,6 +840,7 @@
                     .then(function(data) {
                         if (data.status === 'success') {
                             pendingFotoFile = null;
+                            savedPhoto = '';
                             const fotoInput2 = document.getElementById('profilFotoInput');
                             if (fotoInput2) fotoInput2.value = '';
                             renderAvatar(avatarEl, initial, '');
@@ -871,6 +901,7 @@
 
                         const photoResult = pendingFotoFile ? (results[1] || {}) : null;
                         if (photoResult && photoResult.status === 'success' && photoResult.data && photoResult.data.photo) {
+                            savedPhoto = photoResult.data.photo;
                             renderAvatar(avatarEl, initial, photoResult.data.photo);
                             renderAvatar(document.getElementById('topAvatar'), initial, photoResult.data.photo);
                             renderAvatar(document.getElementById('sidebarAvatar'), initial, photoResult.data.photo);
