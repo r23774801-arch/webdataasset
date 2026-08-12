@@ -1495,20 +1495,23 @@ button[onclick*="save"]:hover,
 
 .pw-toggle {
     position: absolute;
-    right: 12px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
+    width: 36px;
+    height: 36px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
+    padding: 0;
     border: 0;
     background: transparent;
     color: var(--ut-muted-2);
     cursor: pointer;
     border-radius: 8px;
-    transition: color 0.2s ease, background 0.2s ease;
+    transition: color 0.18s ease, background 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .pw-toggle:hover {
@@ -1517,21 +1520,31 @@ button[onclick*="save"]:hover,
 }
 
 .pw-toggle svg {
+    position: absolute;
+    inset: 0;
+    margin: auto;
     width: 20px;
     height: 20px;
     display: block;
+    pointer-events: none;
+    transition: opacity 0.16s ease, transform 0.16s ease;
 }
 
+/* Default: eye visible, eye-off hidden (scaled down + transparent). */
 .pw-toggle .pw-eye-off {
-    display: none;
+    opacity: 0;
+    transform: scale(0.55);
 }
 
+/* When password is shown: eye fades out, eye-off fades in. */
 .pw-toggle.is-visible .pw-eye {
-    display: none;
+    opacity: 0;
+    transform: scale(0.55);
 }
 
 .pw-toggle.is-visible .pw-eye-off {
-    display: block;
+    opacity: 1;
+    transform: scale(1);
 }
 
 /* For inputs NOT wrapped in .field-control (e.g. password modal) */
