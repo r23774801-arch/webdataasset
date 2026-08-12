@@ -67,6 +67,20 @@ if (!$delete->execute()) {
     error_log('[hapus_user] delete failed: ' . $conn->error);
     json_response(['status' => 'error', 'message' => 'Gagal menghapus user.']);
 }
+$delete->close();
+
+// When an account is removed, its registration request is cleared too. If the
+// approval row kept its "Approved" status, register.php would still report the
+// NRP as taken, blocking the employee from re-registering with the same NRP.
+$hasApprovals = $conn->query("SHOW TABLES LIKE 'user_approvals'");
+if ($hasApprovals && $hasApprovals->num_rows > 0) {
+    $delApproval = $conn->prepare("DELETE FROM user_approvals WHERE nrp = ?");
+    if ($delApproval) {
+        $delApproval->bind_param('s', $nrp);
+        $delApproval->execute();
+        $delApproval->close();
+    }
+}
 
 AuditService::log($conn, 'Hapus User', 'users', null, ['by' => $me['nrp'], 'target' => $nrp]);
 
