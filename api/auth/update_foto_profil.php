@@ -61,8 +61,10 @@ if ($file['size'] > $cfg['max_size']) {
     json_response(['status' => 'error', 'message' => "Ukuran file melebihi batas maksimum ({$maxMb} MB)."]);
 }
 
-// Dedicated folder for profile photos.
-$uploadDir = 'uploads/profil/';
+// Dedicated folder for profile photos (absolute path resolved from the
+// project root so the stored URL-relative path always matches the file).
+$rootDir = realpath(__DIR__ . '/../../');
+$uploadDir = ($rootDir !== false ? $rootDir : __DIR__ . '/../../') . '/uploads/profil/';
 if (!is_dir($uploadDir)) {
     @mkdir($uploadDir, 0755, true);
 }
@@ -72,6 +74,7 @@ if (!is_dir($uploadDir)) {
 
 $filename = 'profil_' . (string)$user['nrp'] . '_' . uniqid() . '.' . $ext;
 $destination = $uploadDir . $filename;
+$webPath = 'uploads/profil/' . $filename; // URL-relative path stored in the DB.
 
 if (!move_uploaded_file($file['tmp_name'], $destination)) {
     json_response(['status' => 'error', 'message' => 'Gagal menyimpan file.']);
@@ -95,7 +98,7 @@ $update = $conn->prepare("UPDATE users SET photo = ? WHERE nrp = ?");
 if (!$update) {
     json_response(['status' => 'error', 'message' => 'Terjadi kesalahan pada server.']);
 }
-$update->bind_param('ss', $destination, $nrp);
+$update->bind_param('ss', $webPath, $nrp);
 if (!$update->execute()) {
     error_log('[update_foto_profil] update failed: ' . $conn->error);
     @unlink($destination);
@@ -103,13 +106,13 @@ if (!$update->execute()) {
 }
 
 // Remove the previous profile photo file (never the same path as the new one).
-if ($oldPhoto !== '' && $oldPhoto !== $destination) {
-    $oldPath = __DIR__ . '/' . $oldPhoto;
+if ($oldPhoto !== '' && $oldPhoto !== $webPath) {
+    $oldPath = ($rootDir !== false ? $rootDir : __DIR__ . '/../../') . '/' . $oldPhoto;
     if (is_file($oldPath) && strpos($oldPhoto, 'uploads/profil/') === 0) {
         @unlink($oldPath);
     }
 }
 
-AuditService::log($conn, 'Updated Profile Photo', 'users', null, ['nrp' => $nrp, 'photo' => $destination]);
+AuditService::log($conn, 'Updated Profile Photo', 'users', null, ['nrp' => $nrp, 'photo' => $webPath]);
 
-json_response(['status' => 'success', 'message' => 'Foto profil berhasil diperbarui.', 'data' => ['photo' => $destination]]);
+json_response(['status' => 'success', 'message' => 'Foto profil berhasil diperbarui.', 'data' => ['photo' => $webPath]]);

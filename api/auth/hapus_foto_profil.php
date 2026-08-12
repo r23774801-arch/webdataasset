@@ -50,7 +50,8 @@ if (!$update->execute()) {
 
 // Remove the stored profile photo file (never allow a path outside the folder).
 if ($oldPhoto !== '') {
-    $oldPath = __DIR__ . '/' . $oldPhoto;
+    $rootDir = realpath(__DIR__ . '/../../');
+    $oldPath = ($rootDir !== false ? $rootDir : __DIR__ . '/../../') . '/' . $oldPhoto;
     if (is_file($oldPath) && strpos($oldPhoto, 'uploads/profil/') === 0) {
         @unlink($oldPath);
     }

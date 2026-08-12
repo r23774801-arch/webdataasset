@@ -619,7 +619,7 @@
                             <div class="profil-email-actions">
                                 <button id="saveEmailBtn" class="profil-save-btn" type="button">
                                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                                    Simpan Email
+                                    Simpan
                                 </button>
                                 <span id="emailSaveMsg"></span>
                             </div>
@@ -759,6 +759,7 @@
             // ==========================================
             var fotoBtn  = document.getElementById('profilAvatarEdit');
             var fotoInput = document.getElementById('profilFotoInput');
+            var pendingFotoFile = null;
 
             if (fotoBtn && fotoInput) {
                 fotoBtn.addEventListener('click', function() { fotoInput.click(); });
@@ -777,35 +778,14 @@
                         return;
                     }
 
-                    var fd = new FormData();
-                    fd.append('photo', file);
-
-                    fotoBtn.disabled = true;
-                    var originalHtml = fotoBtn.innerHTML;
-
-                    fetch('api/auth/update_foto_profil.php', {
-                        method: 'POST',
-                        body: fd
-                    })
-                        .then(function(r) { return r.json(); })
-                        .then(function(data) {
-                            if (data.status === 'success' && data.data && data.data.photo) {
-                                // Local preview + propagate to top/sidebar avatars.
-                                renderAvatar(avatarEl, initial, data.data.photo);
-                                renderAvatar(document.getElementById('topAvatar'), initial, data.data.photo);
-                                renderAvatar(document.getElementById('sidebarAvatar'), initial, data.data.photo);
-                                localStorage.setItem('userPhoto', data.data.photo);
-                                setRemoveBtn(true);
-                            } else {
-                                showToast(data.message || 'Gagal memperbarui foto profil.', 'error');
-                            }
-                        })
-                        .catch(function() { showToast('Gagal terhubung ke server.', 'error'); })
-                        .finally(function() {
-                            fotoBtn.disabled = false;
-                            fotoBtn.innerHTML = originalHtml;
-                            fotoInput.value = '';
-                        });
+                    // Local preview only â€” the file is actually uploaded when the
+                    // "Simpan" button is clicked, together with the e-mail.
+                    pendingFotoFile = file;
+                    var previewUrl = URL.createObjectURL(file);
+                    renderAvatar(avatarEl, initial, previewUrl);
+                    renderAvatar(document.getElementById('topAvatar'), initial, previewUrl);
+                    renderAvatar(document.getElementById('sidebarAvatar'), initial, previewUrl);
+                    setMsg('\u2713 Foto baru siap. Klik Simpan untuk menyimpan.', 'var(--ut-green-deep)');
                 });
             }
 
@@ -816,12 +796,12 @@
                 });
             }
 
-            function tutupHapusFotoModal() {
+            window.tutupHapusFotoModal = function () {
                 const hapusFotoModal = document.getElementById('hapusFotoModal');
                 if (hapusFotoModal) hapusFotoModal.style.display = 'none';
-            }
+            };
 
-            function konfirmasiHapusFoto() {
+            window.konfirmasiHapusFoto = function () {
                 if (!fotoRemoveBtn) return;
                 tutupHapusFotoModal();
 
@@ -830,6 +810,9 @@
                     .then(function(r) { return r.json(); })
                     .then(function(data) {
                         if (data.status === 'success') {
+                            pendingFotoFile = null;
+                            const fotoInput2 = document.getElementById('profilFotoInput');
+                            if (fotoInput2) fotoInput2.value = '';
                             renderAvatar(avatarEl, initial, '');
                             renderAvatar(document.getElementById('topAvatar'), initial, '');
                             renderAvatar(document.getElementById('sidebarAvatar'), initial, '');
@@ -842,41 +825,73 @@
                     })
                     .catch(function() { showToast('Gagal terhubung ke server.', 'error'); })
                     .finally(function() { fotoRemoveBtn.disabled = false; });
-            }
+            };
 
             function setMsg(text, color) {
                 msg.textContent = text;
                 msg.style.color = color;
             }
 
-            function saveEmail() {
+            function saveProfile() {
                 const email = emailInput.value.trim();
                 if (!email) { setMsg('Email wajib diisi.', 'var(--ut-red)'); return; }
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Format email tidak valid.', 'var(--ut-red)'); return; }
 
                 saveBtn.disabled = true;
                 setMsg('Menyimpan...', 'var(--ut-muted-2)');
-                fetch('api/auth/update_profil.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                })
-                    .then(function(r) { return r.json(); })
-                    .then(function(data) {
-                        if (data.status === 'success') {
-                            setMsg('\u2713 Email tersimpan.', 'var(--ut-green-deep)');
-                            if (emailReminder) emailReminder.style.display = 'none';
-                        } else {
-                            setMsg('\u2717 ' + (data.message || 'Gagal menyimpan email.'), 'var(--ut-red)');
+
+                // Build the requests: always save the e-mail, and upload the
+                // pending new profile photo at the same time (if one was picked).
+                const requests = [
+                    fetch('api/auth/update_profil.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    }).then(function(r) { return r.json(); })
+                ];
+
+                if (pendingFotoFile) {
+                    const fd = new FormData();
+                    fd.append('photo', pendingFotoFile);
+                    const uploadPromise = fetch('api/auth/update_foto_profil.php', {
+                        method: 'POST',
+                        body: fd
+                    }).then(function(r) { return r.json(); });
+                    requests.push(uploadPromise);
+                }
+
+                Promise.all(requests)
+                    .then(function(results) {
+                        const emailResult = results[0];
+                        if (emailResult.status !== 'success') {
+                            setMsg('\u2717 ' + (emailResult.message || 'Gagal menyimpan email.'), 'var(--ut-red)');
+                            return;
                         }
+                        if (emailReminder) emailReminder.style.display = 'none';
+
+                        const photoResult = pendingFotoFile ? (results[1] || {}) : null;
+                        if (photoResult && photoResult.status === 'success' && photoResult.data && photoResult.data.photo) {
+                            renderAvatar(avatarEl, initial, photoResult.data.photo);
+                            renderAvatar(document.getElementById('topAvatar'), initial, photoResult.data.photo);
+                            renderAvatar(document.getElementById('sidebarAvatar'), initial, photoResult.data.photo);
+                            localStorage.setItem('userPhoto', photoResult.data.photo);
+                            setRemoveBtn(true);
+                            pendingFotoFile = null;
+                            fotoInput.value = '';
+                        } else if (photoResult && photoResult.status !== 'success') {
+                            setMsg('\u2717 ' + (photoResult.message || 'Gagal menyimpan foto profil.'), 'var(--ut-red)');
+                            return;
+                        }
+
+                        setMsg('\u2713 Profil tersimpan.', 'var(--ut-green-deep)');
                     })
                     .catch(function() { setMsg('\u2717 Gagal terhubung ke server.', 'var(--ut-red)'); })
                     .finally(function() { saveBtn.disabled = false; });
             }
 
-            saveBtn.addEventListener('click', saveEmail);
+            saveBtn.addEventListener('click', saveProfile);
             emailInput.addEventListener('keydown', function(ev) {
-                if (ev.key === 'Enter') saveEmail();
+                if (ev.key === 'Enter') saveProfile();
             });
         })();
 
