@@ -161,14 +161,14 @@
             position: absolute;
             top: 20px;
             right: 35px;
-            color: var(--ut-white);
+            color: #fff;
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
         }
         .image-preview-close:hover {
-            color: var(--ut-muted-2);
+            color: #ddd;
         }
     </style>
 </head>
@@ -400,8 +400,11 @@
         <!-- Modal Action Attachment -->
         <div id="actionModal" class="modal">
             <div class="modal-content">
-                <span class="close-btn" onclick="tutupActionBarang()">&times;</span>
-                <h3 style="margin-bottom: 20px; color: var(--ut-text);">Action Attachment</h3>
+                <div class="modal-sticky-header">
+                    <h3 style="margin-bottom: 20px; color: var(--ut-text);">Action Attachment</h3>
+                    <span class="close-btn" onclick="tutupActionBarang()">&times;</span>
+                </div>
+                <div class="modal-scroll-body">
                 <div class="input-group" style="margin-bottom: 18px;">
                     <label>Informasi Barang</label>
                     <div id="actionInfo"></div>
@@ -419,6 +422,7 @@
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
                     <button type="button" onclick="tutupActionBarang()" style="background:var(--ut-muted); color:var(--ut-white); border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Batal</button>
                     <button class="btn-warning" onclick="simpanAttachmentBarang()">Simpan Attachment</button>
+                </div>
                 </div>
             </div>
         </div>
