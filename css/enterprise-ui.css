@@ -1525,26 +1525,34 @@ button[onclick*="save"]:hover,
     pointer-events: none;
 }
 
-/* Default: eye visible, eye-off hidden. */
-.pw-toggle .pw-eye-off {
-    display: none;
+/* Two eye icons overlay the same spot; a smooth fade + zoom swaps between
+   them when the password visibility toggles. */
+.pw-toggle svg.pw-eye,
+.pw-toggle svg.pw-eye-off {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-/* When password is shown: eye hides, eye-off shows. */
+/* Default: eye visible, eye-off hidden. */
+.pw-toggle .pw-eye-off {
+    opacity: 0;
+    transform: scale(0.4);
+    visibility: hidden;
+}
+
+/* When password is shown: eye fades out & shrinks, eye-off fades in. */
 .pw-toggle.is-visible .pw-eye {
-    display: none;
+    opacity: 0;
+    transform: scale(0.4);
+    visibility: hidden;
 }
 
 .pw-toggle.is-visible .pw-eye-off {
-    display: block;
-}
-
-/* Force instant toggle — no animation/transition from any other rule. */
-.pw-toggle,
-.pw-toggle *,
-.pw-toggle svg {
-    animation: none !important;
-    transition: none !important;
+    opacity: 1;
+    transform: scale(1);
+    visibility: visible;
 }
 
 /* Hide the browser's OWN password reveal/clear buttons (Edge/Chrome add an
