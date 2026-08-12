@@ -1547,6 +1547,25 @@ button[onclick*="save"]:hover,
     transition: none !important;
 }
 
+/* Hide the browser's OWN password reveal/clear buttons (Edge/Chrome add an
+   animated reveal eye to <input type=password> that cannot be restyled and
+   would duplicate our custom eye with its own animation). */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Safari / iOS credentials & password auto-fill buttons. */
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-strong-password-auto-fill-button {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 /* For inputs NOT wrapped in .field-control (e.g. password modal) */
 .pw-field {
     position: relative;
