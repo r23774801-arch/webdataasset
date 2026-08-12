@@ -3,16 +3,7 @@ function togglePassword(inputId, btn) {
     const input = document.getElementById(inputId);
     if (!input) return;
     const show = input.type === 'password';
-
-    // Keep the caret/focus stable while the input type changes, so the field
-    // never teleports the cursor or visually stutters.
-    const end = input.selectionStart;
     input.type = show ? 'text' : 'password';
-    requestAnimationFrame(function () {
-        input.focus();
-        if (end !== null) input.setSelectionRange(end, end);
-    });
-
     if (btn) {
         btn.classList.toggle('is-visible', show);
         btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
