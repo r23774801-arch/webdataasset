@@ -1501,9 +1501,8 @@ button[onclick*="save"]:hover,
     z-index: 2;
     width: 36px;
     height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     padding: 0;
     border: 0;
     background: transparent;
@@ -1518,40 +1517,32 @@ button[onclick*="save"]:hover,
     background: rgba(26, 32, 44, 0.06);
 }
 
-.pw-toggle svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-    pointer-events: none;
-}
-
-/* Two eye icons overlay the same spot; a smooth fade + zoom swaps between
-   them when the password visibility toggles. */
+/* Two eye icons share one grid cell, so they always occupy the exact same
+   spot; only opacity/visibility fades between them. No transform is applied,
+   so the icons can never slide up or down while animating. */
 .pw-toggle svg.pw-eye,
 .pw-toggle svg.pw-eye-off {
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    transition: opacity 0.18s ease, transform 0.18s ease;
+    grid-area: 1 / 1;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
 }
 
 /* Default: eye visible, eye-off hidden. */
 .pw-toggle .pw-eye-off {
     opacity: 0;
-    transform: scale(0.4);
     visibility: hidden;
 }
 
-/* When password is shown: eye fades out & shrinks, eye-off fades in. */
+/* When password is shown: eye fades out, eye-off fades in. */
 .pw-toggle.is-visible .pw-eye {
     opacity: 0;
-    transform: scale(0.4);
     visibility: hidden;
 }
 
 .pw-toggle.is-visible .pw-eye-off {
     opacity: 1;
-    transform: scale(1);
     visibility: visible;
 }
 
