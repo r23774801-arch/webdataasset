@@ -575,6 +575,59 @@ function statusBadge(status) {
                         <td>${statusBadge(user.status)}</td>
                         <td>${actionCell}</td>
 </tr>`;
+function statusBadge(status) {
+            const aktif = String(status || '').toLowerCase() !== 'nonaktif';
+            return `<span class="user-status-badge ${aktif ? 'usr-aktif' : 'usr-nonaktif'}">${aktif ? 'Aktif' : 'Nonaktif'}</span>`;
+        }
+
+        function profilePhotoCell(user) {
+            const initial = String(user.username || user.nama_lengkap || 'U').charAt(0).toUpperCase();
+            if (user.photo) {
+                return `<img src="${esc(user.photo)}" alt="Foto ${esc(user.nama_lengkap || user.username)}" class="user-photo" onerror="this.outerHTML='<span class=\\'user-photo fallback\\'>${esc(initial)}</span>'">`;
+            }
+            return `<span class="user-photo fallback">${esc(initial)}</span>`;
+        }
+
+        async function loadUsers() {
+            const tbody = document.getElementById('tabelAkun');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
+
+            try {
+                const response = await fetch('api/auth/get_users.php');
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada akun user.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = result.data.map(user => {
+                    const isSelf = String(user.nrp) === currentUserNrp;
+                    const nonaktif = String(user.status || '').toLowerCase() === 'nonaktif';
+                    const toggleLabel = nonaktif ? 'Aktifkan' : 'Nonaktifkan';
+                    // Akun ADMIN adalah akun sistem: tidak boleh dinonaktifkan atau
+                    // dihapus, tetapi password-nya tetap boleh diubah (termasuk sendiri).
+                    const isAdminRole = String(user.role || '').toUpperCase() === 'ADMIN';
+                    const pwBtn = `<button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>`;
+                    const toggleBtn = isAdminRole
+                        ? ''
+                        : `<button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>`;
+                    const hapusBtn = isAdminRole
+                        ? ''
+                        : `<button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>`;
+                    const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
+                    return `<tr${isSelf ? ' class="self-row"' : ''}>
+                        <td>${profilePhotoCell(user)}</td>
+                        <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:var(--ut-teal); font-weight:700;">(Anda)</div>' : ''}</td>
+                        <td>${esc(user.nrp)}</td>
+                        <td>${esc(user.username)}</td>
+                        <td>${roleBadge(user.role)}</td>
+                        <td>${statusBadge(user.status)}</td>
+                        <td>${actionCell}</td>
+</tr>`;
                 }).join('');
             } catch (error) {
                 console.error(error);
@@ -592,6 +645,13 @@ function statusBadge(status) {
             if (btn) {
                 btn.classList.toggle('is-visible', show);
                 btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+
+                /* Trigger animasi elastic bounce setiap kali toggle diklik */
+                btn.classList.remove('pw-anim-pop');
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => btn.classList.add('pw-anim-pop'));
+                });
+                btn.addEventListener('animationend', () => btn.classList.remove('pw-anim-pop'), { once: true });
             }
         }
 

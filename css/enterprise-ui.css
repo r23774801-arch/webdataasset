@@ -1493,6 +1493,30 @@ button[onclick*="save"]:hover,
     padding-right: 46px;
 }
 
+/* ── Keyframes pw-toggle ──────────────────────────────────────── */
+
+/* Elastic scale bounce — tombol "memantul" saat diklik */
+@keyframes pw-btn-pop {
+    0%   { transform: translateY(-50%) scale(1); }
+    30%  { transform: translateY(-50%) scale(0.78); }
+    65%  { transform: translateY(-50%) scale(1.12); }
+    85%  { transform: translateY(-50%) scale(0.96); }
+    100% { transform: translateY(-50%) scale(1); }
+}
+
+/* Ikon keluar: scale down + putar sedikit */
+@keyframes pw-icon-out {
+    from { opacity: 1; transform: scale(1)    rotate(0deg); }
+    to   { opacity: 0; transform: scale(0.5)  rotate(20deg); }
+}
+
+/* Ikon masuk: scale up dari kecil + putar balik */
+@keyframes pw-icon-in {
+    from { opacity: 0; transform: scale(0.5) rotate(-20deg); }
+    to   { opacity: 1; transform: scale(1)   rotate(0deg); }
+}
+
+/* ── Tombol ────────────────────────────────────────────────────── */
 .pw-toggle {
     position: absolute;
     right: 10px;
@@ -1510,40 +1534,75 @@ button[onclick*="save"]:hover,
     cursor: pointer;
     border-radius: 8px;
     -webkit-tap-highlight-color: transparent;
+    /* Transisi warna & background untuk efek hover yang halus */
+    transition: color 0.2s ease, background 0.2s ease,
+                box-shadow 0.2s ease;
 }
 
+/* Hover: lingkaran cahaya tipis */
 .pw-toggle:hover {
     color: var(--ut-charcoal);
     background: rgba(26, 32, 44, 0.06);
+    box-shadow: 0 0 0 6px rgba(26, 32, 44, 0.04);
 }
 
-/* Two eye icons share one grid cell, so they always occupy the exact same
-   spot; only opacity/visibility fades between them. No transform is applied,
-   so the icons can never slide up or down while animating. */
+/* Klik: elastic bounce — tidak boleh mengubah top/translateY(-50%) */
+.pw-toggle:active {
+    transform: translateY(-50%) scale(0.82) !important;
+    background: rgba(26, 32, 44, 0.12) !important;
+    box-shadow: none !important;
+    transition: transform 0.08s ease, background 0.08s ease !important;
+}
+
+/* Saat toggle berpindah state: panggil animasi bounce pada tombol */
+.pw-toggle.is-visible,
+.pw-toggle:not(.is-visible) {
+    /* animasi hanya terpicu saat class berubah via JS */
+}
+.pw-toggle.pw-anim-pop {
+    animation: pw-btn-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ── Ikon (dua SVG di grid-cell yang sama) ─────────────────────── */
 .pw-toggle svg.pw-eye,
 .pw-toggle svg.pw-eye-off {
     grid-area: 1 / 1;
     width: 20px;
     height: 20px;
     pointer-events: none;
-    transition: opacity 0.18s ease;
+    transform-origin: center;
 }
 
-/* Default: eye visible, eye-off hidden. */
+/* Default: eye terlihat, eye-off tersembunyi */
+.pw-toggle .pw-eye {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
 .pw-toggle .pw-eye-off {
     opacity: 0;
     visibility: hidden;
+    transform: scale(0.5) rotate(-20deg);
 }
 
-/* When password is shown: eye fades out, eye-off fades in. */
+/* Saat password terlihat: eye keluar, eye-off masuk */
 .pw-toggle.is-visible .pw-eye {
-    opacity: 0;
+    animation: pw-icon-out 0.22s ease forwards;
     visibility: hidden;
 }
-
 .pw-toggle.is-visible .pw-eye-off {
     opacity: 1;
     visibility: visible;
+    animation: pw-icon-in 0.22s ease 0.08s both;
+}
+
+/* Reset ke state semula saat password disembunyikan kembali */
+.pw-toggle:not(.is-visible) .pw-eye {
+    animation: pw-icon-in 0.22s ease 0.08s both;
+    visibility: visible;
+}
+.pw-toggle:not(.is-visible) .pw-eye-off {
+    animation: pw-icon-out 0.22s ease forwards;
+    visibility: hidden;
 }
 
 /* Hide the browser's OWN password reveal/clear buttons (Edge/Chrome add an
@@ -2485,7 +2544,7 @@ textarea:focus-visible {
     box-shadow: var(--ut-focus-ring) !important;
 }
 
-button:active,
+button:not(.pw-toggle):active,
 .btn:active,
 .pagination-btn:active {
     transform: translateY(1px) !important;

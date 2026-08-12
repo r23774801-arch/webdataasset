@@ -7,6 +7,15 @@ function togglePassword(inputId, btn) {
     if (btn) {
         btn.classList.toggle('is-visible', show);
         btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+
+        /* Trigger animasi elastic bounce setiap kali toggle diklik.
+           Hapus class dulu (satu frame), lalu tambahkan kembali agar
+           animasi bisa diputar ulang meski diklik berulang kali. */
+        btn.classList.remove('pw-anim-pop');
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => btn.classList.add('pw-anim-pop'));
+        });
+        btn.addEventListener('animationend', () => btn.classList.remove('pw-anim-pop'), { once: true });
     }
 }
 
