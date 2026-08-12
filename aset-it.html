@@ -646,8 +646,11 @@
     <!-- Modal Form Tambah Aset -->
     <div id="modalTambah" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="tutupModalTambah()">&times;</span>
-            <h3>Tambah Data Asset IT</h3>
+            <div class="modal-sticky-header">
+                <h3>Tambah Data Asset IT</h3>
+                <span class="close-btn" onclick="tutupModalTambah()">&times;</span>
+            </div>
+            <div class="modal-scroll-body">
             <div class="input-group"><label>Asset Number</label><input type="text" id="assetNumber" placeholder="Contoh: AST-001"></div>
             <div class="input-group"><label>Serial Number</label><input type="text" id="serialNumber" placeholder="Contoh: SN123456"></div>
             <div class="input-group"><label>Brand</label><input type="text" id="namaBarang" placeholder="Contoh: Lenovo ThinkPad"></div>
@@ -660,6 +663,7 @@
             <div class="input-group"><label>Date</label><input type="date" id="dateOfEntry"></div>
             <div class="input-group"><label>Photo / Lampiran</label><input type="file" id="photo" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
             <button class="btn-warning" onclick="simpanAsetIt()">Simpan Data Asset</button>
+            </div>
         </div>
     </div>
 
@@ -773,9 +777,9 @@
     <script>
         // ========== GLOBAL STATE ==========
         const TABLE_TYPE = 'it';
-        const GET_ENDPOINT = 'get_aset_it.php';
-        const TAMBAH_ENDPOINT = 'tambah_aset_it.php';
-        const UPDATE_ENDPOINT = 'update_aset_it.php';
+        const GET_ENDPOINT = 'api/asset/get_aset_it.php';
+        const TAMBAH_ENDPOINT = 'api/asset/tambah_aset_it.php';
+        const UPDATE_ENDPOINT = 'api/asset/update_aset_it.php';
 
         let allAsetData = [];
         let filteredDataIt = [];
@@ -814,7 +818,7 @@
         }
 
         async function logout() {
-            try { await fetch('logout.php', { method: 'POST' }); } catch (err) {}
+            try { await fetch('api/auth/logout.php', { method: 'POST' }); } catch (err) {}
             sessionStorage.removeItem('isLoggedIn');
             localStorage.clear();
             window.location.replace('login.html');
@@ -865,7 +869,7 @@
         // Approved (asset-type-wide lock). UX only â€” the backend enforces the lock.
         async function syncAssetCreationLock() {
             try {
-                const resp = await fetch('get_stocktaking_submissions.php?lock=1&asset_type=IT');
+                const resp = await fetch('api/stocktaking/get_stocktaking_submissions.php?lock=1&asset_type=IT');
                 const result = await resp.json();
                 const locked = result.status === 'success' && result.data && result.data.locked;
                 // PHASE 4.15 â€” the whole stocktaking session is locked (Pending/Approved).
@@ -885,7 +889,7 @@
 
         async function syncStocktakingSubmissionState() {
             try {
-                const resp = await fetch('get_stocktaking_submissions.php?mine=1&asset_type=IT&latest=1');
+                const resp = await fetch('api/stocktaking/get_stocktaking_submissions.php?mine=1&asset_type=IT&latest=1');
                 const result = await resp.json();
                 if (result.status === 'success') {
                     window.stocktakingSubmission = result.data;
@@ -985,7 +989,7 @@
             }
             toggleLoader(true, 'Mengirim pengajuan stocktaking...');
             try {
-                const response = await fetch('finish_stocktaking.php', {
+                const response = await fetch('api/stocktaking/finish_stocktaking.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ table_type: TABLE_TYPE })
@@ -1455,7 +1459,7 @@
 
             toggleLoader(true, 'Memproses transfer aset...');
             try {
-                const response = await fetch('update_stocktaking.php', {
+                const response = await fetch('api/stocktaking/update_stocktaking.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -1519,7 +1523,7 @@
                     }
                 }
 
-                const response = await fetch('update_stocktaking.php', {
+                const response = await fetch('api/stocktaking/update_stocktaking.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1625,7 +1629,7 @@
                     if (photoInput && photoInput.files && photoInput.files[0]) {
                         const formData = new FormData();
                         formData.append('attachment', photoInput.files[0]);
-                        const uploadResponse = await fetch('upload_photo.php', { method: 'POST', body: formData });
+                        const uploadResponse = await fetch('api/asset/upload_photo.php', { method: 'POST', body: formData });
                         const uploadResult = await uploadResponse.json();
                         if (uploadResult.status !== 'success') {
                             toggleLoader(false);
@@ -1719,7 +1723,7 @@
 
         // ========== MASTER AREA UI (PHASE 4.24) ==========
         // Summary cards + Area dropdowns are driven by master_area via
-        // get_areas.php (shared helpers in js/loader.js) â€” no hardcoded Areas.
+        // api/asset/get_areas.php (shared helpers in js/loader.js) â€” no hardcoded Areas.
         const AREA_CARD_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path><path d="M2 8h20"></path></svg>';
 
         async function initMasterAreaUI() {

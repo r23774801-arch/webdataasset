@@ -11,7 +11,7 @@ Options -Indexes
     RewriteRule (^|/)\. - [F,L]
 
     # Block non-public directories (never served over HTTP).
-    RewriteRule ^(app|config|vendor|google_apps_script|\.vscode)/ - [F,L]
+    RewriteRule ^(app|config|vendor|docs|google_apps_script|\.vscode)/ - [F,L]
 </IfModule>
 
 # Block sensitive file types at any depth.

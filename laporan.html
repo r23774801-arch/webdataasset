@@ -989,7 +989,7 @@
         // ==========================================
         async function loadChartData() {
             try {
-                const response = await fetch('get_laporan_data.php');
+                const response = await fetch('api/dashboard/get_laporan_data.php');
                 const result = await response.json();
                 
                 if (result.status === 'success') {
@@ -1086,7 +1086,7 @@
 
         async function loadDashboardSummary() {
             try {
-                const response = await fetch('get_laporan_data.php?dashboard=true');
+                const response = await fetch('api/dashboard/get_laporan_data.php?dashboard=true');
                 const result = await response.json();
                 if (result.status === 'success') {
                     renderOverallSummary(result.overall);
@@ -1151,7 +1151,7 @@
         // ==========================================
         async function loadSummaryTable() {
             try {
-                const response = await fetch('get_laporan_data.php?summary=true');
+                const response = await fetch('api/dashboard/get_laporan_data.php?summary=true');
                 const result = await response.json();
                 
                 if (result.status === 'success') {
@@ -1377,7 +1377,7 @@
             const filters = getAssetMasterFilterParams();
             for (const [k, v] of Object.entries(filters)) qs.set('filters[' + k + ']', v);
             try {
-                const res = await fetch('get_asset_master_data.php?' + qs.toString());
+                const res = await fetch('api/dashboard/get_asset_master_data.php?' + qs.toString());
                 const result = await res.json();
                 if (result.status !== 'success') throw new Error('API error');
                 assetMasterState.total = result.total;
@@ -1480,11 +1480,11 @@
         }
 
         function exportAssetMasterExcel() {
-            downloadExport(buildAssetMasterExportUrl('export_asset_master_excel.php'));
+            downloadExport(buildAssetMasterExportUrl('api/export/export_asset_master_excel.php'));
         }
 
         function exportAssetMasterPDF() {
-            downloadExport(buildAssetMasterExportUrl('export_asset_master_pdf.php'));
+            downloadExport(buildAssetMasterExportUrl('api/export/export_asset_master_pdf.php'));
         }
 
         // Auto-refresh the Asset Master table whenever the user returns to this
@@ -1515,11 +1515,11 @@
         }
 
         function exportToExcel() {
-            downloadExport('export_excel.php');
+            downloadExport('api/export/export_excel.php');
         }
 
         function exportToPDF() {
-            downloadExport('export_pdf.php');
+            downloadExport('api/export/export_pdf.php');
         }
 
         // ==========================================
@@ -1527,7 +1527,7 @@
         // ==========================================
         async function loadBarangReport() {
             try {
-                const response = await fetch('get_laporan_data.php?barang=true');
+                const response = await fetch('api/dashboard/get_laporan_data.php?barang=true');
                 const result = await response.json();
                 if (result.status !== 'success') return;
                 const d = result.data;
@@ -1585,7 +1585,7 @@
         // ==========================================
         async function loadTransferHistory() {
             try {
-                const response = await fetch('get_laporan_data.php?transfer=true');
+                const response = await fetch('api/dashboard/get_laporan_data.php?transfer=true');
                 const result = await response.json();
                 const tbody = document.getElementById('transferHistoryBody');
                 if (!tbody) return;

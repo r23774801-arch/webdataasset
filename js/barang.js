@@ -238,7 +238,7 @@
     async function loadData() {
         if (typeof toggleLoader === 'function') toggleLoader(true, 'Memuat data...');
         try {
-            const res = await fetch(`get_${API}.php?module=${MODULE}`);
+            const res = await fetch(`api/asset/get_${API}.php?module=${MODULE}`);
             const result = await res.json();
             if (typeof toggleLoader === 'function') toggleLoader(false);
             if (result.status === 'success') {
@@ -266,7 +266,7 @@
         if (!sel) return;
         sel.innerHTML = '<option value="">-- Tanpa Kode Pengajuan --</option>';
         try {
-            const res = await fetch(`get_approved_submissions.php?type=${TYPE.toUpperCase()}`);
+            const res = await fetch(`api/stocktaking/get_approved_submissions.php?type=${TYPE.toUpperCase()}`);
             const result = await res.json();
             if (result.status === 'success' && Array.isArray(result.data)) {
                 result.data.forEach(sub => {
@@ -506,7 +506,7 @@
 
         if (typeof toggleLoader === 'function') toggleLoader(true, 'Menyimpan attachment...');
         try {
-            const res = await fetch(`update_barang_attachment_${TYPE}.php`, {
+            const res = await fetch(`api/asset/update_barang_attachment_${TYPE}.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: actionBarangId, module: MODULE, attachment: attachmentPath })
@@ -545,7 +545,7 @@
         if (!input || !input.files || !input.files[0]) return '';
         const formData = new FormData();
         formData.append('attachment', input.files[0]);
-        const uploadResponse = await fetch('upload_photo.php', { method: 'POST', body: formData });
+        const uploadResponse = await fetch('api/asset/upload_photo.php', { method: 'POST', body: formData });
         const uploadResult = await uploadResponse.json();
         if (uploadResult.status !== 'success') {
             const err = new Error(uploadResult.message || 'Gagal upload foto.');
@@ -583,7 +583,7 @@
             if (photoInput && photoInput.files && photoInput.files[0]) {
                 data.attachment = await uploadPhotoIfAny();
             }
-            const endpoint = editId ? `update_${API}.php` : `tambah_${API}.php`;
+            const endpoint = editId ? `api/asset/update_${API}.php` : `api/asset/tambah_${API}.php`;
             if (editId) data.id = editId;
             const res = await fetch(endpoint, {
                 method: 'POST',
@@ -637,7 +637,7 @@
     };
 
     // ---------- Master Area UI (Phase 4.24) ----------
-    // Summary cards + Area dropdown are driven by master_area via get_areas.php
+    // Summary cards + Area dropdown are driven by master_area via api/asset/get_areas.php
     // (shared helpers in js/loader.js) — no hardcoded Areas.
     const AREA_CARD_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFCC00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path><path d="M2 8h20"></path></svg>';
 

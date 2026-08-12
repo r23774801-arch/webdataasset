@@ -457,7 +457,7 @@
 
         async function loadWelcomeProfile() {
             try {
-                const response = await fetch('get_session_info.php');
+                const response = await fetch('api/auth/get_session_info.php');
                 const result = await response.json();
                 if (result.status === 'success' && result.data) {
                     const areaEl = document.getElementById('welcomeArea');
@@ -489,7 +489,7 @@
             const role = localStorage.getItem('userRole') || '';
             if (role.toLowerCase() !== 'admin') return;
             try {
-                const response = await fetch('get_stocktaking_submissions.php?status=Pending');
+                const response = await fetch('api/stocktaking/get_stocktaking_submissions.php?status=Pending');
                 const result = await response.json();
                 const notification = document.getElementById('admin-notification');
                 const badge = document.getElementById('notification-badge');
@@ -533,7 +533,7 @@
 
             for (const type of types) {
                 try {
-                    const response = await fetch(`get_stocktaking_submissions.php?mine=1&asset_type=${type}&latest=1`);
+                    const response = await fetch(`api/stocktaking/get_stocktaking_submissions.php?mine=1&asset_type=${type}&latest=1`);
                     const result = await response.json();
                     if (result.status !== 'success' || !result.data) continue;
                     const sub = result.data;
@@ -596,7 +596,7 @@
         // ==========================================
         async function loadAssetTotals() {
             try {
-                const response = await fetch('get_dashboard_stats.php');
+                const response = await fetch('api/dashboard/get_dashboard_stats.php');
                 const result = await response.json();
                 if (result.status === 'success' && result.data) {
                     const d = result.data;

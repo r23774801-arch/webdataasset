@@ -11,65 +11,66 @@ html[data-theme="dark"] {
     --ut-yellow: #FFC20E;
     --ut-yellow-strong: #FFD34D;
     --ut-yellow-deep: #E5B94D;
-    --ut-yellow-soft: #3A3320;
-    --ut-charcoal: #E6E9F0;
-    --ut-charcoal-2: #C9CED9;
+    --ut-yellow-soft: #26200A;
+    --ut-charcoal: #F3F4F6;
+    --ut-charcoal-2: #E5E7EB;
 
     /* Text */
-    --ut-text: #DDE1E8;
-    --ut-nav: #B7BEC9;
-    --ut-muted: #9AA3B2;
+    --ut-text: #E5E7EB;
+    --ut-nav: #9CA3AF;
+    --ut-muted: #9CA3AF;
     --ut-muted-2: #6B7280;
 
-    /* Surfaces */
-    --ut-bg: #12151C;
-    --ut-bg-2: #0F1217;
-    --ut-white: #1B1F27;
-    --ut-surface: #171A21;
-    --ut-surface-2: #1E232C;
-    --ut-row-even: #1A1E26;
-    --ut-row-hover: #2B2516;
-    --ut-input-bg: #232833;
-    --ut-red-soft: #2A1C1C;
+    /* Surfaces (OLED Pitch Black System) */
+    --ut-bg: #000000;
+    --ut-bg-2: #09090B;
+    --ut-white: #121214;
+    --ut-surface: #0E0E10;
+    --ut-surface-2: #161618;
+    --ut-row-even: #0B0B0D;
+    --ut-row-hover: #1C1808;
+    --ut-input-bg: #121214;
+    --ut-red-soft: #240C0C;
 
     /* Borders */
-    --ut-border: #2A303B;
-    --ut-border-strong: #3A4250;
+    --ut-border: #222226;
+    --ut-border-strong: #33333A;
 
     /* Semantic */
-    --ut-blue: #4C8DCC;
-    --ut-blue-soft: #1A2740;
+    --ut-blue: #3B82F6;
+    --ut-blue-soft: #0F1D38;
     --ut-green: #22C55E;
-    --ut-green-soft: #15301F;
-    --ut-green-deep: #7BE0A5;
+    --ut-green-soft: #0B2916;
+    --ut-green-deep: #4ADE80;
     --ut-red: #EF4444;
     --ut-red-deep: #F87171;
     --ut-amber: #F59E0B;
-    --ut-amber-deep: #E5B94D;
-    --ut-teal: #2DD4BF;
-    --ut-teal-soft: #142B27;
-    --ut-purple: #A78BFA;
-    --ut-purple-soft: #2A2440;
+    --ut-amber-deep: #FBBF24;
+    --ut-teal: #14B8A6;
+    --ut-teal-soft: #092825;
+    --ut-purple: #A855F7;
+    --ut-purple-soft: #201335;
 
     /* Table header (inverted; stays dark) */
-    --ut-table-header-bg: #262B34;
+    --ut-table-header-bg: #161618;
     --ut-table-header-text: #FFC20E;
-    --ut-table-header-border: #333B47;
+    --ut-table-header-border: #2B2B30;
 
     /* Overlays */
-    --ut-overlay: rgba(0, 0, 0, 0.62);
-    --ut-scrollbar: #343B48;
+    --ut-overlay: rgba(0, 0, 0, 0.82);
+    --ut-scrollbar: #27272A;
 
     /* Shadows */
-    --ut-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --ut-shadow-md: 0 8px 20px rgba(0, 0, 0, 0.4);
-    --ut-shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.5);
+    --ut-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.8);
+    --ut-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.85);
+    --ut-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.95);
 
     color-scheme: dark;
 }
 
 /* ---------- Page background ---------- */
 html[data-theme="dark"] body {
+    background-color: var(--ut-bg) !important;
     color: var(--ut-charcoal);
 }
 
@@ -86,7 +87,10 @@ html[data-theme="dark"] .auth-logo {
 }
 
 html[data-theme="dark"] .user-tab.is-active {
-    box-shadow: var(--ut-shadow-md);
+    background: var(--ut-yellow) !important;
+    border-color: var(--ut-yellow) !important;
+    color: #12151c !important;
+    box-shadow: none;
 }
 
 /* Dashboard welcome meta strip (uses page-level classes) */

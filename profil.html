@@ -735,7 +735,7 @@
             // Pre-fill the e-mail + profile photo from the server session record.
             // Users without an e-mail still work everywhere; the Profile page
             // reminds them to complete it so notifications can be delivered.
-            fetch('get_session_info.php')
+            fetch('api/auth/get_session_info.php')
                 .then(function(r) { return r.json(); })
                 .then(function(res) {
                     if (res.status === 'success' && res.data) {
@@ -783,7 +783,7 @@
                     fotoBtn.disabled = true;
                     var originalHtml = fotoBtn.innerHTML;
 
-                    fetch('update_foto_profil.php', {
+                    fetch('api/auth/update_foto_profil.php', {
                         method: 'POST',
                         body: fd
                     })
@@ -826,7 +826,7 @@
                 tutupHapusFotoModal();
 
                 fotoRemoveBtn.disabled = true;
-                fetch('hapus_foto_profil.php', { method: 'POST' })
+                fetch('api/auth/hapus_foto_profil.php', { method: 'POST' })
                     .then(function(r) { return r.json(); })
                     .then(function(data) {
                         if (data.status === 'success') {
@@ -856,7 +856,7 @@
 
                 saveBtn.disabled = true;
                 setMsg('Menyimpan...', 'var(--ut-muted-2)');
-                fetch('update_profil.php', {
+                fetch('api/auth/update_profil.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: email })

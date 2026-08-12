@@ -116,9 +116,9 @@
                 if (file) {
                     const formData = new FormData();
                     formData.append('file', file);
-                    response = await fetch('import_employee.php', { method: 'POST', body: formData });
+                    response = await fetch('api/asset/import_employee.php', { method: 'POST', body: formData });
                 } else {
-                    response = await fetch('import_employee.php', {
+                    response = await fetch('api/asset/import_employee.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ data: pasted })

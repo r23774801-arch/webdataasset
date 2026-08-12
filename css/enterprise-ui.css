@@ -758,51 +758,59 @@ body {
     transform: translateY(-1px) !important;
 }
 
-/* Segmented tab control — e.g. "Kelola Akun" / "Persetujuan User" on Data Akun */
+/* Tab control — e.g. "Kelola Akun" / "Persetujuan User" on Data Akun (matching approval-tab theme) */
 .user-tabs {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 14px;
-    padding: 4px;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 4px;
     width: fit-content;
     max-width: 100%;
-    background: var(--ut-surface-2);
-    border: 1px solid var(--ut-border);
-    border-radius: 12px;
+    background: transparent;
+    border: none;
+    padding: 0;
 }
 
 .user-tab {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    min-height: 40px;
-    padding: 0 18px;
-    border: none;
-    border-radius: 9px;
-    background: transparent;
+    border: 1px solid var(--ut-border);
+    background: var(--ut-white);
     color: var(--ut-text);
-    font-size: 0.92rem;
+    padding: 8px 18px;
+    border-radius: 20px;
     font-weight: 700;
+    font-size: 0.85rem;
     white-space: nowrap;
     cursor: pointer;
-    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+    transition: all 0.2s ease;
 }
 
 .user-tab svg {
-    width: 17px;
-    height: 17px;
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
 }
 
 .user-tab:hover {
+    border-color: var(--ut-yellow);
     color: var(--ut-charcoal);
 }
 
-.user-tab.is-active {
-    background: var(--ut-white);
-    color: var(--ut-charcoal);
-    box-shadow: 0 2px 8px rgba(31, 31, 31, 0.1);
+.user-tab.is-active,
+.user-tab.active {
+    background: var(--ut-yellow) !important;
+    border-color: var(--ut-yellow) !important;
+    color: #12151c !important;
+    box-shadow: none !important;
+}
+
+.user-tab.is-active svg,
+.user-tab.active svg {
+    stroke: #12151c !important;
 }
 
 .btn-danger,
@@ -910,6 +918,51 @@ button[onclick*="save"]:hover,
 
 .close-btn {
     color: var(--ut-muted) !important;
+}
+
+/* Modal header for add/edit forms: the title + close (X) button live OUTSIDE
+   the scrollable body (approval.html review-modal-body pattern), so the X
+   stays visible no matter how far the form is scrolled. */
+.modal-sticky-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: -32px -28px 22px;
+    padding: 20px 28px 14px;
+    background: var(--ut-white);
+    border-bottom: 2px solid var(--ut-yellow);
+    border-radius: var(--ut-radius-xl) var(--ut-radius-xl) 0 0;
+}
+
+.modal-sticky-header h3 {
+    margin-bottom: 0 !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
+
+.modal-sticky-header .close-btn {
+    position: static;
+    top: auto;
+    right: auto;
+    line-height: 1;
+}
+
+/* Only the form body scrolls; the modal itself stays fixed. Mirrors the
+   working .review-modal-body pattern in approval.html. */
+.modal-scroll-body {
+    max-height: 55vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+@media (max-width: 768px) {
+    .modal-sticky-header {
+        margin: -24px -18px 18px;
+        padding: 16px 18px 10px;
+    }
 }
 
 /* Charts and reports */
@@ -2531,6 +2584,12 @@ button:active,
 .custom-modal-overlay {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+}
+
+/* Keep wheel/touch gestures inside the modal: the page behind a fullscreen
+   modal must never scroll along with the modal content. */
+.modal {
+    overscroll-behavior: contain;
 }
 
 .modal-content,

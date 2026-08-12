@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 async function cekDataPending() {
     try {
-        const response = await fetch('get_pending_count.php');
+        const response = await fetch('api/stocktaking/get_pending_count.php');
         const result = await response.json();
         
         if (result.status === 'success' && result.total > 0) {

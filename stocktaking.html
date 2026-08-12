@@ -220,7 +220,7 @@
         async function loadStocktakingData() {
             toggleLoader(true, "Memuat data stocktaking...");
             try {
-                const response = await fetch('get_stocktaking.php');
+                const response = await fetch('api/stocktaking/get_stocktaking.php');
                 const result = await response.json();
                 toggleLoader(false);
 
@@ -348,7 +348,7 @@
             const assetType = role === 'it' ? 'IT' : 'GA';
 
             try {
-                const response = await fetch('get_stocktaking_submissions.php?latest=1&asset_type=' + assetType);
+                const response = await fetch('api/stocktaking/get_stocktaking_submissions.php?latest=1&asset_type=' + assetType);
                 const result = await response.json();
                 if (result.status !== 'success' || !result.data) return;
 

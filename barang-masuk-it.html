@@ -368,8 +368,11 @@
         <!-- Modal Tambah/Edit Barang Masuk -->
         <div id="modalTambah" class="modal">
             <div class="modal-content">
-                <span class="close-btn" onclick="tutupModal()">&times;</span>
-                <h3 id="modalTitle" style="margin-bottom: 20px; color: var(--ut-text);">Tambah Barang Masuk</h3>
+                <div class="modal-sticky-header">
+                    <h3 id="modalTitle" style="margin-bottom: 20px; color: var(--ut-text);">Tambah Barang Masuk</h3>
+                    <span class="close-btn" onclick="tutupModal()">&times;</span>
+                </div>
+                <div class="modal-scroll-body">
                 <div class="input-group"><label>Asset Number</label><input type="text" id="assetNumber" placeholder="Contoh: AST-001"></div>
                 <div class="input-group"><label>Nomor Tiket / Resi</label><input type="text" id="nomorTiket" placeholder="Contoh: TKT-2024-001"></div>
                 <div class="input-group"><label>Kode Pengajuan (Approval)</label>
@@ -390,6 +393,7 @@
                 </div>
                 <div class="input-group"><label>Photo</label><input type="file" id="photo" accept=".jpg,.jpeg,.png,.webp,.pdf" required></div>
                 <button id="modalSave" class="btn-warning" onclick="simpanBarang()">Simpan Data</button>
+                </div>
             </div>
         </div>
 

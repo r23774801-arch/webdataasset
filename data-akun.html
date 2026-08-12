@@ -314,17 +314,18 @@
                     </button>
                     <h2>Pengelolaan Akun User</h2>
                     <p>Kelola akun user: ubah password, aktifkan/nonaktifkan, hapus akun, dan setujui pendaftaran baru.</p>
-                    <div class="user-tabs" role="tablist" aria-label="Pengelolaan akun">
-                        <button id="tabAkunBtn" class="user-tab is-active" role="tab" aria-selected="true" onclick="switchTab('akun')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                            Kelola Akun
-                        </button>
-                        <button id="tabApprovalBtn" class="user-tab" role="tab" aria-selected="false" onclick="switchTab('approval')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            Persetujuan User
-                        </button>
-                    </div>
                 </div>
+            </div>
+
+            <div class="user-tabs" role="tablist" aria-label="Pengelolaan akun">
+                <button id="tabAkunBtn" class="user-tab is-active" role="tab" aria-selected="true" onclick="switchTab('akun')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Kelola Akun
+                </button>
+                <button id="tabApprovalBtn" class="user-tab" role="tab" aria-selected="false" onclick="switchTab('approval')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Persetujuan User
+                </button>
             </div>
 
             <div id="panelAkun" class="table-container">
@@ -490,7 +491,7 @@
         }
 
         function logout() {
-            try { fetch('logout.php', { method: 'POST' }); } catch (err) {}
+            try { fetch('api/auth/logout.php', { method: 'POST' }); } catch (err) {}
             sessionStorage.removeItem('isLoggedIn');
             localStorage.clear();
             window.location.replace('login.html');
@@ -539,7 +540,7 @@ function statusBadge(status) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
 
             try {
-                const response = await fetch('get_users.php');
+                const response = await fetch('api/auth/get_users.php');
                 const result = await response.json();
                 if (result.status !== 'success') {
                     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
@@ -651,7 +652,7 @@ function statusBadge(status) {
 
             toggleLoader(true, 'Mengubah password...');
             try {
-                const response = await fetch('ubah_password_user.php', {
+                const response = await fetch('api/auth/ubah_password_user.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nrp: nrp, password_baru: pwBaru, password_konfirmasi: pwKonfirmasi })
@@ -679,7 +680,7 @@ function statusBadge(status) {
 
             toggleLoader(true, 'Mengubah status akun...');
             try {
-                const response = await fetch('update_status_user.php', {
+                const response = await fetch('api/auth/update_status_user.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nrp: nrp, status: tujuan })
@@ -718,7 +719,7 @@ function statusBadge(status) {
 
             toggleLoader(true, 'Menghapus akun...');
             try {
-                const response = await fetch('hapus_user.php', {
+                const response = await fetch('api/auth/hapus_user.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nrp: nrp })
@@ -756,7 +757,7 @@ function statusBadge(status) {
             const tbody = document.getElementById('tabelApproval');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
             try {
-                const response = await fetch('get_user_approvals.php');
+                const response = await fetch('api/auth/get_user_approvals.php');
                 const result = await response.json();
                 if (result.status !== 'success') {
                     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
@@ -809,7 +810,7 @@ let setujuiTargetId = null;
             tutupSetujuiModal();
             toggleLoader(true, 'Menyetujui pendaftaran...');
             try {
-                const response = await fetch('approve_user.php', {
+                const response = await fetch('api/auth/approve_user.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: id, status: 'Approved' })
@@ -856,7 +857,7 @@ async function konfirmasiTolak() {
             tutupTolakModal();
             toggleLoader(true, 'Menolak pendaftaran...');
             try {
-                const response = await fetch('approve_user.php', {
+                const response = await fetch('api/auth/approve_user.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: id, status: 'Rejected', reason: reason })

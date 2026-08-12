@@ -440,7 +440,7 @@
         }
 
         function logout() {
-            try { fetch('logout.php', { method: 'POST' }); } catch (err) {}
+            try { fetch('api/auth/logout.php', { method: 'POST' }); } catch (err) {}
             sessionStorage.removeItem('isLoggedIn');
             localStorage.clear();
             window.location.replace('login.html');
@@ -484,7 +484,7 @@
 
             try {
                 const query = status ? `?status=${encodeURIComponent(status)}` : '';
-                const response = await fetch('get_stocktaking_submissions.php' + query);
+                const response = await fetch('api/stocktaking/get_stocktaking_submissions.php' + query);
                 const result = await response.json();
                 if (result.status !== 'success') {
                     tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${result.message || 'Gagal memuat data.'}</td></tr>`;
@@ -530,7 +530,7 @@
             body.innerHTML = '<p style="color:var(--ut-muted);">Memuat detail...</p>';
 
             try {
-                const response = await fetch('get_stocktaking_submissions.php?id=' + id);
+                const response = await fetch('api/stocktaking/get_stocktaking_submissions.php?id=' + id);
                 const result = await response.json();
                 if (result.status !== 'success' || !result.data) {
                     body.innerHTML = `<p style="color:var(--ut-red-deep);">${result.message || 'Gagal memuat detail.'}</p>`;
@@ -681,7 +681,7 @@
                 frame.style.border = '0';
                 document.body.appendChild(frame);
             }
-            frame.src = 'export_review.php?id=' + currentReviewId + '&format=' + format;
+            frame.src = 'api/export/export_review.php?id=' + currentReviewId + '&format=' + format;
         }
 
         // ========== REJECT REASON MODAL ==========
@@ -723,7 +723,7 @@
         async function changeStatus(id, status, reason) {
             toggleLoader(true, 'Memperbarui status pengajuan...');
             try {
-                const response = await fetch('approve_stocktaking.php', {
+                const response = await fetch('api/stocktaking/approve_stocktaking.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: id, status: status, reason: reason || '' })

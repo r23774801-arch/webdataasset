@@ -182,7 +182,7 @@ function initializeNrpDropdown() {
                     callback();
                     return;
                 }
-                fetch(`search_employee.php?q=${encodeURIComponent(q)}`)
+                fetch(`api/asset/search_employee.php?q=${encodeURIComponent(q)}`)
                     .then(r => r.json())
                     .then(res => {
                         const list = (res && res.data) || [];
@@ -331,8 +331,8 @@ async function handleRegister() {
 
     toggleLoader(true, "Mendaftarkan akun...");
     try {
-        // Mengirim data ke register.php
-        const response = await fetch('register.php', {
+        // Mengirim data ke api/auth/register.php
+        const response = await fetch('api/auth/register.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -385,8 +385,8 @@ async function handleLogin() {
         await new Promise(resolve => setTimeout(resolve, 1000));
         // ==========================================
 
-        // Mengirim data ke login.php
-        const response = await fetch('login.php', {
+        // Mengirim data ke api/auth/login.php
+        const response = await fetch('api/auth/login.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -443,7 +443,7 @@ async function handleForgotPassword() {
 
     toggleLoader(true, "Mengirim permintaan...");
     try {
-        const response = await fetch('request_password_reset.php', {
+        const response = await fetch('api/auth/request_password_reset.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nrp: nrp, username: username })

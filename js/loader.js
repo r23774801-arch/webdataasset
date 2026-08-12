@@ -420,7 +420,7 @@ function applyProfilePhoto() {
         _renderAvatarPhoto(document.getElementById('sidebarAvatar'), saved, fallback);
     }
 
-    fetch('get_session_info.php')
+    fetch('api/auth/get_session_info.php')
         .then(function (r) { return r.json(); })
         .then(function (res) {
             const photo = res && res.status === 'success' && res.data ? (res.data.photo || '') : '';
@@ -567,14 +567,14 @@ if (document.readyState === 'loading') {
 // ==========================================
 // MASTER AREA — single source of truth for Area lists (Phase 4.24)
 // Area dropdowns, summary cards and charts read from master_area via
-// get_areas.php, so a new Area appears everywhere without code changes.
+// api/asset/get_areas.php, so a new Area appears everywhere without code changes.
 // ==========================================
 window.UTAreas = { list: [], loaded: false };
 
 window.loadMasterAreas = async function () {
     if (window.UTAreas.loaded) return window.UTAreas.list;
     try {
-        const res = await fetch('get_areas.php');
+        const res = await fetch('api/asset/get_areas.php');
         const result = await res.json();
         if (result.status === 'success' && Array.isArray(result.data)) {
             window.UTAreas.list = result.data
@@ -697,13 +697,13 @@ function previewPdfAttachment(path) {
 // ==========================================
 // SHARED STOCKTAKING ATTACHMENT UPLOAD —
 // single entry point used by aset-it.html and
-// aset-ga.html. Reuses upload_attachment.php
+// aset-ga.html. Reuses api/asset/upload_attachment.php
 // (JPG/JPEG/PNG/WEBP images and PDF documents).
 // ==========================================
 window.uploadAttachmentFile = async function (file) {
     const formData = new FormData();
     formData.append('attachment', file);
-    const response = await fetch('upload_attachment.php', { method: 'POST', body: formData });
+    const response = await fetch('api/asset/upload_attachment.php', { method: 'POST', body: formData });
     return response.json();
 };
 
