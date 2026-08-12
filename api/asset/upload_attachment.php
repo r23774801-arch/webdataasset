@@ -11,8 +11,10 @@ require_once __DIR__ . '/../../config/upload.php';
 
 $cfg = upload_config();
 
-// Create uploads directory if it doesn't exist
-$uploadDir = 'uploads/';
+// Create uploads directory if it doesn't exist (absolute path from the
+// project root so the stored URL-relative path always matches the file).
+$rootDir = realpath(__DIR__ . '/../../');
+$uploadDir = ($rootDir !== false ? $rootDir : __DIR__ . '/../../') . '/uploads/';
 if (!file_exists($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
@@ -57,14 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['attachment'])) {
     }
     $filename = uniqid() . '.' . $extension;
     $destination = $uploadDir . $filename;
-    
+    $webPath = 'uploads/' . $filename; // URL-relative path stored in the DB.
+
     // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $destination)) {
         // Return the path that will be stored in database
         echo json_encode([
-            "status" => "success", 
+            "status" => "success",
             "message" => "File uploaded successfully",
-            "path" => $uploadDir . $filename
+            "path" => $webPath
         ]);
     } else {
         echo json_encode(["status" => "error", "message" => "Failed to move uploaded file"]);

@@ -179,6 +179,7 @@ try {
         $transferPic   = trim((string)($input['transfer_pic'] ?? ''));
         $transferDate  = trim((string)($input['transfer_date'] ?? ''));
         $remarks       = trim((string)($input['remarks'] ?? ''));
+        $utilisasi     = trim((string)($input['utilisasi'] ?? ''));
 
         if ($newArea === '') {
             echo json_encode(["status" => "error", "message" => "Area tujuan wajib diisi."]);
@@ -214,9 +215,11 @@ try {
 
         $conn->begin_transaction();
         try {
-            $query = "UPDATE $table SET area = ?, location_note = ?, pic = ?, kondisi = 'Transfer', stocktaking_condition = 'Transfer' WHERE id = ?";
+            // Utilisasi ikut dipindahkan bersama aset (default 'No' bila kosong).
+            $utilisasiVal = ($utilisasi === '') ? 'No' : $utilisasi;
+            $query = "UPDATE $table SET area = ?, location_note = ?, pic = ?, kondisi = 'Transfer', stocktaking_condition = 'Transfer', utilisasi = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("sssi", $newArea, $newDepartment, $transferPic, $id);
+            $stmt->bind_param("ssssi", $newArea, $newDepartment, $transferPic, $utilisasiVal, $id);
             if (!$stmt->execute()) {
                 throw new Exception("Database error.");
             }
