@@ -351,10 +351,14 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="tabelAkun">
+<tbody id="tabelAkun">
                         <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
+                </div>
+                <div class="pagination-container">
+                    <div class="pagination-info" id="paginationInfoAkun">Menampilkan 0-0 dari 0 data</div>
+                    <div class="pagination-buttons" id="paginationButtonsAkun"></div>
                 </div>
             </div>
 
@@ -384,6 +388,10 @@
                             <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                         </tbody>
                     </table>
+                    </div>
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfoPersetujuan">Menampilkan 0-0 dari 0 data</div>
+                        <div class="pagination-buttons" id="paginationButtonsPersetujuan"></div>
                     </div>
                 </div>
             </div>
@@ -535,57 +543,81 @@ function statusBadge(status) {
             return `<span class="user-photo fallback">${esc(initial)}</span>`;
         }
 
-        async function loadUsers() {
-            const tbody = document.getElementById('tabelAkun');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
+        const AKUN_PAGE_SIZE = 10;
+        let akunData = [];
+        let akunPage = 1;
 
-            try {
-                const response = await fetch('api/auth/get_users.php');
-                const result = await response.json();
-                if (result.status !== 'success') {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
-                    return;
-                }
-                if (!result.data || result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada akun user.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = result.data.map(user => {
-                    const isSelf = String(user.nrp) === currentUserNrp;
-                    const nonaktif = String(user.status || '').toLowerCase() === 'nonaktif';
-                    const toggleLabel = nonaktif ? 'Aktifkan' : 'Nonaktifkan';
-                    // Akun ADMIN adalah akun sistem: tidak boleh dinonaktifkan atau
-                    // dihapus, tetapi password-nya tetap boleh diubah (termasuk sendiri).
-                    const isAdminRole = String(user.role || '').toUpperCase() === 'ADMIN';
-                    const pwBtn = `<button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>`;
-                    const toggleBtn = isAdminRole
-                        ? ''
-                        : `<button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>`;
-                    const hapusBtn = isAdminRole
-                        ? ''
-                        : `<button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>`;
-                    const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
-                    return `<tr${isSelf ? ' class="self-row"' : ''}>
-                        <td>${profilePhotoCell(user)}</td>
-                        <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:var(--ut-teal); font-weight:700;">(Anda)</div>' : ''}</td>
-                        <td>${esc(user.nrp)}</td>
-                        <td>${esc(user.username)}</td>
-                        <td>${roleBadge(user.role)}</td>
-                        <td>${statusBadge(user.status)}</td>
-                        <td>${actionCell}</td>
-</tr>`;
-function statusBadge(status) {
-            const aktif = String(status || '').toLowerCase() !== 'nonaktif';
-            return `<span class="user-status-badge ${aktif ? 'usr-aktif' : 'usr-nonaktif'}">${aktif ? 'Aktif' : 'Nonaktif'}</span>`;
+        function renderAkunRow(user) {
+            const isSelf = String(user.nrp) === currentUserNrp;
+            const nonaktif = String(user.status || '').toLowerCase() === 'nonaktif';
+            const toggleLabel = nonaktif ? 'Aktifkan' : 'Nonaktifkan';
+            // Akun ADMIN adalah akun sistem: tidak boleh dinonaktifkan atau
+            // dihapus, tetapi password-nya tetap boleh diubah (termasuk sendiri).
+            const isAdminRole = String(user.role || '').toUpperCase() === 'ADMIN';
+            const pwBtn = `<button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>`;
+            const toggleBtn = isAdminRole
+                ? ''
+                : `<button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>`;
+            const hapusBtn = isAdminRole
+                ? ''
+                : `<button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>`;
+            const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
+            return `<tr${isSelf ? ' class="self-row"' : ''}>
+                <td>${profilePhotoCell(user)}</td>
+                <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:var(--ut-teal); font-weight:700;">(Anda)</div>' : ''}</td>
+                <td>${esc(user.nrp)}</td>
+                <td>${esc(user.username)}</td>
+                <td>${roleBadge(user.role)}</td>
+                <td>${statusBadge(user.status)}</td>
+                <td>${actionCell}</td>
+            </tr>`;
         }
 
-        function profilePhotoCell(user) {
-            const initial = String(user.username || user.nama_lengkap || 'U').charAt(0).toUpperCase();
-            if (user.photo) {
-                return `<img src="${esc(user.photo)}" alt="Foto ${esc(user.nama_lengkap || user.username)}" class="user-photo" onerror="this.outerHTML='<span class=\\'user-photo fallback\\'>${esc(initial)}</span>'">`;
+        function renderAkunPagination() {
+            const info = document.getElementById('paginationInfoAkun');
+            const btns = document.getElementById('paginationButtonsAkun');
+            const total = akunData.length;
+            const totalPages = Math.ceil(total / AKUN_PAGE_SIZE);
+            if (total === 0) {
+                info.textContent = 'Menampilkan 0-0 dari 0 data';
+                btns.innerHTML = '';
+                return;
             }
-            return `<span class="user-photo fallback">${esc(initial)}</span>`;
+            const start = (akunPage - 1) * AKUN_PAGE_SIZE + 1;
+            const end = Math.min(akunPage * AKUN_PAGE_SIZE, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+            let html = `<button class="pagination-btn" onclick="goToPageAkun(${akunPage - 1})" ${akunPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === akunPage) {
+                    html += `<button class="pagination-btn pagination-active">${i}</button>`;
+                } else if (i === 1 || i === totalPages || Math.abs(i - akunPage) <= 2) {
+                    html += `<button class="pagination-btn" onclick="goToPageAkun(${i})">${i}</button>`;
+                } else if (i === akunPage - 3 || i === akunPage + 3) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+            html += `<button class="pagination-btn" onclick="goToPageAkun(${akunPage + 1})" ${akunPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            btns.innerHTML = html;
+        }
+
+        function goToPageAkun(page) {
+            const totalPages = Math.ceil(akunData.length / AKUN_PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            akunPage = page;
+            renderAkunPage();
+        }
+
+        function renderAkunPage() {
+            const tbody = document.getElementById('tabelAkun');
+            const start = (akunPage - 1) * AKUN_PAGE_SIZE;
+            const end = start + AKUN_PAGE_SIZE;
+            const pageData = akunData.slice(start, end);
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada akun user.</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(renderAkunRow).join('');
+            }
+            renderAkunPagination();
         }
 
         async function loadUsers() {
@@ -596,39 +628,21 @@ function statusBadge(status) {
                 const response = await fetch('api/auth/get_users.php');
                 const result = await response.json();
                 if (result.status !== 'success') {
+                    akunData = [];
                     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    renderAkunPagination();
                     return;
                 }
                 if (!result.data || result.data.length === 0) {
+                    akunData = [];
                     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada akun user.</td></tr>';
+                    renderAkunPagination();
                     return;
                 }
 
-                tbody.innerHTML = result.data.map(user => {
-                    const isSelf = String(user.nrp) === currentUserNrp;
-                    const nonaktif = String(user.status || '').toLowerCase() === 'nonaktif';
-                    const toggleLabel = nonaktif ? 'Aktifkan' : 'Nonaktifkan';
-                    // Akun ADMIN adalah akun sistem: tidak boleh dinonaktifkan atau
-                    // dihapus, tetapi password-nya tetap boleh diubah (termasuk sendiri).
-                    const isAdminRole = String(user.role || '').toUpperCase() === 'ADMIN';
-                    const pwBtn = `<button class="btn-soft" onclick="bukaPwModal('${esc(user.nrp)}', '${esc(user.username)}')">Ubah Password</button>`;
-                    const toggleBtn = isAdminRole
-                        ? ''
-                        : `<button class="btn-soft btn-toggle" ${isSelf ? 'disabled title="Tidak dapat menonaktifkan akun sendiri"' : ''} onclick="ubahStatus('${esc(user.nrp)}', '${esc(user.username)}', ${nonaktif ? '1' : '0'})">${toggleLabel}</button>`;
-                    const hapusBtn = isAdminRole
-                        ? ''
-                        : `<button class="btn-soft btn-danger" ${isSelf ? 'disabled title="Tidak dapat menghapus akun sendiri"' : ''} onclick="bukaHapusModal('${esc(user.nrp)}', '${esc(user.username)}')">Hapus</button>`;
-                    const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
-                    return `<tr${isSelf ? ' class="self-row"' : ''}>
-                        <td>${profilePhotoCell(user)}</td>
-                        <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:var(--ut-teal); font-weight:700;">(Anda)</div>' : ''}</td>
-                        <td>${esc(user.nrp)}</td>
-                        <td>${esc(user.username)}</td>
-                        <td>${roleBadge(user.role)}</td>
-                        <td>${statusBadge(user.status)}</td>
-                        <td>${actionCell}</td>
-</tr>`;
-                }).join('');
+                akunData = result.data;
+                akunPage = 1;
+                renderAkunPage();
             } catch (error) {
                 console.error(error);
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-red-deep);">Gagal memuat data dari server.</td></tr>';
@@ -813,6 +827,73 @@ function statusBadge(status) {
         }
 
         // ========== USER REGISTRATION APPROVAL ==========
+        const PERSETUJUAN_PAGE_SIZE = 10;
+        let persetujuanData = [];
+        let persetujuanPage = 1;
+
+        function renderPersetujuanRow(a) {
+            const actionCell = `
+                <div class="user-actions">
+                    <button class="btn-soft btn-approve" onclick="bukaSetujuiModal(${a.id}, '${esc(a.username)}')">Setujui</button>
+                    <button class="btn-soft btn-reject" onclick="bukaTolakModal(${a.id}, '${esc(a.username)}')">Tolak</button>
+                </div>`;
+            return `<tr>
+                <td><strong>${esc(a.nama_lengkap || a.username)}</strong></td>
+                <td>${esc(a.nrp)}</td>
+                <td>${esc(a.email) || '-'}</td>
+                <td><span class="user-status-badge usr-aktif" style="background:var(--ut-yellow-soft); color:var(--ut-yellow-deep);">Pending</span></td>
+                <td>${esc(a.requested_at)}</td>
+                <td>${actionCell}</td>
+            </tr>`;
+        }
+
+        function renderPersetujuanPagination() {
+            const info = document.getElementById('paginationInfoPersetujuan');
+            const btns = document.getElementById('paginationButtonsPersetujuan');
+            const total = persetujuanData.length;
+            const totalPages = Math.ceil(total / PERSETUJUAN_PAGE_SIZE);
+            if (total === 0) {
+                info.textContent = 'Menampilkan 0-0 dari 0 data';
+                btns.innerHTML = '';
+                return;
+            }
+            const start = (persetujuanPage - 1) * PERSETUJUAN_PAGE_SIZE + 1;
+            const end = Math.min(persetujuanPage * PERSETUJUAN_PAGE_SIZE, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+            let html = `<button class="pagination-btn" onclick="goToPagePersetujuan(${persetujuanPage - 1})" ${persetujuanPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === persetujuanPage) {
+                    html += `<button class="pagination-btn pagination-active">${i}</button>`;
+                } else if (i === 1 || i === totalPages || Math.abs(i - persetujuanPage) <= 2) {
+                    html += `<button class="pagination-btn" onclick="goToPagePersetujuan(${i})">${i}</button>`;
+                } else if (i === persetujuanPage - 3 || i === persetujuanPage + 3) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+            html += `<button class="pagination-btn" onclick="goToPagePersetujuan(${persetujuanPage + 1})" ${persetujuanPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            btns.innerHTML = html;
+        }
+
+        function goToPagePersetujuan(page) {
+            const totalPages = Math.ceil(persetujuanData.length / PERSETUJUAN_PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            persetujuanPage = page;
+            renderPersetujuanPage();
+        }
+
+        function renderPersetujuanPage() {
+            const tbody = document.getElementById('tabelApproval');
+            const start = (persetujuanPage - 1) * PERSETUJUAN_PAGE_SIZE;
+            const end = start + PERSETUJUAN_PAGE_SIZE;
+            const pageData = persetujuanData.slice(start, end);
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada permintaan pendaftaran yang menunggu persetujuan.</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(renderPersetujuanRow).join('');
+            }
+            renderPersetujuanPagination();
+        }
+
         async function loadUserApprovals() {
             const tbody = document.getElementById('tabelApproval');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>';
@@ -820,29 +901,21 @@ function statusBadge(status) {
                 const response = await fetch('api/auth/get_user_approvals.php');
                 const result = await response.json();
                 if (result.status !== 'success') {
+                    persetujuanData = [];
                     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${esc(result.message) || 'Gagal memuat data.'}</td></tr>`;
+                    renderPersetujuanPagination();
                     return;
                 }
                 const pending = (result.data || []).filter(a => a.status === 'Pending');
                 if (pending.length === 0) {
+                    persetujuanData = [];
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada permintaan pendaftaran yang menunggu persetujuan.</td></tr>';
+                    renderPersetujuanPagination();
                     return;
                 }
-                tbody.innerHTML = pending.map(a => {
-                    const actionCell = `
-                        <div class="user-actions">
-                            <button class="btn-soft btn-approve" onclick="bukaSetujuiModal(${a.id}, '${esc(a.username)}')">Setujui</button>
-                            <button class="btn-soft btn-reject" onclick="bukaTolakModal(${a.id}, '${esc(a.username)}')">Tolak</button>
-                        </div>`;
-                    return `<tr>
-                        <td><strong>${esc(a.nama_lengkap || a.username)}</strong></td>
-                        <td>${esc(a.nrp)}</td>
-                        <td>${esc(a.email) || '-'}</td>
-                        <td><span class="user-status-badge usr-aktif" style="background:var(--ut-yellow-soft); color:var(--ut-yellow-deep);">Pending</span></td>
-                        <td>${esc(a.requested_at)}</td>
-                        <td>${actionCell}</td>
-                    </tr>`;
-                }).join('');
+                persetujuanData = pending;
+                persetujuanPage = 1;
+                renderPersetujuanPage();
             } catch (error) {
                 console.error(error);
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-red-deep);">Gagal memuat data dari server.</td></tr>';

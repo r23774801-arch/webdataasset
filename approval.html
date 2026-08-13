@@ -391,6 +391,10 @@
                     </tbody>
                 </table>
                 </div>
+                <div class="pagination-container">
+                    <div class="pagination-info" id="paginationInfoApproval">Menampilkan 0-0 dari 0 data</div>
+                    <div class="pagination-buttons" id="paginationButtonsApproval"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -456,6 +460,9 @@
 
         // ========== SUBMISSION LIST ==========
         let currentFilter = '';
+        const APPROVAL_PAGE_SIZE = 10;
+        let approvalData = [];
+        let approvalPage = 1;
 
         // Escape user-controlled values before injecting into innerHTML (XSS-safe).
         function esc(value) {
@@ -473,6 +480,70 @@
             return `<span class="approval-status-badge ${map[status] || 'stk-pending'}">${status || 'Pending'}</span>`;
         }
 
+        function renderApprovalRow(item) {
+            const assetType = item.asset_type === 'IT' ? '<span class="badge-stocktaked" style="padding:4px 12px;">IT</span>' : '<span class="badge-pending" style="padding:4px 12px;">GA</span>';
+            return `<tr>
+                <td><strong>${esc(item.submission_code || 'BKJ-' + item.id)}</strong></td>
+                <td>${esc(item.submitted_by_name)}<div style="font-size:11px; color:var(--ut-muted);">${esc(item.submitted_by)}</div></td>
+                <td>${assetType}</td>
+                <td>${esc(item.area) || '-'}</td>
+                <td>${esc(item.submission_date)}</td>
+                <td>${esc(item.approved_by_name || '-')}</td>
+                <td>${esc(item.rejected_by_name || '-')}</td>
+                <td>${esc(item.approval_date || '-')}</td>
+                <td class="reason-cell"><span style="color:${item.rejection_reason ? 'var(--ut-red-deep)' : 'var(--ut-muted)'};">${esc(item.rejection_reason || '-')}</span></td>
+                <td>${statusBadge(item.status)}</td>
+                <td><button class="btn-warning" onclick="openReview(${esc(item.id)})">Review</button></td>
+            </tr>`;
+        }
+
+        function renderApprovalPagination() {
+            const info = document.getElementById('paginationInfoApproval');
+            const btns = document.getElementById('paginationButtonsApproval');
+            const total = approvalData.length;
+            const totalPages = Math.ceil(total / APPROVAL_PAGE_SIZE);
+            if (total === 0) {
+                info.textContent = 'Menampilkan 0-0 dari 0 data';
+                btns.innerHTML = '';
+                return;
+            }
+            const start = (approvalPage - 1) * APPROVAL_PAGE_SIZE + 1;
+            const end = Math.min(approvalPage * APPROVAL_PAGE_SIZE, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+            let html = `<button class="pagination-btn" onclick="goToPageApproval(${approvalPage - 1})" ${approvalPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === approvalPage) {
+                    html += `<button class="pagination-btn pagination-active">${i}</button>`;
+                } else if (i === 1 || i === totalPages || Math.abs(i - approvalPage) <= 2) {
+                    html += `<button class="pagination-btn" onclick="goToPageApproval(${i})">${i}</button>`;
+                } else if (i === approvalPage - 3 || i === approvalPage + 3) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+            html += `<button class="pagination-btn" onclick="goToPageApproval(${approvalPage + 1})" ${approvalPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            btns.innerHTML = html;
+        }
+
+        function goToPageApproval(page) {
+            const totalPages = Math.ceil(approvalData.length / APPROVAL_PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            approvalPage = page;
+            renderApprovalPage();
+        }
+
+        function renderApprovalPage() {
+            const tbody = document.getElementById('tabelApproval');
+            const start = (approvalPage - 1) * APPROVAL_PAGE_SIZE;
+            const end = start + APPROVAL_PAGE_SIZE;
+            const pageData = approvalData.slice(start, end);
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada pengajuan stocktaking.</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(renderApprovalRow).join('');
+            }
+            renderApprovalPagination();
+        }
+
         async function loadSubmissions(status) {
             currentFilter = status || '';
             document.querySelectorAll('.approval-tab').forEach(tab => {
@@ -487,30 +558,21 @@
                 const response = await fetch('api/stocktaking/get_stocktaking_submissions.php' + query);
                 const result = await response.json();
                 if (result.status !== 'success') {
+                    approvalData = [];
                     tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:20px; color:var(--ut-red-deep);">${result.message || 'Gagal memuat data.'}</td></tr>`;
+                    renderApprovalPagination();
                     return;
                 }
                 if (!result.data || result.data.length === 0) {
+                    approvalData = [];
                     tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-muted);">Tidak ada pengajuan stocktaking.</td></tr>';
+                    renderApprovalPagination();
                     return;
                 }
 
-                tbody.innerHTML = result.data.map((item, index) => {
-                    const assetType = item.asset_type === 'IT' ? '<span class="badge-stocktaked" style="padding:4px 12px;">IT</span>' : '<span class="badge-pending" style="padding:4px 12px;">GA</span>';
-                    return `<tr>
-                        <td><strong>${esc(item.submission_code || 'BKJ-' + item.id)}</strong></td>
-                        <td>${esc(item.submitted_by_name)}<div style="font-size:11px; color:var(--ut-muted);">${esc(item.submitted_by)}</div></td>
-                        <td>${assetType}</td>
-                        <td>${esc(item.area) || '-'}</td>
-                        <td>${esc(item.submission_date)}</td>
-                        <td>${esc(item.approved_by_name || '-')}</td>
-                        <td>${esc(item.rejected_by_name || '-')}</td>
-                        <td>${esc(item.approval_date || '-')}</td>
-                        <td class="reason-cell"><span style="color:${item.rejection_reason ? 'var(--ut-red-deep)' : 'var(--ut-muted)'};">${esc(item.rejection_reason || '-')}</span></td>
-                        <td>${statusBadge(item.status)}</td>
-                        <td><button class="btn-warning" onclick="openReview(${esc(item.id)})">Review</button></td>
-                    </tr>`;
-                }).join('');
+                approvalData = result.data;
+                approvalPage = 1;
+                renderApprovalPage();
             } catch (error) {
                 console.error(error);
                 tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--ut-red-deep);">Gagal memuat data dari server.</td></tr>';
@@ -570,28 +632,8 @@
                 ['Rejection Date', sub.rejection_date || '-']
             ];
 
-            const assets = sub.assets || [];
-            let rowsHtml = '';
-            if (assets.length === 0) {
-                rowsHtml = '<tr><td colspan="7" style="text-align:center; padding:14px; color:var(--ut-muted);">Tidak ada data aset.</td></tr>';
-            } else {
-                rowsHtml = assets.map((a, i) => {
-                    const cond = a.condition || '-';
-                    let condCls = 'badge-pending';
-                    if (cond === 'Normal') condCls = 'badge-approved';
-                    else if (cond === 'Broken') condCls = 'badge-rejected';
-                    else if (cond === 'Lost') condCls = 'badge-lost';
-                    return `<tr>
-                        <td>${esc(a.asset_number) || '-'}</td>
-                        <td>${esc(a.serial_number) || '-'}</td>
-                        <td>${esc(a.nama_barang) || '-'}</td>
-                        <td>${esc(a.area) || '-'}</td>
-                        <td>${esc(a.location_note) || '-'}</td>
-                        <td><span class="${condCls}" style="padding:4px 12px;">${esc(cond)}</span></td>
-                        <td><span class="badge-stocktaked" style="padding:4px 12px;">${esc(a.stocktaking_status) || 'Stocktaked'}</span></td>
-                    </tr>`;
-                }).join('');
-            }
+            reviewAssets = sub.assets || [];
+            reviewAssetPage = 1;
 
             // Action buttons depend on the current status (bidirectional transitions).
             // Reject always routes through the required-reason modal.
@@ -647,8 +689,12 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>${rowsHtml}</tbody>
+                        <tbody id="reviewAssetsBody"></tbody>
                     </table>
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="paginationInfoReviewAssets">Menampilkan 0-0 dari 0 data</div>
+                        <div class="pagination-buttons" id="paginationButtonsReviewAssets"></div>
+                    </div>
                 </div>
 
                 <div class="review-actions">
@@ -658,6 +704,78 @@
                     ${statusActions}
                 </div>
             `;
+
+            renderReviewAssetsPage();
+        }
+
+        // ========== REVIEW MODAL ASSET PAGINATION ==========
+        const REVIEW_ASSETS_PAGE_SIZE = 10;
+        let reviewAssets = [];
+        let reviewAssetPage = 1;
+
+        function renderReviewAssetRow(a) {
+            const cond = a.condition || '-';
+            let condCls = 'badge-pending';
+            if (cond === 'Normal') condCls = 'badge-approved';
+            else if (cond === 'Broken') condCls = 'badge-rejected';
+            else if (cond === 'Lost') condCls = 'badge-lost';
+            return `<tr>
+                <td>${esc(a.asset_number) || '-'}</td>
+                <td>${esc(a.serial_number) || '-'}</td>
+                <td>${esc(a.nama_barang) || '-'}</td>
+                <td>${esc(a.area) || '-'}</td>
+                <td>${esc(a.location_note) || '-'}</td>
+                <td><span class="${condCls}" style="padding:4px 12px;">${esc(cond)}</span></td>
+                <td><span class="badge-stocktaked" style="padding:4px 12px;">${esc(a.stocktaking_status) || 'Stocktaked'}</span></td>
+            </tr>`;
+        }
+
+        function renderReviewAssetsPage() {
+            const tbody = document.getElementById('reviewAssetsBody');
+            if (!tbody) return;
+            const start = (reviewAssetPage - 1) * REVIEW_ASSETS_PAGE_SIZE;
+            const end = start + REVIEW_ASSETS_PAGE_SIZE;
+            const pageData = reviewAssets.slice(start, end);
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:14px; color:var(--ut-muted);">Tidak ada data aset.</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(renderReviewAssetRow).join('');
+            }
+            renderReviewAssetsPagination();
+        }
+
+        function renderReviewAssetsPagination() {
+            const info = document.getElementById('paginationInfoReviewAssets');
+            const btns = document.getElementById('paginationButtonsReviewAssets');
+            const total = reviewAssets.length;
+            const totalPages = Math.ceil(total / REVIEW_ASSETS_PAGE_SIZE);
+            if (total === 0) {
+                info.textContent = 'Menampilkan 0-0 dari 0 data';
+                btns.innerHTML = '';
+                return;
+            }
+            const start = (reviewAssetPage - 1) * REVIEW_ASSETS_PAGE_SIZE + 1;
+            const end = Math.min(reviewAssetPage * REVIEW_ASSETS_PAGE_SIZE, total);
+            info.textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+            let html = `<button class="pagination-btn" onclick="goToPageReviewAssets(${reviewAssetPage - 1})" ${reviewAssetPage === 1 ? 'disabled' : ''}>&laquo; Prev</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === reviewAssetPage) {
+                    html += `<button class="pagination-btn pagination-active">${i}</button>`;
+                } else if (i === 1 || i === totalPages || Math.abs(i - reviewAssetPage) <= 2) {
+                    html += `<button class="pagination-btn" onclick="goToPageReviewAssets(${i})">${i}</button>`;
+                } else if (i === reviewAssetPage - 3 || i === reviewAssetPage + 3) {
+                    html += '<span class="pagination-ellipsis">...</span>';
+                }
+            }
+            html += `<button class="pagination-btn" onclick="goToPageReviewAssets(${reviewAssetPage + 1})" ${reviewAssetPage === totalPages ? 'disabled' : ''}>Next &raquo;</button>`;
+            btns.innerHTML = html;
+        }
+
+        function goToPageReviewAssets(page) {
+            const totalPages = Math.ceil(reviewAssets.length / REVIEW_ASSETS_PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            reviewAssetPage = page;
+            renderReviewAssetsPage();
         }
 
         // ========== REVIEW EXPORT ==========
