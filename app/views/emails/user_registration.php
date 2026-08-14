@@ -4,13 +4,14 @@
  * layout (app/views/emails/layout.php). No HTML shell / header / footer here.
  *
  * Expected variables (set by MailService):
- *   $user (nrp, username, nama_lengkap, email), $config, $logo_url
+ *   $user (nrp, username, nama_lengkap, email), $config, $logo_url,
+ *   $pengaju (Informasi Pengajuan block)
  */
 $user = (array)($user ?? []);
-$nrp         = trim((string)($user['nrp'] ?? ''));
-$username    = trim((string)($user['username'] ?? ''));
+$nrp          = trim((string)($user['nrp'] ?? ''));
+$username     = trim((string)($user['username'] ?? ''));
 $nama_lengkap = trim((string)($user['nama_lengkap'] ?? ''));
-$email       = trim((string)($user['email'] ?? ''));
+$email        = trim((string)($user['email'] ?? ''));
 
 ob_start();
 ?>
@@ -60,4 +61,7 @@ ob_start();
                                 </tr>
                             </table>
 <?php
-return trim(ob_get_clean());
+$title   = 'New User Registration Request';
+$content = ob_get_clean();
+
+include __DIR__ . '/layout.php';

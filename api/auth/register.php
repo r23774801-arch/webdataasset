@@ -82,18 +82,10 @@ if (strlen($username) > 100) {
 // aset IT dan GA). Role admin tidak pernah diizinkan lewat registrasi.
 $role = 'user';
 
-// Departemen sudah tidak dipakai pada alur registrasi — field dihilangkan dari
-// form Daftar Akun (login.html). Nama lengkap diisi otomatis dari direktori
-// karyawan saat NRP dipilih; username diketik bebas oleh pengguna.
+// Nama lengkap diisi otomatis dari direktori karyawan (master_employee)
+// berdasarkan NRP — tidak lagi dikirim lewat form Daftar Akun (login.html).
+// Fallback ke payload bila tabel master belum ada (backward compatible).
 $nama_lengkap = trim((string)($data['nama_lengkap'] ?? ''));
-if ($nama_lengkap === '') {
-    echo json_encode(["status" => "error", "message" => "Nama lengkap wajib diisi!"]);
-    exit;
-}
-if (strlen($nama_lengkap) > 100) {
-    echo json_encode(["status" => "error", "message" => "Nama lengkap terlalu panjang (maksimal 100 karakter)!"]);
-    exit;
-}
 
 // Email wajib diisi, format harus valid, dan tidak boleh sama dengan akun lain (case-insensitive).
 $email = trim((string)($data['email'] ?? ''));
@@ -173,7 +165,7 @@ if ($cek_nrp->num_rows > 0) {
 
     if ($hasMasterTable) {
         $rawNrp = $nrp;
-        $cekMaster = $conn->prepare("SELECT id FROM master_employee WHERE nrp = ? LIMIT 1");
+        $cekMaster = $conn->prepare("SELECT id, employee_name FROM master_employee WHERE nrp = ? LIMIT 1");
         if (!$cekMaster) {
             error_log('[register] cekMaster prepare failed: ' . $conn->error);
             echo json_encode(["status" => "error", "message" => "Gagal memvalidasi data karyawan. Silakan coba lagi."]);
@@ -187,7 +179,21 @@ if ($cek_nrp->num_rows > 0) {
             echo json_encode(["status" => "error", "message" => "NRP tidak terdaftar sebagai karyawan. Silakan pilih karyawan dari direktori."]);
             exit;
         }
+        // Nama lengkap diambil otomatis dari direktori karyawan.
+        $cekMaster->bind_result($masterId, $masterName);
+        $cekMaster->fetch();
+        $nama_lengkap = trim((string)($masterName ?? ''));
         $cekMaster->close();
+    }
+
+    // Validasi akhir: nama lengkap wajib ada (dari direktori karyawan).
+    if ($nama_lengkap === '') {
+        echo json_encode(["status" => "error", "message" => "Nama lengkap tidak ditemukan dari direktori karyawan."]);
+        exit;
+    }
+    if (strlen($nama_lengkap) > 100) {
+        echo json_encode(["status" => "error", "message" => "Nama lengkap terlalu panjang (maksimal 100 karakter)!"]);
+        exit;
     }
 
     // 1b. Cek apakah email sudah dipakai akun lain (LOWER() = case-insensitive)
@@ -206,8 +212,10 @@ if ($cek_nrp->num_rows > 0) {
         exit;
     } else {
         $cek_email->close();
-        // 1c. Cek apakah NRP masih mengantre persetujuan (Pending/Approved belum dipindah).
-        $cek_pending = $conn->prepare("SELECT id, status FROM user_approvals WHERE nrp = ? AND status IN ('Pending','Approved') LIMIT 1");
+// 1c. Cek apakah NRP sudah pernah mengajukan pendaftaran. Kolom nrp pada
+        //     user_approvals bersifat UNIQUE, jadi baris lama (termasuk yang
+        //     ditolak) TIDAK bisa di-INSERT ulang — harus diperbarui lagi.
+        $cek_pending = $conn->prepare("SELECT id, status FROM user_approvals WHERE nrp = ? LIMIT 1");
         if (!$cek_pending) {
             error_log('[register] cek_pending prepare failed: ' . $conn->error);
             echo json_encode(["status" => "error", "message" => "Gagal memeriksa data. Silakan coba lagi."]);
@@ -218,12 +226,48 @@ if ($cek_nrp->num_rows > 0) {
         $pendingResult = $cek_pending->get_result();
         if ($pendingResult && $pendingResult->num_rows > 0) {
             $pendingRow = $pendingResult->fetch_assoc();
+            $approvalStatus = strtoupper(trim((string)($pendingRow['status'] ?? '')));
+            $approvalRowId  = (int)($pendingRow['id'] ?? 0);
             $cek_pending->close();
-            if (($pendingRow['status'] ?? '') === 'Approved') {
+
+            if ($approvalStatus === 'APPROVED') {
                 echo json_encode(["status" => "error", "message" => "NRP sudah terdaftar di sistem!"]);
-            } else {
-                echo json_encode(["status" => "error", "message" => "Permintaan pendaftaran dengan NRP ini masih menunggu persetujuan admin."]);
+                exit;
             }
+            if ($approvalStatus === 'PENDING') {
+                echo json_encode(["status" => "error", "message" => "Permintaan pendaftaran dengan NRP ini masih menunggu persetujuan admin."]);
+                exit;
+            }
+
+            // REJECTED → daftar ulang: perbarui baris lama menjadi Pending lagi
+            // dengan data terbaru (tidak bisa INSERT karena kolom nrp UNIQUE).
+            $reupdate = $conn->prepare("UPDATE user_approvals SET username = ?, nama_lengkap = ?, email = ?, password = ?, status = 'Pending', rejection_reason = NULL, reviewed_by = NULL, reviewed_by_name = NULL, review_date = NULL, requested_at = NOW() WHERE id = ?");
+            if (!$reupdate) {
+                error_log('[register] reupdate prepare failed: ' . $conn->error);
+                echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
+                exit;
+            }
+            $reupdate->bind_param('ssssi', $username, $nama_lengkap, $email, $password, $approvalRowId);
+            if ($reupdate->execute()) {
+                $reupdate->close();
+                // Beri tahu admin agar segera memproses permintaan pendaftaran.
+                // Kegagalan kirim email TIDAK mengubah hasil registrasi.
+                try {
+                    require_once __DIR__ . '/../../app/bootstrap.php';
+                    MailService::notifyAdminsUserRegistration($conn, [
+                        'nrp'          => $nrp,
+                        'username'     => $username,
+                        'nama_lengkap' => $nama_lengkap,
+                        'email'        => $email,
+                    ]);
+                } catch (\Throwable $t) {
+                    error_log('[register] admin notification failed: ' . $t->getMessage());
+                }
+                echo json_encode(["status" => "success", "message" => "Permintaan pendaftaran dikirim. Silakan tunggu persetujuan admin sebelum dapat login."]);
+                exit;
+            }
+            $reupdate->close();
+            echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
             exit;
         }
         $cek_pending->close();
@@ -238,7 +282,7 @@ if ($cek_nrp->num_rows > 0) {
             exit;
         }
 
-        $stmt = $conn->prepare("INSERT INTO user_approvals (nrp, username, nama_lengkap, email, password, status, requested_at) VALUES (?, ?, ?, ?, ?, 'Pending', NOW())");
+$stmt = $conn->prepare("INSERT INTO user_approvals (nrp, username, nama_lengkap, email, password, status, requested_at) VALUES (?, ?, ?, ?, ?, 'Pending', NOW())");
         if (!$stmt) {
             error_log('[register] prepare failed: ' . $conn->error);
             echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
@@ -246,29 +290,33 @@ if ($cek_nrp->num_rows > 0) {
         }
         $stmt->bind_param('sssss', $nrp, $username, $nama_lengkap, $email, $password);
 
-        if ($stmt->execute()) {
-            // Beri tahu admin agar segera memproses permintaan pendaftaran.
-            // Kegagalan kirim email TIDAK mengubah hasil registrasi.
-            try {
-                require_once __DIR__ . '/../../app/bootstrap.php';
-                MailService::notifyAdminsUserRegistration($conn, [
-                    'nrp'         => $nrp,
-                    'username'    => $username,
-                    'nama_lengkap'=> $nama_lengkap,
-                    'email'       => $email,
-                ]);
-            } catch (\Throwable $t) {
-                error_log('[register] admin notification failed: ' . $t->getMessage());
+        try {
+            if ($stmt->execute()) {
+                $stmt->close();
+                // Beri tahu admin agar segera memproses permintaan pendaftaran.
+                // Kegagalan kirim email TIDAK mengubah hasil registrasi.
+                try {
+                    require_once __DIR__ . '/../../app/bootstrap.php';
+                    MailService::notifyAdminsUserRegistration($conn, [
+                        'nrp'         => $nrp,
+                        'username'    => $username,
+                        'nama_lengkap'=> $nama_lengkap,
+                        'email'       => $email,
+                    ]);
+                } catch (\Throwable $t) {
+                    error_log('[register] admin notification failed: ' . $t->getMessage());
+                }
+                echo json_encode(["status" => "success", "message" => "Permintaan pendaftaran dikirim. Silakan tunggu persetujuan admin sebelum dapat login."]);
+                exit;
             }
-            $stmt->close();
-            echo json_encode(["status" => "success", "message" => "Permintaan pendaftaran dikirim. Silakan tunggu persetujuan admin sebelum dapat login."]);
-            exit;
-        } else {
-            error_log('[register] insert failed: ' . $stmt->error);
-            $stmt->close();
-            echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
+        } catch (mysqli_sql_exception $e) {
+            error_log('[register] insert duplicate/error: ' . $e->getMessage());
+            echo json_encode(["status" => "error", "message" => "NRP sudah pernah didaftarkan. Silakan hubungi admin."]);
             exit;
         }
+        $stmt->close();
+        echo json_encode(["status" => "error", "message" => "Gagal menyimpan data. Silakan coba lagi."]);
+        exit;
     }
 }
 

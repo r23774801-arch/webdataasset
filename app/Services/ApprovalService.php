@@ -341,6 +341,36 @@ class ApprovalService
     }
 
     /**
+     * Fetch the LATEST submission for an asset type across ALL users.
+     *
+     * Used by the asset pages to show the session-wide status (e.g. an Approved
+     * submission made by another user) even when the current user has no
+     * submission of their own or only an old rejected one.
+     */
+    public static function getLatestForType(mysqli $conn, string $assetType): ?array
+    {
+        $assetType = strtoupper($assetType);
+        if (!in_array($assetType, ['IT', 'GA'], true)) {
+            return null;
+        }
+        $stmt = $conn->prepare(
+            "SELECT id, submission_code, asset_type, submitted_by, submitted_by_name,
+                    status, approved_by, approved_by_name, submission_date, approval_date
+             FROM stocktaking_submissions
+             WHERE asset_type = ?
+             ORDER BY id DESC
+             LIMIT 1"
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('s', $assetType);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+    }
+
+    /**
      * List APPROVED submissions for an asset type (IT or GA) so the admin can
      * link a Barang Masuk/Keluar transaction to the stocktaking submission that
      * drove the movement. Newest approval first; returns empty array on any

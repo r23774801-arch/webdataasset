@@ -275,6 +275,29 @@ $queries = [
     // Allow existing user_approvals tables (created before nama_lengkap was
     // introduced) to gain the column on a re-run.
     "ALTER TABLE user_approvals ADD COLUMN IF NOT EXISTS nama_lengkap VARCHAR(100) DEFAULT NULL",
+
+    // ==========================================
+    // PHASE 4.27 — password reset requests:
+    // every time a user reports a forgotten
+    // password from the Login page, one row is
+    // inserted here (status Pending). The admin
+    // dashboard shows a badge with the pending
+    // count; rows flip to Processed the moment a
+    // password is actually changed for that NRP.
+    // ==========================================
+    "CREATE TABLE IF NOT EXISTS password_reset_requests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nrp VARCHAR(50) NOT NULL,
+        username VARCHAR(100) DEFAULT NULL,
+        email VARCHAR(100) DEFAULT NULL,
+        status ENUM('Pending','Processed') NOT NULL DEFAULT 'Pending',
+        requested_at DATETIME NOT NULL,
+        processed_by VARCHAR(20) DEFAULT NULL,
+        processed_at DATETIME DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        KEY idx_prr_nrp (nrp),
+        KEY idx_prr_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
 ];
 
 $allSuccess = true;

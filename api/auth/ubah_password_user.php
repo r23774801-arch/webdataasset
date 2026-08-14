@@ -50,18 +50,18 @@ if ($passwordBaru !== $passwordKonfirmasi) {
 }
 
 // Target must exist (prepared).
-$check = $conn->prepare("SELECT nrp FROM users WHERE nrp = ? LIMIT 1");
+$check = $conn->prepare("SELECT nrp, username, nama_lengkap, email FROM users WHERE nrp = ? LIMIT 1");
 if (!$check) {
     json_response(['status' => 'error', 'message' => 'Terjadi kesalahan pada server.']);
 }
 $check->bind_param('s', $nrp);
 $check->execute();
-$check->store_result();
-if ($check->num_rows === 0) {
-    $check->close();
+$result = $check->get_result();
+$target = $result->fetch_assoc();
+$check->close();
+if (!$target) {
     json_response(['status' => 'error', 'message' => 'User tidak ditemukan.']);
 }
-$check->close();
 
 $hash = password_hash($passwordBaru, PASSWORD_DEFAULT);
 
@@ -77,5 +77,37 @@ if (!$update->execute()) {
 
 $me = current_user();
 AuditService::log($conn, 'Ubah Password User', 'users', null, ['by' => $me['nrp'], 'target' => $nrp]);
+
+// Flip any pending password-reset requests for this NRP to Processed, so the
+// admin dashboard badge clears once the password has actually been changed.
+try {
+    $markDone = $conn->prepare("UPDATE password_reset_requests SET status = 'Processed', processed_by = ?, processed_at = NOW() WHERE nrp = ? AND status = 'Pending'");
+    if ($markDone) {
+        $markDone->bind_param('ss', $me['nrp'], $nrp);
+        $markDone->execute();
+        $markDone->close();
+    }
+} catch (\Throwable $t) {
+    error_log('[ubah_password_user] password_reset_requests update failed: ' . $t->getMessage());
+}
+
+// Notify the target user so they know their password has been changed and
+// receive the new one. Best-effort: a send failure never fails the update.
+$targetEmail = trim((string)($target['email'] ?? ''));
+if ($targetEmail !== '' && filter_var($targetEmail, FILTER_VALIDATE_EMAIL)) {
+    try {
+        $mailer = MailService::instance();
+        $mailer->sendPasswordChanged($targetEmail, [
+            'nrp'          => $target['nrp'],
+            'username'     => $target['username'] ?? '',
+            'nama_lengkap' => $target['nama_lengkap'] ?? '',
+            'email'        => $targetEmail,
+        ], $passwordBaru);
+    } catch (\Throwable $t) {
+        error_log('[ubah_password_user] password-change notification failed: ' . $t->getMessage());
+    }
+} else {
+    error_log('[ubah_password_user] target user has no valid e-mail; skipped password-change notification for nrp=' . $nrp);
+}
 
 json_response(['status' => 'success', 'message' => 'Password berhasil diubah.']);

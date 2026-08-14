@@ -4,6 +4,10 @@
 
 Options -Indexes
 
+# Serve login.html as the directory index (this project has no index.php/html;
+# index.html also exists as a JS/meta-refresh fallback for the same purpose).
+DirectoryIndex login.html index.html index.php
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

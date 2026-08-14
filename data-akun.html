@@ -333,7 +333,6 @@
                 <table class="user-table">
                     <colgroup>
                         <col style="min-width:70px">
-                        <col style="min-width:180px">
                         <col style="min-width:140px">
                         <col style="min-width:160px">
                         <col style="min-width:100px">
@@ -343,7 +342,6 @@
                     <thead>
                         <tr>
                             <th>Foto</th>
-                            <th>Nama Lengkap</th>
                             <th>NRP / ID</th>
                             <th>Username</th>
                             <th>Role</th>
@@ -352,7 +350,7 @@
                         </tr>
                     </thead>
 <tbody id="tabelAkun">
-                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
+                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -564,7 +562,6 @@ function statusBadge(status) {
             const actionCell = `<div class="user-actions">${pwBtn}${toggleBtn}${hapusBtn}</div>`;
             return `<tr${isSelf ? ' class="self-row"' : ''}>
                 <td>${profilePhotoCell(user)}</td>
-                <td><strong>${esc(user.nama_lengkap || user.username)}</strong>${isSelf ? '<div style="font-size:11px; color:var(--ut-teal); font-weight:700;">(Anda)</div>' : ''}</td>
                 <td>${esc(user.nrp)}</td>
                 <td>${esc(user.username)}</td>
                 <td>${roleBadge(user.role)}</td>

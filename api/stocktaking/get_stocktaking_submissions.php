@@ -30,9 +30,16 @@ $filters = [
 
 // -- Asset creation lock status for an asset type (Phase 4.11, used by the asset pages) --
 if (isset($_GET['lock']) && $_GET['lock'] === '1' && !empty($filters['asset_type'])) {
+    $latest = ApprovalService::getLatestForType($conn, $filters['asset_type']);
     json_response([
         'status' => 'success',
-        'data'   => ['locked' => ApprovalService::isAssetCreationLocked($conn, $filters['asset_type'])],
+        'data'   => [
+            'locked' => ApprovalService::isAssetCreationLocked($conn, $filters['asset_type']),
+            // Latest submission across ALL users — lets the asset page show the
+            // session-wide state (e.g. Approved by another user) even when the
+            // current user has no submission of their own.
+            'submission' => $latest,
+        ],
     ]);
 }
 

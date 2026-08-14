@@ -30,6 +30,19 @@ if (!table_exists($conn, 'stocktaking_submissions')) {
     json_response(['status' => 'error', 'message' => 'Sistem persetujuan belum tersedia. Jalankan migrate_db.php terlebih dahulu.']);
 }
 
+// Phase 4.15 — global (asset-type-wide) lock: the latest submission for this
+// asset type across ALL users is Pending or Approved, so no user may finish a
+// new stocktaking cycle right now. The per-user checks below are NOT enough:
+// a user who never submitted has no submission row of their own ($latest = null),
+// which would wrongly allow them to open a parallel/duplicate submission while
+// another user's cycle is awaiting review or has already been approved.
+if (ApprovalService::isStocktakingLocked($conn, $assetType)) {
+    json_response([
+        'status'  => 'error',
+        'message' => 'Stocktaking aset ' . $assetType . ' sedang berlangsung atau telah disetujui oleh user lain. Anda tidak dapat mengirim stocktaking lagi.'
+    ]);
+}
+
 // Every Stocktaked asset must have a photo/PDF, a condition, and an utilisasi
 // before the submission can be created. Block early and list the incomplete ones
 // (by asset number) so the user knows exactly what still needs to be filled in.

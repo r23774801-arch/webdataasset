@@ -269,13 +269,23 @@ class MailService
 
     /**
      * Render a reusable HTML e-mail template with the given data.
+     *
+     * Two template styles are supported:
+     *  - Templates that echo directly into the output buffer (most, e.g.
+     *    stocktaking_result.php, which includes layout.php).
+     *  - Templates that RETURN their body string (user_registration.php).
+     * The buffered output wins; the include return value is the fallback.
      */
     public function renderTemplate(string $template, array $data = []): string
     {
         extract($data, EXTR_SKIP);
         ob_start();
-        include __DIR__ . '/../views/emails/' . $template;
-        return (string) ob_get_clean();
+        $included = include __DIR__ . '/../views/emails/' . $template;
+        $buffered = (string) ob_get_clean();
+        if (trim($buffered) !== '') {
+            return $buffered;
+        }
+        return is_string($included) ? $included : $buffered;
     }
 
     /**
@@ -506,6 +516,51 @@ class MailService
     }
 
     /**
+     * Send the "Password Changed" notification to the user after an
+     * administrator changes their password on the Data Akun page.
+     *
+     * The recipient MUST be the user's own e-mail address resolved from the
+     * users table (never the SMTP account). Best-effort: a failure is logged
+     * and never breaks the caller's password-update flow.
+     *
+     * @param string $to           recipient e-mail address (must be non-empty)
+     * @param array  $user         user data; keys: nrp, username, nama_lengkap, email
+     * @param string $newPassword  the plaintext new password to send
+     */
+    public function sendPasswordChanged(string $to, array $user, string $newPassword): bool
+    {
+        if (trim($to) === '') {
+            error_log('[MailService] sendPasswordChanged skipped: recipient e-mail is empty.');
+            return false;
+        }
+
+        $subject = 'Password Anda Telah Diubah';
+
+        try {
+            $config = mail_config();
+
+            $html = $this->renderTemplate('password_changed.php', [
+                'user'         => $user,
+                'config'       => $config,
+                'logo_url'     => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
+                'new_password' => (string)$newPassword,
+                'pengaju'      => $this->buildPengaju($user, [
+                    'nama'    => (string)($user['nama_lengkap'] ?? $user['username'] ?? ''),
+                    'email'   => (string)($user['email'] ?? ''),
+                    'role'    => 'User',
+                    'tanggal' => date('Y-m-d H:i:s'),
+                ]),
+            ]);
+
+            return $this->send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            // E-mail must never break the caller — log and report failure.
+            error_log('[MailService] sendPasswordChanged failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Send the "New Asset Created" notification to one administrator.
      *
      * The recipient MUST be resolved by the caller (e.g. via adminEmails())
@@ -662,10 +717,19 @@ class MailService
         $mailer     = self::instance();
         $recipients = self::adminEmails($conn);
         $sentCount  = 0;
-        $body       = $mailer->renderTemplate('user_registration.php', [
-            'user'   => $user,
-            'config' => mail_config(),
+
+        $body = $mailer->renderTemplate('user_registration.php', [
+            'user'     => $user,
+            'config'   => mail_config(),
+            'logo_url' => $mailer->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
+            'pengaju'  => $mailer->buildPengaju($user, [
+                'nama'       => (string)($user['nama_lengkap'] ?? $user['username'] ?? ''),
+                'email'      => (string)($user['email'] ?? ''),
+                'role'       => 'User',
+                'tanggal'    => date('Y-m-d H:i:s'),
+            ]),
         ]);
+
         foreach ($recipients as $recipient) {
             try {
                 $mail = $mailer->createMailer();
@@ -680,5 +744,52 @@ class MailService
             }
         }
         return $sentCount;
+    }
+
+    /**
+     * Send the "User Registration Approved / Rejected" result notification to
+     * the registering user after an administrator approves or rejects their
+     * registration request on the Data Akun -> Persetujuan User page.
+     *
+     * Best-effort: failures are logged and never break the caller. Returns
+     * false when the recipient e-mail is empty or the send fails.
+     *
+     * @param string $to             recipient e-mail address (must be non-empty)
+     * @param array  $user           user data; keys: nrp, username, nama_lengkap, email
+     * @param string $status         'Approved' or 'Rejected'
+     * @param string $reason         rejection reason (only used when Rejected)
+     * @param string $reviewedByName name of the administrator who reviewed the request
+     * @param string $reviewDate     review timestamp
+     */
+    public function sendUserRegistrationResult(string $to, array $user, string $status, string $reason = '', string $reviewedByName = '', string $reviewDate = ''): bool
+    {
+        if (trim($to) === '') {
+            error_log('[MailService] sendUserRegistrationResult skipped: recipient e-mail is empty.');
+            return false;
+        }
+
+        $status = ($status === 'Approved') ? 'Approved' : 'Rejected';
+        $subject = ($status === 'Approved')
+            ? 'User Registration Approved'
+            : 'User Registration Rejected';
+
+        try {
+            $config = mail_config();
+
+            $html = $this->renderTemplate('user_registration_result.php', [
+                'user'             => $user,
+                'config'           => $config,
+                'logo_url'         => $this->logoPath() !== '' ? 'cid:' . self::LOGO_CID : '',
+                'approval_status'  => $status,
+                'rejection_reason' => trim((string)$reason),
+                'reviewed_by'      => trim((string)$reviewedByName),
+                'review_date'      => trim((string)$reviewDate),
+            ]);
+
+            return $this->send($to, $subject, $html);
+        } catch (\Throwable $e) {
+            error_log('[MailService] sendUserRegistrationResult failed: ' . $e->getMessage());
+            return false;
+        }
     }
 }

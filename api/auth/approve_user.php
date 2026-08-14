@@ -70,6 +70,21 @@ if ($status === 'APPROVED') {
         $update->bind_param('sssi', $dupReason, $me['nrp'], $me['username'], $id);
         $update->execute();
         $update->close();
+
+        // Notify the applicant that their request was automatically rejected.
+        try {
+            MailService::instance()->sendUserRegistrationResult(
+                (string)$rowEmail,
+                ['nrp' => $rowNrp, 'username' => $rowUsername, 'nama_lengkap' => $rowNamaLengkap, 'email' => $rowEmail],
+                'Rejected',
+                $dupReason,
+                (string)$me['username'],
+                date('Y-m-d H:i:s')
+            );
+        } catch (\Throwable $t) {
+            error_log('[approve_user] auto-reject notification failed: ' . $t->getMessage());
+        }
+
         json_response(['status' => 'error', 'message' => 'NRP sudah terdaftar di sistem. Permintaan ditolak otomatis.']);
     }
 
@@ -90,6 +105,21 @@ if ($status === 'APPROVED') {
     $update->close();
 
     AuditService::log($conn, 'Approved User Registration', 'user_approvals', $id, ['nrp' => $rowNrp, 'username' => $rowUsername, 'by' => $me['nrp']]);
+
+    // Notify the newly registered user that their account is now active.
+    try {
+        MailService::instance()->sendUserRegistrationResult(
+            (string)$rowEmail,
+            ['nrp' => $rowNrp, 'username' => $rowUsername, 'nama_lengkap' => $rowNamaLengkap, 'email' => $rowEmail],
+            'Approved',
+            '',
+            (string)$me['username'],
+            date('Y-m-d H:i:s')
+        );
+    } catch (\Throwable $t) {
+        error_log('[approve_user] approval notification failed: ' . $t->getMessage());
+    }
+
     json_response(['status' => 'success', 'message' => 'Akun ' . $rowUsername . ' disetujui dan aktif.']);
 }
 
@@ -100,4 +130,19 @@ $update->execute();
 $update->close();
 
 AuditService::log($conn, 'Rejected User Registration', 'user_approvals', $id, ['nrp' => $rowNrp, 'username' => $rowUsername, 'by' => $me['nrp'], 'reason' => $reason]);
+
+// Notify the applicant that their registration was rejected.
+try {
+    MailService::instance()->sendUserRegistrationResult(
+        (string)$rowEmail,
+        ['nrp' => $rowNrp, 'username' => $rowUsername, 'nama_lengkap' => $rowNamaLengkap, 'email' => $rowEmail],
+        'Rejected',
+        $reason,
+        (string)$me['username'],
+        date('Y-m-d H:i:s')
+    );
+} catch (\Throwable $t) {
+    error_log('[approve_user] rejection notification failed: ' . $t->getMessage());
+}
+
 json_response(['status' => 'success', 'message' => 'Permintaan pendaftaran ' . $rowUsername . ' ditolak.']);

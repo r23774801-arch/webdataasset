@@ -85,9 +85,23 @@ if ($user) {
         }
     }
 
+    // Persist the request so the admin dashboard can show a pending badge
+    // (password_reset_requests). Best-effort: the notification from the Login
+    // page must never fail just because the tracking insert did.
+    try {
+        $ins = $conn->prepare("INSERT INTO password_reset_requests (nrp, username, email, status, requested_at) VALUES (?, ?, ?, 'Pending', NOW())");
+        if ($ins) {
+            $ins->bind_param('sss', $user['nrp'], $user['username'], $user['email']);
+            $ins->execute();
+            $ins->close();
+        }
+    } catch (\Throwable $t) {
+        error_log('[request_password_reset] tracking insert failed: ' . $t->getMessage());
+    }
+
     AuditService::log($conn, 'Password Reset Request', 'users', null, [
-        'nrp'      => $user['nrp'],
-        'username' => $user['username'],
+        'nrp'         => $user['nrp'],
+        'username'    => $user['username'],
         'emails_sent' => $sent,
         'admins'      => count($admins),
     ]);
