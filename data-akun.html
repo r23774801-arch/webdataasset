@@ -336,6 +336,7 @@
                         <col style="min-width:140px">
                         <col style="min-width:160px">
                         <col style="min-width:100px">
+                        <col style="min-width:140px">
                         <col style="min-width:120px">
                         <col style="min-width:430px">
                     </colgroup>
@@ -345,12 +346,13 @@
                             <th>NRP / ID</th>
                             <th>Username</th>
                             <th>Role</th>
+                            <th>Area</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
 <tbody id="tabelAkun">
-                        <tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
+                        <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ut-muted);">Memuat data...</td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -565,6 +567,7 @@ function statusBadge(status) {
                 <td>${esc(user.nrp)}</td>
                 <td>${esc(user.username)}</td>
                 <td>${roleBadge(user.role)}</td>
+                <td>${isAdminRole ? 'All Areas' : (esc(user.area) || '-')}</td>
                 <td>${statusBadge(user.status)}</td>
                 <td>${actionCell}</td>
             </tr>`;

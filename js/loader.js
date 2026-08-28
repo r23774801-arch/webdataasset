@@ -307,25 +307,24 @@ if (document.readyState === 'loading') {
 
 // ==========================================
 // SHARED RBAC — ADD/MANAGE PERMISSION (Phase 4.5.3)
-// One rule used by every asset-management page:
-//   admin → false (monitoring/approval only — no add/edit/delete)
-//   any other logged-in role → true (manages both IT and GA data)
+// All authenticated roles, including ADMIN, may open Asset Action for IT/GA.
+// Endpoint-specific rules still protect edit, approval, and Finish Stocktaking.
 // ==========================================
 function canManageData(type) {
     const role = (localStorage.getItem('userRole') || '').toLowerCase();
-    if (role === 'admin') return false;
     return role !== '' && ['it', 'ga'].includes(String(type || '').toLowerCase());
 }
 window.canManageData = canManageData;
 
 // ==========================================
 // SHARED RBAC — CREATE-ONLY PERMISSION (Phase 4.x)
-// Admin may ADD new assets (IT and GA), but stays read-only for
-// editing / action / stocktaking (that is still canManageData=false).
+// All authenticated roles may add new IT/GA assets.
 // ==========================================
 function canAddAsset(type) {
-    const role = (localStorage.getItem('userRole') || '').toLowerCase();
-    return role !== '' && ['it', 'ga'].includes(String(type || '').toLowerCase());
+    // Do not couple asset creation to a cached client-side role. The server
+    // session is authoritative and the create endpoints call require_login().
+    return sessionStorage.getItem('isLoggedIn') === 'true'
+        && ['it', 'ga'].includes(String(type || '').toLowerCase());
 }
 window.canAddAsset = canAddAsset;
 

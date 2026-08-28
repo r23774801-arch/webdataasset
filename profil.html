@@ -597,6 +597,13 @@
                                     <span id="profilRole">-</span>
                                 </div>
                             </div>
+                            <div class="profil-field">
+                                <label>Area</label>
+                                <div class="profil-readonly">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11z"></path><circle cx="12" cy="10" r="2"></circle></svg>
+                                    <span id="profilArea">-</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -739,6 +746,12 @@
                 .then(function(r) { return r.json(); })
                 .then(function(res) {
                     if (res.status === 'success' && res.data) {
+                        var areaEl = document.getElementById('profilArea');
+                        if (areaEl) {
+                            areaEl.textContent = String(res.data.role || role).toUpperCase() === 'ADMIN'
+                                ? 'All Areas'
+                                : (res.data.area || '-');
+                        }
                         if (res.data.email) {
                             emailInput.value = res.data.email;
                         } else if (emailReminder) {

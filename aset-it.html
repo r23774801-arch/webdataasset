@@ -837,8 +837,7 @@
         syncAssetCreationLock();
 
         // RBAC: Add button visible to roles that may create IT assets.
-        // Admin is also allowed to add (see canAddAsset in js/loader.js); the
-        // Action/edit buttons remain hidden for Admin via canManageData.
+        // Admin is also allowed to add and access Asset Action.
         if (typeof window.canAddAsset === 'function' && !window.canAddAsset('it')) {
             const btnTambah = document.querySelector('button[onclick="bukaModalTambah()"]');
             if (btnTambah) btnTambah.style.display = 'none';
@@ -1156,8 +1155,8 @@
                     ? `<img src="${esc(imgPath)}" alt="Attachment" width="40" height="40" style="object-fit: cover; border-radius: var(--ut-radius-sm); cursor: pointer;" onclick="previewImage(this.dataset.src)" data-src="${esc(imgPath)}">`
                     : '<span class="text-muted" style="font-size:12px;">No Image</span>');
 
-            // Action button â€” hidden for ADMIN (monitoring/approval only, per the
-            // shared RBAC rule). For IT/GA it is disabled only when the whole
+            // Action is available to every authenticated role. For IT/GA it is
+            // disabled only when the whole
             // stocktaking session is locked (Pending/Approved submission).
             const canAct = typeof window.canManageData === 'function' ? window.canManageData('it') : true;
             const submissionRejected = !!(window.stocktakingSubmission && window.stocktakingSubmission.status === 'Rejected');

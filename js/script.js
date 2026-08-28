@@ -345,7 +345,7 @@ async function handleRegister() {
             })
         });
 
-        const result = await response.json();
+        const result = await readBackendResponse(response);
         toggleLoader(false);
         
         showToast(result.message, result.status === "success" ? "success" : "error");
@@ -362,11 +362,45 @@ async function handleRegister() {
     } catch (error) {
         toggleLoader(false);
         console.error("Error:", error);
-        showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
+        showToast(error.message || "Terjadi kesalahan saat menghubungi server backend.", "error");
     }
 }
 
 /// --- Logika Login Menggunakan PHP & MySQL ---
+async function readBackendResponse(response) {
+    const body = await response.text();
+    let result;
+
+    try {
+        result = JSON.parse(body);
+    } catch (error) {
+        const contentType = response.headers.get('content-type') || '';
+        console.error('Respons backend bukan JSON:', {
+            url: response.url,
+            status: response.status,
+            contentType,
+            preview: body.slice(0, 500)
+        });
+
+        if (response.status === 404) {
+            throw new Error('Endpoint backend tidak ditemukan (HTTP 404). Pastikan folder api ikut di-upload dan struktur folder tidak berubah.');
+        }
+        if (response.status === 403) {
+            throw new Error('Akses backend ditolak hosting (HTTP 403). Periksa aturan .htaccess dan permission file.');
+        }
+        if (response.status >= 500) {
+            throw new Error(`Backend mengalami error server (HTTP ${response.status}). Periksa PHP error log di panel hosting.`);
+        }
+        throw new Error(`Respons backend tidak valid (HTTP ${response.status || 'tidak diketahui'}).`);
+    }
+
+    if (!response.ok && !result.message) {
+        throw new Error(`Backend mengembalikan HTTP ${response.status}.`);
+    }
+
+    return result;
+}
+
 async function handleLogin() {
     const nrp = document.getElementById('loginNrp').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
@@ -398,7 +432,7 @@ async function handleLogin() {
             })
         });
 
-        const result = await response.json();
+        const result = await readBackendResponse(response);
         toggleLoader(false);
         
         if (result.status === "success") {
@@ -427,7 +461,7 @@ async function handleLogin() {
     } catch (error) {
         toggleLoader(false);
         console.error("Error:", error);
-        showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
+        showToast(error.message || "Terjadi kesalahan saat menghubungi server backend.", "error");
     }
 }
 
@@ -449,7 +483,7 @@ async function handleForgotPassword() {
             body: JSON.stringify({ nrp: nrp, username: username })
         });
 
-        const result = await response.json();
+        const result = await readBackendResponse(response);
         toggleLoader(false);
 
         showToast(result.message, result.status === "success" ? "success" : "error");
@@ -462,6 +496,6 @@ async function handleForgotPassword() {
     } catch (error) {
         toggleLoader(false);
         console.error("Error:", error);
-        showToast("Terjadi kesalahan saat menghubungi server backend.", "error");
+        showToast(error.message || "Terjadi kesalahan saat menghubungi server backend.", "error");
     }
 }

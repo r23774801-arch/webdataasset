@@ -31,17 +31,12 @@ class BarangService
     /**
      * Whether the given role may create/edit/delete records of this type.
      *
-     * All non-ADMIN roles manage both IT and GA records; ADMIN is
-     * monitoring/approval only — enforced here as defense-in-depth in addition
-     * to the deny_admin_transaction() guard on every barang endpoint.
+     * Barang Masuk/Keluar is restricted to ADMIN for both IT and GA.
      */
     public static function canManage(string $role, string $type): bool
     {
         $role = strtoupper($role);
-        if ($role === 'ADMIN' || $role === '') {
-            return false;
-        }
-        return in_array(strtolower($type), self::TYPES, true);
+        return $role === 'ADMIN' && in_array(strtolower($type), self::TYPES, true);
     }
 
     /**

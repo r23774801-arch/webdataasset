@@ -36,11 +36,8 @@ if (!in_array($table_type, ['it', 'ga'], true)) {
 // Determine table name
 $table = ($table_type === 'it') ? 'aset_it' : 'aset_ga';
 
-// RBAC: Admin cannot change stocktaking data (admin only approves).
-if ($userRole === 'ADMIN') {
-    echo json_encode(["status" => "error", "message" => "Akses ditolak. Admin hanya dapat menyetujui stocktaking, tidak dapat mengubah data stocktaking."]);
-    exit;
-}
+// Every authenticated role, including ADMIN, may process an Asset Action.
+// Approval and Finish Stocktaking keep their own endpoint-specific guards.
 
 // PHASE 4.15 â€” session lock: the entire stocktaking session (all actions:
 // submit_action, create_document, transfer, update_utilisasi) is locked while

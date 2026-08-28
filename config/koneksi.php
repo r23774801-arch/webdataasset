@@ -40,10 +40,17 @@ $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: '';
 $db   = getenv('DB_NAME') ?: 'db_ut_assets';
 
-$conn = new mysqli($host, $user, $pass, $db);
-
-if ($conn->connect_error) {
-    error_log('[koneksi] database connection failed: ' . $conn->connect_error);
-    echo json_encode(["status" => "error", "message" => "Koneksi database gagal."]);
+try {
+    $conn = new mysqli($host, $user, $pass, $db);
+    $conn->set_charset('utf8mb4');
+} catch (mysqli_sql_exception $exception) {
+    // PHP 8.1+ can throw here before connect_error can be inspected. Keep the
+    // credential-bearing technical detail in the server log, not the response.
+    error_log('[koneksi] database connection failed: ' . $exception->getMessage());
+    http_response_code(503);
+    echo json_encode([
+        "status" => "error",
+        "message" => "Koneksi database hosting gagal. Periksa DB_HOST, DB_USER, DB_PASS, DB_NAME, dan hak akses user database.",
+    ]);
     exit;
 }

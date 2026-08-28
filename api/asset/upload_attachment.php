@@ -1,12 +1,12 @@
 <?php
 header('Content-Type: application/json');
 
-// Authentication: uploads are only allowed for authenticated, non-ADMIN
-// transaction roles. Admin is monitoring/approval only.
+// Authentication: this shared uploader is used by non-ADMIN stocktaking flows
+// and by the ADMIN-only Barang Masuk/Keluar flows. Record-level endpoints keep
+// enforcing the appropriate role before an uploaded file can be attached.
 session_start();
 require_once __DIR__ . '/../../app/bootstrap.php';
 require_login();
-deny_admin_transaction();
 require_once __DIR__ . '/../../config/upload.php';
 
 $cfg = upload_config();

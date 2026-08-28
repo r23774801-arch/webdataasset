@@ -6,8 +6,9 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../../config/koneksi.php';
 require_once __DIR__ . '/../../app/bootstrap.php';
 
-// RBAC + CSRF: All non-ADMIN roles may add assets. ADMIN is monitoring/approval only.
-deny_admin_transaction();
+// Every authenticated role, including ADMIN, may create a new asset.
+// Other asset transactions remain protected by deny_admin_transaction().
+require_login();
 
 // Phase 4.11 — asset-type-wide lock: no new IT assets while an IT stocktaking
 // cycle is Pending or Approved (single source of truth: stocktaking_submissions.status).
